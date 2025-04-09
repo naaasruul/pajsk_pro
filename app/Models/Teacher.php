@@ -25,4 +25,8 @@ class Teacher extends Model
     {
         return $this->hasOne(Club::class);
     }
+
+    public function activities() {
+        return $this->belongsToMany(Activity::class);
+    }
 }

@@ -26,4 +26,9 @@ class Student extends Model
     {
         return $this->belongsToMany(Club::class);
     }
+
+    public function activities()
+    {
+        return $this->belongsToMany(Activity::class);
+    }
 }
