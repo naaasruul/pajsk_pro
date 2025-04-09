@@ -26,7 +26,8 @@ Route::middleware('auth')->group(function () {
     });
 
     // Routes accessible by teachers only
-    Route::middleware('role:teacher')->group(function () {
+    ///////////////////// ! development mode, allow admin to access this route, remove 'admin' once prod
+    Route::middleware('role:teacher|admin')->group(function () {
         Route::prefix('cocuriculum')->name('cocuriculum.')->group(function () {
             Route::get('/', [CocuriculumController::class, 'index'])->name('index');
             Route::get('/create', [CocuriculumController::class, 'create'])->name('create');
