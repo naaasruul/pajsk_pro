@@ -20,14 +20,14 @@
 
 
             {{-- ADMIN SIDEBAR --}}
-            @if(auth()->user()->hasRole('admin'))
+            @hasrole('admin')
             <x-sidebar-item :route="route('teachers.index')" :role="request()->routeIs('teachers.*')">Teachers
             </x-sidebar-item>
-            @endif
+            @endhasrole
 
 
             {{-- TEACHER SIDEBAR --}}
-            @if(auth()->user()->hasRole('admin') || auth()->user()->hasRole('teacher'))
+            @hasanyrole('teacher|admin')
             <button type="button"
                 class="flex items-center w-full p-2 text-base text-gray-900 transition duration-75 rounded-lg group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
                 aria-controls="dropdown-example" data-collapse-toggle="dropdown-student">
@@ -45,7 +45,7 @@
                     SEGAK</x-sidebar-item>
             </ul>
 
-           <button type="button"
+            <button type="button"
                 class="flex items-center w-full p-2 text-base text-gray-900 transition duration-75 rounded-lg group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
                 aria-controls="dropdown-example" data-collapse-toggle="dropdown-activity">
                 <span class="flex-1 ms-3 text-left rtl:text-right whitespace-nowrap">Activities</span>
@@ -66,7 +66,7 @@
 
             <x-sidebar-item :route="route('students.index')" :role="request()->routeIs('students.*')">Report
             </x-sidebar-item>
-            @endif
+            @endhasanyrole
 
 
 
