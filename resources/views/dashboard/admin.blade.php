@@ -8,11 +8,11 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {{-- Total Students --}}
-                <x-card title="3" user="Student" />
+                <x-card title="3" content="Student" />
                 {{-- Total Teachers --}}
-                <x-card title="3" user="Techer" />
+                <x-card title="3" content="Teacher" />
                 {{-- Total New Applications --}}
-                <x-card title="3" user="New Applications" />
+                <x-card title="3" content="New Applications" />
             </div>
         </div>
 

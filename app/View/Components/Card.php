@@ -9,14 +9,14 @@ use Illuminate\Contracts\View\View;
 class Card extends Component
 {
     public $title;
-    public $user;
+    public $content;
     /**
      * Create a new component instance.
      */
-    public function __construct($title='',$user='' )
+    public function __construct($title='',$content='' )
     {
         $this->title = $title;
-        $this->user = $user;
+        $this->content = $content;
     }
 
 
