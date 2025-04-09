@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('activities', function (Blueprint $table) {
             $table->id();
             $table->foreignId('involvement_type_id')->constrained()->onDelete('cascade');
-            $table->foreignId('achievements_id')->constrained()->onDelete('cascade');
+            $table->foreignId('achievement_id')->constrained()->onDelete('cascade');
             $table->string('activity_name');
             $table->string('activity_place');
             $table->string('levels');
