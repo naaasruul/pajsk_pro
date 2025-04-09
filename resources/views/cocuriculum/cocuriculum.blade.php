@@ -1,14 +1,20 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            {{ __('Co-Curriculum') }}
-        </h2>
+        <div class="flex justify-between items-center">
+            <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
+                {{ __('Co-Curriculum') }}
+            </h2>
+            <a href="{{ route('cocuriculum.create') }}"
+                class="inline-flex items-center px-4 py-2 bg-gray-800 dark:bg-gray-200 border border-transparent rounded-md font-semibold text-xs text-white dark:text-gray-800 uppercase tracking-widest hover:bg-gray-700 dark:hover:bg-white focus:bg-gray-700 dark:focus:bg-white active:bg-gray-900 dark:active:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                {{ __('Create New') }}
+            </a>
+        </div>
     </x-slot>
 
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-                <div class=" text-gray-900 dark:text-gray-100">
+                <div class="p-6 text-gray-900 dark:text-gray-100">
                     <h2 class="text-4xl font-extrabold dark:text-white">Kelab Alam Sekitar</h2>
                     <p class="my-2 text-lg text-gray-500">Kelab Persatuan</p>
                     <div class="grid grid-cols-3 gap-4">
@@ -19,91 +25,80 @@
                 </div>
             </div>
 
-
-
-
             <x-container>
+                <div class="mb-4 flex flex-col md:flex-row gap-4">
+                    <div class="w-full md:w-1/4">
+                        <label for="class" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Class</label>
+                        <select id="class" name="class" onchange="updateFilters()"
+                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                            <option value="">All Classes</option>
+                            @foreach($classes as $class)
+                                <option value="{{ $class }}" {{ request('class') == $class ? 'selected' : '' }}>
+                                    {{ $class }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="w-full md:w-1/4">
+                        <label for="activity" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Activity</label>
+                        <select id="activity" name="activity" onchange="updateFilters()"
+                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                            <option value="">All Activities</option>
+                            @foreach($activityTypes as $type)
+                                <option value="{{ $type }}" {{ request('activity') == $type ? 'selected' : '' }}>
+                                    {{ $type }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+
                 <div class="relative z-0 overflow-x-auto">
                     <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
                         <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                             <tr>
-                                <th scope="col" class="px-6 py-3">
-                                    #
-                                </th>
-                                <th scope="col" class="px-6 py-3">
-                                    Name
-                                </th>
-                                <th scope="col" class="px-6 py-3">
-                                    No Maktab
-                                </th>
-                                <th scope="col" class="px-6 py-3">
-                                    Class
-                                </th>
-                                <th scope="col" class="px-6 py-3">
-                                    Activity
-                                </th>
-                                <th scope="col" class="px-6 py-3">
-                                    Marks
-                                </th>
-                                <th scope="col" class="px-6 py-3">
-
-                                </th>
+                                <th scope="col" class="px-6 py-3">#</th>
+                                <th scope="col" class="px-6 py-3">Name</th>
+                                <th scope="col" class="px-6 py-3">No Maktab</th>
+                                <th scope="col" class="px-6 py-3">Class</th>
+                                <th scope="col" class="px-6 py-3">Activity</th>
+                                <th scope="col" class="px-6 py-3">Marks</th>
+                                <th scope="col" class="px-6 py-3"></th>
                             </tr>
                         </thead>
                         <tbody>
+                            @forelse($activities as $activity)
                             <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200">
-                                <th scope="row"
-                                    class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                                    1
+                                <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                                    {{ $activities->firstItem() + $loop->index }}
                                 </th>
+                                <td class="px-6 py-4">{{ $activity->student->user->name }}</td>
+                                <td class="px-6 py-4">{{ $activity->no_maktab }}</td>
+                                <td class="px-6 py-4">{{ $activity->class }}</td>
+                                <td class="px-6 py-4">{{ $activity->activity }}</td>
+                                <td class="px-6 py-4">{{ $activity->marks }}</td>
                                 <td class="px-6 py-4">
-                                    Nasrulhaq Hidayat
-                                </td>
-                                <td class="px-6 py-4">
-                                    BCS2211-035
-                                </td>
-                                <td class="px-6 py-4">
-                                    DCS
-                                </td>
-                                <td class="px-6 py-4">
-                                    Syarahan Kelab
-                                </td>
-                                <td class="px-6 py-4">
-                                    86
-                                </td>
-                             <td class="px-6 py-4">
-                                    <a href="#" class="font-medium text-blue-600 dark:text-blue-500 hover:underline">Edit</a>
-                                    <a href="#" class="font-medium text-red-600 dark:text-red-500 hover:underline ms-3">Remove</a>
+                                    <a href="{{ route('cocuriculum.edit', $activity) }}" class="font-medium text-blue-600 dark:text-blue-500 hover:underline">Edit</a>
+                                    <form action="{{ route('cocuriculum.destroy', $activity) }}" method="POST" class="inline">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="font-medium text-red-600 dark:text-red-500 hover:underline ms-3">Remove</button>
+                                    </form>
                                 </td>
                             </tr>
-
+                            @empty
+                            <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200">
+                                <td colspan="7" class="px-6 py-4 text-center">No activities found.</td>
+                            </tr>
+                            @endforelse
                         </tbody>
                     </table>
                     <nav class="flex items-center flex-column flex-wrap md:flex-row justify-between pt-4" aria-label="Table navigation">
-                        <span class="text-sm font-normal text-gray-500 dark:text-gray-400 mb-4 md:mb-0 block w-full md:inline md:w-auto">Showing <span class="font-semibold text-gray-900 dark:text-white">1-10</span> of <span class="font-semibold text-gray-900 dark:text-white">1000</span></span>
-                        <ul class="inline-flex -space-x-px rtl:space-x-reverse text-sm h-8">
-                            <li>
-                                <a href="#" class="flex items-center justify-center px-3 h-8 ms-0 leading-tight text-gray-500 bg-white border border-gray-300 rounded-s-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">Previous</a>
-                            </li>
-                            <li>
-                                <a href="#" class="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">1</a>
-                            </li>
-                            <li>
-                                <a href="#" class="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">2</a>
-                            </li>
-                            <li>
-                                <a href="#" aria-current="page" class="flex items-center justify-center px-3 h-8 text-blue-600 border border-gray-300 bg-blue-50 hover:bg-blue-100 hover:text-blue-700 dark:border-gray-700 dark:bg-gray-700 dark:text-white">3</a>
-                            </li>
-                            <li>
-                                <a href="#" class="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">4</a>
-                            </li>
-                            <li>
-                                <a href="#" class="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">5</a>
-                            </li>
-                            <li>
-                        <a href="#" class="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 rounded-e-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">Next</a>
-                            </li>
-                        </ul>
+                        <span class="text-sm font-normal text-gray-500 dark:text-gray-400 mb-4 md:mb-0 block w-full md:inline md:w-auto">
+                            Showing <span class="font-semibold text-gray-900 dark:text-white">{{ $activities->firstItem() ?? 0 }}-{{ $activities->lastItem() ?? 0 }}</span> of 
+                            <span class="font-semibold text-gray-900 dark:text-white">{{ $activities->total() }}</span>
+                        </span>
+                        {{ $activities->withQueryString()->links() }}
                     </nav>
                 </div>
             </x-container>
@@ -287,5 +282,29 @@
 
         </div>
     </div>
-    <script src="{{ asset('js/simple-db.js') }}"></script>
+
+    @push('scripts')
+    <script>
+        function updateFilters() {
+            const classValue = document.getElementById('class').value;
+            const activityValue = document.getElementById('activity').value;
+            
+            let url = new URL(window.location.href);
+            
+            if (classValue) {
+                url.searchParams.set('class', classValue);
+            } else {
+                url.searchParams.delete('class');
+            }
+            
+            if (activityValue) {
+                url.searchParams.set('activity', activityValue);
+            } else {
+                url.searchParams.delete('activity');
+            }
+            
+            window.location.href = url.toString();
+        }
+    </script>
+    @endpush
 </x-app-layout>
