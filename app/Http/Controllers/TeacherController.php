@@ -12,7 +12,7 @@ class TeacherController extends Controller
 {
     public function index()
     {
-        $teachers = Teacher::with('user')->get();
+        $teachers = Teacher::with('user')->paginate(10);
         return view('teacher.index', compact('teachers'));
     }
 

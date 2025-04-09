@@ -18,9 +18,9 @@
                                 <select id="student_id" name="student_id" required
                                     class="mt-1 block w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm">
                                     <option value="">Select Student</option>
-                                    @foreach(\App\Models\Student::with('user')->get() as $student)
+                                    @foreach($students as $student)
                                         <option value="{{ $student->id }}" {{ old('student_id') == $student->id ? 'selected' : '' }}>
-                                            {{ $student->user->name }} - {{ $student->no_maktab }}
+                                            {{ $student->user->name }} - {{ $student->class }}
                                         </option>
                                     @endforeach
                                 </select>

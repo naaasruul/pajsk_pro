@@ -41,5 +41,8 @@
                 @endforelse
             </tbody>
         </table>
+        <div class="mt-4">
+            <x-paginator :paginator="$teachers" />
+        </div>
     </div>
 </x-app-layout>
