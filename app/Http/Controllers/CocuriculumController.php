@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\CocuriculumActivity;
+use App\Models\Student;
 use Illuminate\Http\Request;
 
 class CocuriculumController extends Controller
@@ -31,7 +32,9 @@ class CocuriculumController extends Controller
 
     public function create()
     {
-        return view('cocuriculum.create');
+        // get all students
+        $students = Student::with('user')->get();
+        return view('cocuriculum.create', compact('students'));
     }
 
     public function store(Request $request)
