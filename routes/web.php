@@ -4,10 +4,10 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\TeacherController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\CocuriculumController;
+use App\Http\Controllers\ExtraCocuriculumController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
-use App\Http\Controllers\Cocuriculum;
-use App\Http\Controllers\ExtraCocuriculum;
 
 Route::get('/', [AuthenticatedSessionController::class, 'create'])
         ->name('login');
@@ -26,9 +26,16 @@ Route::middleware('auth')->group(function () {
     });
 
     // Routes accessible by teachers only
-    Route::middleware('role:teacher')->prefix('cocuriculum')->name('cocuriculum.')->group(function () {
-        Route::get('/', [Cocuriculum::class, 'index'])->name('index');
-        Route::get('/extra-cocuriculum', [ExtraCocuriculum::class, 'index'])->name('index.extra-cocuriculum');
+    Route::middleware('role:teacher')->group(function () {
+        Route::prefix('cocuriculum')->name('cocuriculum.')->group(function () {
+            Route::get('/', [CocuriculumController::class, 'index'])->name('index');
+            Route::get('/create', [CocuriculumController::class, 'create'])->name('create');
+            Route::post('/', [CocuriculumController::class, 'store'])->name('store');
+            Route::get('/{cocuriculum}/edit', [CocuriculumController::class, 'edit'])->name('edit');
+            Route::put('/{cocuriculum}', [CocuriculumController::class, 'update'])->name('update');
+            Route::delete('/{cocuriculum}', [CocuriculumController::class, 'destroy'])->name('destroy');
+            Route::get('/extra-cocuriculum', [ExtraCocuriculumController::class, 'index'])->name('extra-cocuriculum');
+        });
     });
 
     // Routes accessible by admin only
