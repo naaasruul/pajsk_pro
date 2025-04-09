@@ -54,12 +54,12 @@
                 </svg>
             </button>
             <ul id="dropdown-activity" class="hidden py-2 space-y-2">
-                <x-sidebar-item class="pl-11" :route="route('cocuriculum.index')" :role="request()->routeIs('cocuriculum.*')">Co-curiculum
+                <x-sidebar-item class="pl-11" :route="route('cocuriculum.index')" :role="request()->routeIs('cocuriculum.index')">Co-curiculum
                 </x-sidebar-item>
-                <x-sidebar-item class="pl-11" :route="route('cocuriculum.index.extra-cocuriculum')" :role="request()->routeIs('cocuriculum.*')">Extra
+                <x-sidebar-item class="pl-11" :route="route('cocuriculum.extra-cocuriculum')" :role="request()->routeIs('cocuriculum.extra-cocuriculum')">Extra
                     Co-curiculum
                 </x-sidebar-item>
-                <x-sidebar-item class="pl-11" :route="route('students.index')" :role="request()->routeIs('students.*')">
+                <x-sidebar-item class="pl-11" :route="route('students.index')" :role="request()->routeIs('students.index')">
                     Presentations
                 </x-sidebar-item>
             </ul>
