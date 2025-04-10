@@ -5,7 +5,7 @@ namespace Database\Seeders;
 use App\Models\Commitment;
 use Illuminate\Database\Seeder;
 
-class ClubPositionSeeder extends Seeder
+class CommitmentSeeder extends Seeder
 {
     /**
      * Run the database seeds.

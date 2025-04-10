@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Attendance;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -37,12 +38,15 @@ class DatabaseSeeder extends Seeder
         $userStudent->assignRole('student');
 
         $this->call([
-            StudentSeeder::class,
-            TeacherSeeder::class,
-            CocurriculumSeeder::class,
             AchievementSeeder::class,
+            AttendanceSeeder::class,
             ClubPositionSeeder::class,
             ClubSeeder::class,
+            CocurriculumSeeder::class,
+            CommitmentSeeder::class,
+            ServiceContributionSeeder::class,
+            StudentSeeder::class,
+            TeacherSeeder::class,
         ]);
     }
 }
