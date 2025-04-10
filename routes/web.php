@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Activity\ActivityController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\TeacherController;
@@ -36,6 +37,14 @@ Route::middleware('auth')->group(function () {
             Route::put('/{cocuriculum}', [CocuriculumController::class, 'update'])->name('update');
             Route::delete('/{cocuriculum}', [CocuriculumController::class, 'destroy'])->name('destroy');
             Route::get('/extra-cocuriculum', [ExtraCocuriculumController::class, 'index'])->name('extra-cocuriculum');
+        });
+        Route::prefix('activity')->name('activity.')->group(function () {
+            Route::get('/', [ActivityController::class, 'index'])->name('index');
+            Route::get('/create', [ActivityController::class, 'create'])->name('create');
+            Route::post('/', [ActivityController::class, 'store'])->name('store');
+            Route::get('/{activity}/edit', [ActivityController::class, 'edit'])->name('edit');
+            Route::put('/{activity}', [ActivityController::class, 'update'])->name('update');
+            Route::delete('/{activity}', [ActivityController::class, 'destroy'])->name('destroy');
         });
     });
 
