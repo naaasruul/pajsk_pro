@@ -9,12 +9,15 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
+    // JADUAL 7/8: jenis penglibatan, skor elemen penglibatan
     public function up(): void
     {
         Schema::create('involvement_types', function (Blueprint $table) {
             $table->id();
-            $table->string('type');
-            $table->string('description');
+            $table->integer('involvement_type'); // 1 = Penglibatan I, 2 = Penglibatan II, 3 = Penglibatan III
+            $table->string('involvement_stage'); // Antarabangsa, Kebangsaan, Negeri, Bahagian, Daerah
+            $table->string('involvement_score');
+            $table->string('description')->nullable(); // "penglibatan I/II/III"
             $table->timestamps();
         });
     }
