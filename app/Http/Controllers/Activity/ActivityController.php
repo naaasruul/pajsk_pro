@@ -3,9 +3,12 @@
 namespace App\Http\Controllers\Activity;
 
 use App\Http\Controllers\Controller;
+use App\Models\Club;
 use Illuminate\Http\Request;
 use App\Models\CocuriculumActivity;
+use App\Models\InvolvementType;
 use App\Models\Student;
+use App\Models\Teacher;
 
 class ActivityController extends Controller
 {
@@ -38,18 +41,30 @@ class ActivityController extends Controller
      * Show the form for creating a new resource.
      */
     public function create()
-{
-    // Get the logged-in teacher
-    $teacher = auth()->user()->teacher;
+    {
+        // Get the logged-in teacher
+        $teacher = auth()->user()->teacher;
 
-    // Get all students
-    $students = Student::with('user')->get();
+        // Get all involvement types
+        $involvementTypes = InvolvementType::all();
 
-    // Get all teachers
-    $teachers = \App\Models\Teacher::with('user')->get();
+        // Get all students
+        $students = Student::with('user')->get();
 
-    return view('cocuriculum.create-activity', compact('teacher', 'students', 'teachers'));
-}
+        // Get all teachers
+        $teachers = Teacher::with('user')->get();
+
+        // Get all clubs
+        $clubs = Club::all();
+
+        return view('cocuriculum.create-activity', compact(
+            'teacher', 
+            'students', 
+            'teachers',
+            'involvementTypes',
+            'clubs'
+        ));
+    }
     /**
      * Store a newly created resource in storage.
      */
