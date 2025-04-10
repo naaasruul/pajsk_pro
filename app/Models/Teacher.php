@@ -11,6 +11,7 @@ class Teacher extends Model
 
     protected $fillable = [
         'user_id',
+        'club_id',
         'address',
         'phone_number',
         'home_number'
@@ -23,10 +24,11 @@ class Teacher extends Model
 
     public function club()
     {
-        return $this->hasOne(Club::class);
+        return $this->belongsTo(Club::class, 'club_id'); // Reference the club_id column
     }
 
-    public function activities() {
+    public function activities()
+    {
         return $this->belongsToMany(Activity::class);
     }
 }
