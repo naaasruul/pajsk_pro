@@ -28,18 +28,61 @@
 
             <!-- Step 1: Activity Details -->
             <div class="step-content" data-step="1">
+
+                {{-- COLUMN 1 --}}
                 <div class="mt-6">
                     <label for="represent" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Select
                         an option</label>
-                    <select id="countries"
+                        <select id="represent"
+                        name="represent"
                         class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-                        <option selected>Choose one</option>
+                        <option value="Menghadiri" selected>Menghadiri</option>
                         <option value="Menerima Anugerah Cemerlang">Menerima Anugerah Cemerlang</option>
-                        <option value="Menghadiri">Menghadiri</option>
                         <option value="Menyertai">Menyertai</option>
                         <option value="Mewakili Daerah dalam">Mewakili Daerah dalam</option>
                     </select>
                 </div>
+                
+                {{-- COLUMN 2 --}}
+                <div class="mt-6">
+                    <label for="represent" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                        Select Involvement Type
+                    </label>
+                    <select id="involvement"
+                    name="involvement"
+                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                    @foreach ( $involvementTypes as $involvementType )
+                    <option value="Menghadiri" selected>{{ $involvementType->description }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
+                {{-- COLUMN 3 --}}
+                <div class="mt-6">
+                    <label for="represent" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                        Select Club
+                    </label>
+                    <select id="club" name="club"
+                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                        @foreach ( $clubs as $club )
+                        <option value="Menghadiri" selected>{{ $club->club_name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
+                {{-- COLUMN 4 --}}
+                <div class="mt-6">
+                    <label for="represent" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                        Select Club
+                    </label>
+                    <select id="club" name="club"
+                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                        @foreach ( $clubs as $club )
+                        <option value="Menghadiri" selected>{{ $club->club_name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
 
                 {{-- <div class="mt-6">
                     <x-input-label for="activity_name" :value="__('Activity Name')" />
