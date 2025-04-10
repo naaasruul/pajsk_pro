@@ -3,8 +3,12 @@
 namespace App\Http\Controllers\Activity;
 
 use App\Http\Controllers\Controller;
+use App\Models\Club;
 use Illuminate\Http\Request;
 use App\Models\CocuriculumActivity;
+use App\Models\InvolvementType;
+use App\Models\Student;
+use App\Models\Teacher;
 
 class ActivityController extends Controller
 {
@@ -15,9 +19,9 @@ class ActivityController extends Controller
     {
         //
         $query = CocuriculumActivity::with('student.user');
-        
+
         if ($request->has('class')) {
-                $query->where('class', $request->class);
+            $query->where('class', $request->class);
         }
 
         if ($request->has('activity')) {
@@ -25,11 +29,11 @@ class ActivityController extends Controller
         }
 
         $activities = $query->orderBy('created_at', 'desc')->paginate(10);
-        
+
         // Get unique values for filters
         $classes = CocuriculumActivity::distinct()->pluck('class');
         $activityTypes = CocuriculumActivity::distinct()->pluck('activity');
-        
+
         return view('cocuriculum.activity', compact('activities', 'classes', 'activityTypes'));
     }
 
@@ -38,9 +42,29 @@ class ActivityController extends Controller
      */
     public function create()
     {
-        //
-    }
+        // Get the logged-in teacher
+        $teacher = auth()->user()->teacher;
 
+        // Get all involvement types
+        $involvementTypes = InvolvementType::all();
+
+        // Get all students
+        $students = Student::with('user')->get();
+
+        // Get all teachers
+        $teachers = Teacher::with('user')->get();
+
+        // Get all clubs
+        $clubs = Club::all();
+
+        return view('cocuriculum.create-activity', compact(
+            'teacher', 
+            'students', 
+            'teachers',
+            'involvementTypes',
+            'clubs'
+        ));
+    }
     /**
      * Store a newly created resource in storage.
      */
@@ -56,13 +80,13 @@ class ActivityController extends Controller
 
         CocuriculumActivity::create($validated);
 
-        return redirect()->route('cocuriculum.index')
+        return redirect()->route('activity.index')
             ->with('success', 'Activity created successfully.');
     }
 
-    
 
-    
+
+
 
     /**
      * Display the specified resource.
