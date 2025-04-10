@@ -10,7 +10,8 @@ use Illuminate\Http\Request;
 class CocuriculumController extends Controller
 {
     public function index(Request $request)
-    {
+    {   
+        
         $query = CocuriculumActivity::with('student.user');
 
         if ($request->has('class')) {
@@ -27,7 +28,11 @@ class CocuriculumController extends Controller
         $classes = CocuriculumActivity::distinct()->pluck('class');
         $activityTypes = CocuriculumActivity::distinct()->pluck('activity');
 
-        return view('cocuriculum.cocuriculum', compact('activities', 'classes', 'activityTypes'));
+        // Get the logged-in teacher's club details
+        $teacher = auth()->user()->teacher; // Assuming the logged-in user is a teacher
+        $club = $teacher ? $teacher->club : null;
+
+        return view('cocuriculum.cocuriculum', compact('activities', 'classes', 'activityTypes','club'));
     }
 
     public function create()
