@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Models\ClubPosition;
 use App\Models\CocuriculumActivity;
 use App\Models\Student;
 use Illuminate\Http\Request;
@@ -10,29 +11,45 @@ use Illuminate\Http\Request;
 class CocuriculumController extends Controller
 {
     public function index(Request $request)
-    {   
-        
-        $query = CocuriculumActivity::with('student.user');
-
-        if ($request->has('class')) {
-            $query->where('class', $request->class);
-        }
-
-        if ($request->has('activity')) {
-            $query->where('activity', $request->activity);
-        }
-
-        $activities = $query->orderBy('created_at', 'desc')->paginate(10);
-        
-        // Get unique values for filters
-        $classes = CocuriculumActivity::distinct()->pluck('class');
-        $activityTypes = CocuriculumActivity::distinct()->pluck('activity');
-
-        // Get the logged-in teacher's club details
+    {
         $teacher = auth()->user()->teacher; // Assuming the logged-in user is a teacher
         $club = $teacher ? $teacher->club : null;
 
-        return view('cocuriculum.cocuriculum', compact('activities', 'classes', 'activityTypes','club'));
+        // Preload all students with their positions
+        $studentsWithPositions = $club ? $club->students->map(function ($student) {
+            $position = $student->pivot->club_position_id
+                ? ClubPosition::find($student->pivot->club_position_id)
+                : null;
+
+            return [
+                'id' => $student->id,
+                'name' => $student->user->name,
+                'position_name' => $position ? $position->position_name : 'No Position',
+            ];
+        }) : [];
+
+
+
+        return view('cocuriculum.cocuriculum', compact('club', 'studentsWithPositions'));
+        // return view('cocuriculum.cocuriculum', compact('activities', 'classes', 'activityTypes','club'));
+        // $query = CocuriculumActivity::with('student.user');
+
+        // if ($request->has('class')) {
+        //     $query->where('class', $request->class);
+        // }
+
+        // if ($request->has('activity')) {
+        //     $query->where('activity', $request->activity);
+        // }
+
+        // $activities = $query->orderBy('created_at', 'desc')->paginate(10);
+
+        // // Get unique values for filters
+        // $classes = CocuriculumActivity::distinct()->pluck('class');
+        // $activityTypes = CocuriculumActivity::distinct()->pluck('activity');
+
+        // Get the logged-in teacher's club details
+
     }
 
     public function create()
