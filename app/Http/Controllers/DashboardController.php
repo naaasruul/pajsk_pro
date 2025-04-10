@@ -18,6 +18,7 @@ class DashboardController extends Controller
             return view('dashboard.student');
         }
 
-        return view('dashboard');
+        // Return back with an error message
+        return back()->withErrors(['error' => 'You do not have access to the dashboard.']);
     }
 }
