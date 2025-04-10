@@ -4,9 +4,9 @@
             <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
                 {{ __('Activity') }}
             </h2>
-            <a href="{{ route('cocuriculum.create') }}"
+            <a href="{{ route('activity.create') }}"
                 class="inline-flex items-center px-4 py-2 bg-gray-800 dark:bg-gray-200 border border-transparent rounded-md font-semibold text-xs text-white dark:text-gray-800 uppercase tracking-widest hover:bg-gray-700 dark:hover:bg-white focus:bg-gray-700 dark:focus:bg-white active:bg-gray-900 dark:active:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
-                {{ __('Create New') }}
+                {{ __('Request New Activity') }}
             </a>
         </div>
     </x-slot>
@@ -49,12 +49,17 @@
                         <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                             <tr>
                                 <th scope="col" class="px-6 py-3">#</th>
-                                <th scope="col" class="px-6 py-3">Name</th>
-                                <th scope="col" class="px-6 py-3">No Maktab</th>
-                                <th scope="col" class="px-6 py-3">Class</th>
-                                <th scope="col" class="px-6 py-3">Activity</th>
-                                <th scope="col" class="px-6 py-3">Marks</th>
-                                <th scope="col" class="px-6 py-3"></th>
+                                <th scope="col" class="px-6 py-3">Activity Name</th>
+                                {{-- BORANG ASAS --}}
+                                {{-- BORANG Mo1/Mo2 --}}
+                                {{-- BORANG KEBENARAN IBU BAPA --}}
+                                {{-- SIJIL PENGHARGAAN --}}
+                                {{-- NO BORANG --}}
+                                {{-- DATE --}}
+                                <th scope="col" class="px-6 py-3">Date</th>
+                                {{-- EDIT --}}
+                                {{-- LAPOR PENCAPAIAN (UPDATE PLACEMENT) --}}
+                                {{-- DELETE) --}}
                             </tr>
                         </thead>
                         <tbody>
@@ -84,6 +89,8 @@
                             @endforelse
                         </tbody>
                     </table>
+
+
                     <nav class="flex items-center flex-column flex-wrap md:flex-row justify-between pt-4" aria-label="Table navigation">
                         <span class="text-sm font-normal text-gray-500 dark:text-gray-400 mb-4 md:mb-0 block w-full md:inline md:w-auto">
                             Showing <span class="font-semibold text-gray-900 dark:text-white">{{ $activities->firstItem() ?? 0 }}-{{ $activities->lastItem() ?? 0 }}</span> of 
