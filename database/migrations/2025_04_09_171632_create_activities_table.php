@@ -14,10 +14,9 @@ return new class extends Migration
         Schema::create('activities', function (Blueprint $table) {
             $table->id();
             $table->foreignId('involvement_type_id')->constrained()->onDelete('cascade');
-            $table->foreignId('achievement_id')->constrained()->onDelete('cascade');
-            $table->string('activity_name');
+            $table->foreignId('achievement_score_id')->constrained()->onDelete('cascade');
+            $table->foreignId('placement_score_id')->constrained()->onDelete('cascade');
             $table->string('activity_place');
-            $table->string('levels');
             $table->string('category');
             $table->dateTime('datetime_start');
             $table->dateTime('datetime_end');
