@@ -43,7 +43,6 @@ class DatabaseSeeder extends Seeder
             AchievementSeeder::class,
             ClubPositionSeeder::class,
             ClubSeeder::class,
-            
         ]);
     }
 }
