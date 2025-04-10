@@ -29,6 +29,13 @@ class Student extends Model
                     ->withTimestamps();
     }
 
+    public function uniformedBodies()
+    {
+        return $this->belongsToMany(UniformedBody::class, 'club_student')
+                    ->withPivot('uniformed_body_position_id') // Include position in the pivot table
+                    ->withTimestamps();
+    }
+
     public function activities()
     {
         return $this->belongsToMany(Activity::class);

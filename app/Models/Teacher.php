@@ -27,6 +27,11 @@ class Teacher extends Model
         return $this->belongsTo(Club::class, 'club_id'); // Reference the club_id column
     }
 
+    public function uniformedBody()
+    {
+        return $this->belongsTo(UniformedBody::class, 'uniformed_body_id'); // Reference the club_id column
+    }
+
     public function activities()
     {
         return $this->belongsToMany(Activity::class);
