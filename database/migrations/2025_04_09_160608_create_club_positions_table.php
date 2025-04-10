@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('club_positions', function (Blueprint $table) {
             $table->id();
             $table->string('position_name');
+            $table->integer('point'); // Add point column
             $table->timestamps();
         });
     }
