@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Activity;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\CocuriculumActivity;
+use App\Models\Student;
 
 class ActivityController extends Controller
 {
@@ -15,9 +16,9 @@ class ActivityController extends Controller
     {
         //
         $query = CocuriculumActivity::with('student.user');
-        
+
         if ($request->has('class')) {
-                $query->where('class', $request->class);
+            $query->where('class', $request->class);
         }
 
         if ($request->has('activity')) {
@@ -25,11 +26,11 @@ class ActivityController extends Controller
         }
 
         $activities = $query->orderBy('created_at', 'desc')->paginate(10);
-        
+
         // Get unique values for filters
         $classes = CocuriculumActivity::distinct()->pluck('class');
         $activityTypes = CocuriculumActivity::distinct()->pluck('activity');
-        
+
         return view('cocuriculum.activity', compact('activities', 'classes', 'activityTypes'));
     }
 
@@ -37,10 +38,18 @@ class ActivityController extends Controller
      * Show the form for creating a new resource.
      */
     public function create()
-    {
-        //
-    }
+{
+    // Get the logged-in teacher
+    $teacher = auth()->user()->teacher;
 
+    // Get all students
+    $students = Student::with('user')->get();
+
+    // Get all teachers
+    $teachers = \App\Models\Teacher::with('user')->get();
+
+    return view('cocuriculum.create-activity', compact('teacher', 'students', 'teachers'));
+}
     /**
      * Store a newly created resource in storage.
      */
@@ -56,13 +65,13 @@ class ActivityController extends Controller
 
         CocuriculumActivity::create($validated);
 
-        return redirect()->route('cocuriculum.index')
+        return redirect()->route('activity.index')
             ->with('success', 'Activity created successfully.');
     }
 
-    
 
-    
+
+
 
     /**
      * Display the specified resource.
