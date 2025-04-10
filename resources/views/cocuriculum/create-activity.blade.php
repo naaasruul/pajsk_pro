@@ -85,8 +85,6 @@
 
             <!-- Step 2: Teachers List -->
             <div class="step-content hidden" data-step="2">
-
-
                 <div class="relative overflow-x-auto shadow-md sm:rounded-lg mt-6">
                     <div
                         class="flex items-center justify-between flex-column flex-wrap md:flex-row space-y-4 md:space-y-0 pb-4 bg-transparent ">
@@ -159,7 +157,7 @@
                                 <th scope="col" class="px-6 py-3">
                                     Phone Number
                                 </th>
-                              
+
                                 <th scope="col" class="px-6 py-3">
                                     Action
                                 </th>
@@ -168,7 +166,7 @@
                         <tbody>
                             @foreach($teachers as $teacher)
                             <tr
-                                class="child-tr bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600">
+                                class="teacher-tr bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600">
                                 <td class="w-4 p-4">
                                     <div class="flex items-center">
                                         <input id="checkbox-table-search-{{ $teacher->id }}" type="checkbox"
@@ -189,7 +187,8 @@
                                     {{ $teacher->phone_number }}
                                 </td>
                                 <td class="px-6 py-4">
-                                    <button type="button" data-teacher-id="{{ $teacher->id }}" class="assign-leader-btn font-medium text-blue-600 dark:text-blue-500 hover:underline">
+                                    <button type="button" data-teacher-id="{{ $teacher->id }}"
+                                        class="assign-leader-btn font-medium text-blue-600 dark:text-blue-500 hover:underline">
                                         Assign Leader
                                     </button>
                                 </td>
@@ -197,30 +196,96 @@
                             @endforeach
 
                         </tbody>
-                        
+
                     </table>
                     <nav aria-label="Page navigation example" class="flex items-center justify-end py-4 px-4">
-                        <ul class="inline-flex -space-x-px text-base h-10" id="pagination-buttons">
-                          <li>
-                            <a href="#" class="flex items-center justify-center px-4 h-10 ms-0 leading-tight text-gray-500 bg-white border border-e-0 border-gray-300 rounded-s-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">Previous</a>
-                          </li>
+                        <ul class="inline-flex -space-x-px text-base h-10" id="pagination-buttons-teacher">
+                            <li>
+                                <a href="#"
+                                    class="flex items-center justify-center px-4 h-10 ms-0 leading-tight text-gray-500 bg-white border border-e-0 border-gray-300 rounded-s-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">Previous</a>
+                            </li>
                         </ul>
-                      </nav>
-                    {{-- <div class="my-4 px-3" ></div> --}}
+                    </nav>
+                    {{-- <div class="my-4 px-3"></div> --}}
                 </div>
 
             </div>
 
             <!-- Step 3: Students List -->
             <div class="step-content hidden" data-step="3">
-                <div class="mt-6">
-                    <x-input-label for="student_ids" :value="__('Select Students')" />
-                    <select id="student_ids" name="student_ids[]" multiple
-                        class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
-                        @foreach($students as $student)
-                        <option value="{{ $student->id }}">{{ $student->user->name }}</option>
-                        @endforeach
-                    </select>
+                <div class="relative overflow-x-auto shadow-md sm:rounded-lg mt-6">
+                    <div
+                        class="flex items-center justify-end flex-column flex-wrap md:flex-row space-y-4 md:space-y-0 pb-4 bg-transparent">
+                        <div>
+                            <label for="student-search" class="sr-only">Search</label>
+                            <div class="relative">
+                                <div
+                                    class="absolute inset-y-0 rtl:inset-r-0 start-0 flex items-center ps-3 pointer-events-none">
+                                    <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true"
+                                        xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+                                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                            stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" />
+                                    </svg>
+                                </div>
+                                <input type="text" id="student-search"
+                                    class="block p-2 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg w-80 bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                    placeholder="Search for students">
+                            </div>
+                        </div>
+                    </div>
+                    <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+                        <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                            <tr>
+                                <th scope="col" class="p-4">
+                                    <div class="flex items-center">
+                                        <input id="checkbox-all-students" type="checkbox"
+                                            class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded-sm focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:focus:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                                        <label for="checkbox-all-students" class="sr-only">checkbox</label>
+                                    </div>
+                                </th>
+                                <th scope="col" class="px-6 py-3">Name</th>
+                                <th scope="col" class="px-6 py-3">Email</th>
+                                <th scope="col" class="px-6 py-3">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($students as $student)
+                            <tr
+                                class="student-tr bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600">
+                                <td class="w-4 p-4">
+                                    <div class="flex items-center">
+                                        <input id="checkbox-student-{{ $student->id }}" type="checkbox"
+                                            class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded-sm focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:focus:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                                        <label for="checkbox-student-{{ $student->id }}"
+                                            class="sr-only">checkbox</label>
+                                    </div>
+                                </td>
+                                <th scope="row"
+                                    class="flex items-center px-6 py-4 text-gray-900 whitespace-nowrap dark:text-white">
+                                    <div class="ps-3">
+                                        <div class="text-base font-semibold">{{ $student->user->name }}</div>
+                                        <div class="font-normal text-gray-500">{{ $student->user->email }}</div>
+                                    </div>
+                                </th>
+                                <td class="px-6 py-4">{{ $student->user->email }}</td>
+                                <td class="px-6 py-4">
+                                    <button type="button" data-student-id="{{ $student->id }}"
+                                        class="assign-student-leader-btn font-medium text-blue-600 dark:text-blue-500 hover:underline">
+                                        Assign Leader
+                                    </button>
+                                </td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                    <nav aria-label="Page navigation example" class="flex items-center justify-end py-4 px-4">
+                        <ul class="inline-flex -space-x-px text-base h-10" id="pagination-buttons-student">
+                            <li>
+                                <a href="#"
+                                    class="flex items-center justify-center px-4 h-10 ms-0 leading-tight text-gray-500 bg-white border border-e-0 border-gray-300 rounded-s-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">Previous</a>
+                            </li>
+                        </ul>
+                    </nav>
                 </div>
             </div>
 
@@ -246,10 +311,11 @@
 
     @push('scripts')
     <script src="{{ asset('js/activity-stepper.js') }}"></script>
-    <script src="{{ asset('js/add-teacher-list.js') }}"></script>
+    <script src="{{ asset('js/add-teachers-list.js') }}"></script>
+    <script src="{{ asset('js/add-students-list.js') }}"></script>
 
-  
-  
+
+
 
     @endpush
 </x-app-layout>
