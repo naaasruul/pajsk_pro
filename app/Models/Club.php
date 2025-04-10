@@ -12,13 +12,14 @@ class Club extends Model
     ];
 
     public function teachers()
-{
-    return $this->hasMany(Teacher::class, 'club_id'); // Reference the club_id column
-}
+    {
+        return $this->hasMany(Teacher::class, 'club_id'); // Reference the club_id column
+    }
 
     public function students()
     {
-        return $this->belongsToMany(Student::class);
+        return $this->belongsToMany(Student::class, 'club_student')
+            ->withPivot('club_position_id') // Include position in the pivot table
+            ->withTimestamps();
     }
-
 }
