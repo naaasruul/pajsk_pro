@@ -15,8 +15,8 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900 dark:text-gray-100">
-                    <h2 class="text-4xl font-extrabold dark:text-white">Kelab Alam Sekitar</h2>
-                    <p class="my-2 text-lg text-gray-500">Kelab Persatuan</p>
+                    <h2 class="text-4xl font-extrabold dark:text-white">{{ $club->club_name ?? 'No Club' }}</h2>
+                    <p class="my-2 text-lg text-gray-500">{{ $club->category ?? '' }}</p>
                     <div class="grid grid-cols-3 gap-4">
                         <x-card title="23" content="Male" />
                         <x-card title="22" content="Female" />
