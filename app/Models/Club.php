@@ -7,15 +7,14 @@ use Illuminate\Database\Eloquent\Model;
 class Club extends Model
 {
     protected $fillable = [
-        'position_name',
-        'teacher_id',
+        'club_name',
         'category',
     ];
 
-    public function teacher()
-    {
-        return $this->belongsTo(Teacher::class);
-    }
+    public function teachers()
+{
+    return $this->hasMany(Teacher::class, 'club_id'); // Reference the club_id column
+}
 
     public function students()
     {
