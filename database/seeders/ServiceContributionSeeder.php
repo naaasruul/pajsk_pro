@@ -3,9 +3,9 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use App\Models\Service;
+use App\Models\ServiceContribution;
 
-class ClubPositionSeeder extends Seeder
+class ServiceContributionSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -20,7 +20,7 @@ class ClubPositionSeeder extends Seeder
         ];
 
         foreach ($services as $service) {
-            Service::create($service);
+            ServiceContribution::create($service);
         }
     }
 }
