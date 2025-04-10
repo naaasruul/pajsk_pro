@@ -21,13 +21,27 @@
 
             {{-- ADMIN SIDEBAR --}}
             @hasrole('admin')
-            <x-sidebar-item :route="route('teachers.index')" :role="request()->routeIs('teachers.*')">Teachers
-            </x-sidebar-item>
+            <button type="button"
+                class="flex items-center w-full p-2 text-base text-gray-900 transition duration-75 rounded-lg group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
+                aria-controls="dropdown-example" data-collapse-toggle="dropdown-user">
+                <span class="flex-1 ms-3 text-left rtl:text-right whitespace-nowrap">Users</span>
+                <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
+                    viewBox="0 0 10 6">
+                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="m1 1 4 4 4-4" />
+                </svg>
+            </button>
+            <ul id="dropdown-user" class="hidden py-2 space-y-2">
+                <x-sidebar-item class="pl-11" :route="route('teachers.index')" :role="request()->routeIs('teachers.*')">Teachers</x-sidebar-item>
+            <x-sidebar-item class="pl-11" :route="route('students.index')" :role="request()->routeIs('students.*')">Students</x-sidebar-item>
+              
+            </ul>
             @endhasrole
 
 
             {{-- TEACHER SIDEBAR --}}
-            @hasanyrole('teacher|admin')
+            {{-- @hasanyrole('teacher|admin') --}}
+            @hasanyrole('teacher')
             <button type="button"
                 class="flex items-center w-full p-2 text-base text-gray-900 transition duration-75 rounded-lg group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
                 aria-controls="dropdown-example" data-collapse-toggle="dropdown-student">
