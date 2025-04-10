@@ -1,71 +1,86 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            {{ __('Add Co-Curriculum Activity') }}
+            {{ __('Request New Activity') }}
         </h2>
     </x-slot>
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900 dark:text-gray-100">
-                    <form method="POST" action="{{ route('cocuriculum.store') }}" class="space-y-6">
-                        @csrf
+    <x-container>
+        <h2 class="text-4xl font-extrabold dark:text-white">Activity Applications</h2>
+        <p class="my-2 text-lg text-gray-500">Please fill out the form below to submit a new activity application.
+            Ensure all required fields are completed accurately to avoid delays in processing your request.
+        </p>
 
-                        <div class="space-y-4">
-                            <div>
-                                <x-input-label for="student_id" :value="__('Student')" />
-                                <select id="student_id" name="student_id" required
-                                    class="mt-1 block w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm">
-                                    <option value="">Select Student</option>
-                                    @foreach($students as $student)
-                                        <option value="{{ $student->id }}" {{ old('student_id') == $student->id ? 'selected' : '' }}>
-                                            {{ $student->user->name }} - {{ $student->class }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                                <x-input-error :messages="$errors->get('student_id')" class="mt-2" />
-                            </div>
+        <div class="mt-5">
+            <!-- Stepper -->
+            <ol id="stepper" class="flex items-center w-full text-sm font-medium text-center text-gray-500 dark:text-gray-400 sm:text-base">
+                <x-step-item  step="1" label="Activity Details" :active="true" />
+                <x-step-item  step="2" label="Teachers List" :active="false" />
+                <x-step-item  step="3" label="Students List" :active="false" />
+                <x-step-item  step="4" label="Submission" :active="false" />
+            </ol>
+        </div>
 
-                            <div>
-                                <x-input-label for="no_maktab" :value="__('No Maktab')" />
-                                <x-text-input id="no_maktab" name="no_maktab" type="text" class="mt-1 block w-full"
-                                    :value="old('no_maktab')" required />
-                                <x-input-error :messages="$errors->get('no_maktab')" class="mt-2" />
-                            </div>
+        <!-- Form -->
+        <form id="activity-form" method="POST" action="{{ route('activity.store') }}">
+            @csrf
 
-                            <div>
-                                <x-input-label for="class" :value="__('Class')" />
-                                <x-text-input id="class" name="class" type="text" class="mt-1 block w-full"
-                                    :value="old('class')" required />
-                                <x-input-error :messages="$errors->get('class')" class="mt-2" />
-                            </div>
-
-                            <div>
-                                <x-input-label for="activity" :value="__('Activity')" />
-                                <x-text-input id="activity" name="activity" type="text" class="mt-1 block w-full"
-                                    :value="old('activity')" required />
-                                <x-input-error :messages="$errors->get('activity')" class="mt-2" />
-                            </div>
-
-                            <div>
-                                <x-input-label for="marks" :value="__('Marks')" />
-                                <x-text-input id="marks" name="marks" type="number" class="mt-1 block w-full"
-                                    :value="old('marks')" required min="0" max="100" />
-                                <x-input-error :messages="$errors->get('marks')" class="mt-2" />
-                            </div>
-                        </div>
-
-                        <div class="mt-6 flex items-center gap-4">
-                            <x-primary-button>{{ __('Save Activity') }}</x-primary-button>
-                            <a href="{{ route('cocuriculum.index') }}"
-                                class="inline-flex items-center px-4 py-2 bg-gray-800 dark:bg-gray-200 border border-transparent rounded-md font-semibold text-xs text-white dark:text-gray-800 uppercase tracking-widest hover:bg-gray-700 dark:hover:bg-white focus:bg-gray-700 dark:focus:bg-white active:bg-gray-900 dark:active:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
-                                {{ __('Cancel') }}
-                            </a>
-                        </div>
-                    </form>
+            <!-- Step 1: Activity Details -->
+            <div class="step-content" data-step="1">
+                <div class="mt-6">
+                    <x-input-label for="activity_name" :value="__('Activity Name')" />
+                    <x-text-input id="activity_name" name="activity_name" type="text" class="mt-1 block w-full"  />
+                </div>
+                <div class="mt-6">
+                    <x-input-label for="activity_date" :value="__('Activity Date')" />
+                    <x-text-input id="activity_date" name="activity_date" type="date" class="mt-1 block w-full"  />
                 </div>
             </div>
-        </div>
-    </div>
+
+            <!-- Step 2: Teachers List -->
+            <div class="step-content hidden" data-step="2">
+                <div class="mt-6">
+                    <x-input-label for="teacher_id" :value="__('Select Teacher')" />
+                    <select id="teacher_id" name="teacher_id" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
+                        <option value="">Select a Teacher</option>
+                        @foreach($teachers as $teacher)
+                            <option value="{{ $teacher->id }}">{{ $teacher->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+            </div>
+
+            <!-- Step 3: Students List -->
+            <div class="step-content hidden" data-step="3">
+                <div class="mt-6">
+                    <x-input-label for="student_ids" :value="__('Select Students')" />
+                    <select id="student_ids" name="student_ids[]" multiple class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
+                        @foreach($students as $student)
+                            <option value="{{ $student->id }}">{{ $student->user->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+            </div>
+
+            <!-- Step 4: Submission -->
+            <div class="step-content hidden" data-step="4">
+                <div class="mt-6">
+                    <p class="text-lg text-gray-700 dark:text-gray-300">Review your details and click "Submit" to complete the process.</p>
+                </div>
+            </div>
+
+            <!-- Navigation Buttons -->
+            <div class="mt-6 flex justify-between">
+                <button type="button" id="prev-button" class="text-white hidden bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">Previous</button>
+                <button type="button" id="next-button" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">Next</button>
+                <button type="button" id="submit-button" class="text-white hidden bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">Submit</button>
+            </div>
+        </form>
+    </x-container>
+
+          @push('scripts')
+    <script src="{{ asset('js/activity-stepper.js') }}"></script>
+        
+    </script>
+    @endpush
 </x-app-layout>
