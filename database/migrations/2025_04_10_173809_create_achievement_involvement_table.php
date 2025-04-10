@@ -10,7 +10,7 @@ class CreateAchievementInvolvementTable extends Migration
         Schema::create('achievement_involvement', function (Blueprint $table) {
             $table->id();
             $table->foreignId('achievement_id')->constrained()->onDelete('cascade');
-            $table->foreignId('involvement_types_id')->constrained()->onDelete('cascade');
+            $table->foreignId('involvement_type_id')->constrained()->onDelete('cascade');
             $table->integer('score');
             $table->timestamps();
         });
