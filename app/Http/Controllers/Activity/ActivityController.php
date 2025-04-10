@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Activity;
 
 use App\Http\Controllers\Controller;
+use App\Models\Achievement;
 use App\Models\Club;
 use Illuminate\Http\Request;
 use App\Models\CocuriculumActivity;
@@ -57,12 +58,16 @@ class ActivityController extends Controller
         // Get all clubs
         $clubs = Club::all();
 
+        // Get all achievement types
+        $achievementTypes = Achievement::all();
+
         return view('cocuriculum.create-activity', compact(
             'teacher', 
             'students', 
             'teachers',
             'involvementTypes',
-            'clubs'
+            'clubs',
+            'achievementTypes'
         ));
     }
     /**

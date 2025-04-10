@@ -73,25 +73,15 @@
                 {{-- COLUMN 4 --}}
                 <div class="mt-6">
                     <label for="represent" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                        Select Club
+                        Select Achievement Stage
                     </label>
                     <select id="club" name="club"
                         class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-                        @foreach ( $clubs as $club )
-                        <option value="Menghadiri" selected>{{ $club->club_name }}</option>
+                        @foreach ( $achievementTypes as $achievementType )
+                        <option value="Menghadiri" selected>{{ $achievementType->achievement_name }}</option>
                         @endforeach
                     </select>
                 </div>
-
-
-                {{-- <div class="mt-6">
-                    <x-input-label for="activity_name" :value="__('Activity Name')" />
-                    <x-text-input id="activity_name" name="activity_name" type="text" class="mt-1 block w-full" />
-                </div>
-                <div class="mt-6">
-                    <x-input-label for="activity_date" :value="__('Activity Date')" />
-                    <x-text-input id="activity_date" name="activity_date" type="date" class="mt-1 block w-full" />
-                </div> --}}
             </div>
 
             <!-- Step 2: Teachers List -->
