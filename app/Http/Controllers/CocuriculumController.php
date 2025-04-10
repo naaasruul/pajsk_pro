@@ -31,24 +31,7 @@ class CocuriculumController extends Controller
 
 
         return view('cocuriculum.cocuriculum', compact('club', 'studentsWithPositions'));
-        // return view('cocuriculum.cocuriculum', compact('activities', 'classes', 'activityTypes','club'));
-        // $query = CocuriculumActivity::with('student.user');
-
-        // if ($request->has('class')) {
-        //     $query->where('class', $request->class);
-        // }
-
-        // if ($request->has('activity')) {
-        //     $query->where('activity', $request->activity);
-        // }
-
-        // $activities = $query->orderBy('created_at', 'desc')->paginate(10);
-
-        // // Get unique values for filters
-        // $classes = CocuriculumActivity::distinct()->pluck('class');
-        // $activityTypes = CocuriculumActivity::distinct()->pluck('activity');
-
-        // Get the logged-in teacher's club details
+        
 
     }
 
