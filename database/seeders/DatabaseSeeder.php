@@ -40,6 +40,10 @@ class DatabaseSeeder extends Seeder
             StudentSeeder::class,
             TeacherSeeder::class,
             CocurriculumSeeder::class,
+            AchievementSeeder::class,
+            ClubPositionSeeder::class,
+            ClubSeeder::class,
+            
         ]);
     }
 }
