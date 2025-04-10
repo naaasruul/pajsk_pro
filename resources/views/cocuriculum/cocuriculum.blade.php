@@ -25,7 +25,41 @@
                 </div>
             </div>
 
+            {{-- TABLE STUDENTS CLUB --}}
             <x-container>
+                <h3 class="text-2xl font-bold dark:text-white mt-6">Students in {{ $club->club_name }}</h3>
+                <div class="relative z-0 overflow-x-auto mt-4">
+                    <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+                        <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                            <tr>
+                                <th scope="col" class="px-6 py-3">#</th>
+                                <th scope="col" class="px-6 py-3">Name</th>
+                                <th scope="col" class="px-6 py-3">Position</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse($studentsWithPositions as $index => $student)
+                            <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200">
+                                <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                                    {{ $index + 1 }}
+                                </th>
+                                <td class="px-6 py-4">{{ $student['name'] }}</td>
+                                <td class="px-6 py-4">{{ $student['position_name'] }}</td>
+
+                            </tr>
+                            @empty
+                            <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200">
+                                <td colspan="3" class="px-6 py-4 text-center">No students found in this club.</td>
+                            </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </x-container>
+
+
+            {{-- TABLE TO SHOW ACTIVITIES --}}
+            {{-- <x-container>
                 <div class="mb-4 flex flex-col md:flex-row gap-4">
                     <div class="w-full md:w-1/4">
                         <label for="class" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Class</label>
@@ -101,7 +135,7 @@
                         {{ $activities->withQueryString()->links() }}
                     </nav>
                 </div>
-            </x-container>
+            </x-container> --}}
 
 
             {{-- IF USE DATATABLES --}}
