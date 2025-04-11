@@ -4,6 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Teacher extends Model
 {
@@ -17,12 +20,12 @@ class Teacher extends Model
         'home_number'
     ];
 
-    public function user()
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
-    public function club()
+    public function club(): BelongsTo
     {
         return $this->belongsTo(Club::class, 'club_id'); // Reference the club_id column
     }
@@ -32,8 +35,14 @@ class Teacher extends Model
         return $this->belongsTo(UniformedBody::class, 'uniformed_body_id'); // Reference the club_id column
     }
 
-    public function activities()
+    public function activities(): BelongsToMany
     {
-        return $this->belongsToMany(Activity::class);
+        return $this->belongsToMany(Activity::class)
+            ->withTimestamps();
+    }
+
+    public function evaluations(): HasMany
+    {
+        return $this->hasMany(Evaluation::class);
     }
 }

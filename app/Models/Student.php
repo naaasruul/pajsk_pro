@@ -4,6 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Student extends Model
 {
@@ -14,15 +17,15 @@ class Student extends Model
         'address',
         'phone_number',
         'home_number',
-        'class'
+        'class',
     ];
 
-    public function user()
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
-    public function clubs()
+    public function clubs(): BelongsToMany
     {
         return $this->belongsToMany(Club::class, 'club_student')
                     ->withPivot('club_position_id') // Include position in the pivot table
@@ -36,8 +39,15 @@ class Student extends Model
                     ->withTimestamps();
     }
 
-    public function activities()
+    public function evaluations(): HasMany
     {
-        return $this->belongsToMany(Activity::class);
+        return $this->hasMany(Evaluation::class);
+    }
+
+    public function activities(): BelongsToMany
+    {
+        return $this->belongsToMany(Activity::class, 'activity_student')
+                    ->withPivot(['achievement_id', 'placement_id'])
+                    ->withTimestamps();
     }
 }
