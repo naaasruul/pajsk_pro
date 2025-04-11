@@ -3,6 +3,8 @@
 namespace Database\Seeders;
 
 use App\Models\Attendance;
+use App\Models\Student;
+use App\Models\Teacher;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -36,17 +38,32 @@ class DatabaseSeeder extends Seeder
             'password' => bcrypt('password'),
         ]);
         $userStudent->assignRole('student');
+        
+        $userStudent = Student::create([
+            'user_id' => $userStudent->id,
+            'phone_number' => fake()->phoneNumber(),
+            'home_number' => fake()->phoneNumber(),
+            'address' => fake()->address(),
+            'class' => rand(1,6) . ' ' . fake()->word(),
+        ]);
 
         $this->call([
             AchievementSeeder::class,
-            AttendanceSeeder::class,
             ClubPositionSeeder::class,
             ClubSeeder::class,
             CocurriculumSeeder::class,
-            CommitmentSeeder::class,
-            ServiceContributionSeeder::class,
             StudentSeeder::class,
             TeacherSeeder::class,
+            ScoringTablesSeeder::class,
+            ClubStudentSeeder::class,
+        ]);
+
+        $userTeacher = Teacher::create([
+            'user_id' => $userTeacher->id,
+            'club_id' => 1,
+            'address' => fake()->address(),
+            'phone_number' => fake()->phoneNumber(),
+            'home_number' => fake()->phoneNumber(),
         ]);
     }
 }
