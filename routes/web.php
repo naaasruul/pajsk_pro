@@ -7,6 +7,8 @@ use App\Http\Controllers\TeacherController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\CocuriculumController;
 use App\Http\Controllers\ExtraCocuriculumController;
+use App\Http\Controllers\ClubController;
+use App\Http\Controllers\PAJSKController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 
@@ -45,6 +47,26 @@ Route::middleware('auth')->group(function () {
             Route::get('/{activity}/edit', [ActivityController::class, 'edit'])->name('edit');
             Route::put('/{activity}', [ActivityController::class, 'update'])->name('update');
             Route::delete('/{activity}', [ActivityController::class, 'destroy'])->name('destroy');
+        });
+    });
+
+    // Routes accessible by teachers only
+    Route::middleware('role:teacher')->group(function () {
+        Route::prefix('club')->name('club.')->group(function () {
+            Route::get('/', [ClubController::class, 'index'])->name('index');
+            Route::get('/add-student', [ClubController::class, 'showAddStudentForm'])->name('add-student');
+            Route::post('/add-student', [ClubController::class, 'addStudent'])->name('store-student');
+            Route::delete('/remove-student/{student}', [ClubController::class, 'removeStudent'])->name('remove-student');
+        });
+    });
+
+    // Routes accessible by teachers only
+    Route::middleware('role:teacher')->group(function () {
+        Route::prefix('pajsk')->name('pajsk.')->group(function () {
+            Route::get('/', [PAJSKController::class, 'index'])->name('index');
+            Route::get('/evaluate-pajsk/{student}', [PAJSKController::class, 'evaluateStudent'])->name('evaluate-student');
+            Route::get('/evaluate-student/{student}', [PAJSKController::class, 'evaluateStudent'])->name('evaluate-student');
+            Route::post('/evaluate-student/{student}', [PAJSKController::class, 'storeEvaluation'])->name('store-evaluation');
         });
     });
 
