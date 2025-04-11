@@ -26,49 +26,117 @@
                     </div>
 
                     <form method="POST" action="{{ route('pajsk.store-evaluation', $student) }}" 
-                        x-data="{ 
-                            selectedCommitments: [], 
-                            maxCommitments: 4,
-                            attendanceScore: 0,
-                            positionScore: {{ $position ? $position->point : 0 }},
-                            commitmentScore: 0,
-                            serviceScore: 0,
-                            calculateTotal() {
-                                return parseFloat(this.attendanceScore) + parseFloat(this.positionScore) + parseFloat(this.commitmentScore) + parseFloat(this.serviceScore);
-                            },
-                            calculatePercentage() {
-                                return ((this.calculateTotal() / 110) * 100).toFixed(2);
-                            }
-                        }"
-                        x-init="
-                            // Explicitly reset all form controls on page load
-                            $refs.attendanceSelect.value = '0';
-                            document.querySelectorAll('input[name=\'commitments[]\']').forEach(el => el.checked = false);
-                            document.querySelectorAll('input[name=\'service_contribution_id\']').forEach(el => el.checked = false);
-                        ">
-                        @csrf
+						x-data="{ 
+							selectedCommitments: [],
+							maxCommitments: 4,
+							attendanceDays: 0,  // Track days separately
+							attendanceScore: 0,
+							positionScore: {{ $position ? $position->point : 0 }},
+							commitmentScore: 0,
+							serviceScore: 0,
+							
+							// Preload attendance scores from backend
+							attendanceScores: {
+								@foreach($attendanceScores as $attendance)
+									{{ $attendance->attendance_count }}: {{ $attendance->score }},
+								@endforeach
+							},
+							
+							// Calculate score based on days
+							calculateAttendanceScore(days) {
+								this.attendanceDays = days;
+								this.attendanceScore = this.attendanceScores[days] || 0;
+								return this.attendanceScore;
+							},
+							
+							calculateTotal() {
+								return this.attendanceScore + this.positionScore + this.commitmentScore + this.serviceScore;
+							},
+							calculatePercentage() {
+								return ((this.calculateTotal() / 110) * 100).toFixed(2);
+							}
+						}"
+						x-init="
+							// Initialize with first day selected
+							$nextTick(() => {
+								if ($refs.attendanceSlider) {
+									$refs.attendanceSlider.value = 1;
+									attendanceScore = calculateAttendanceScore(1);
+								}
+							});
+						">
+						@csrf
 
-                        <!-- Attendance Section -->
-                        <div class="mb-6">
-                            <h4 class="text-lg font-medium mb-4 border-b pb-2">Attendance [<span x-text="attendanceScore + ' Marks'"></span>]</h4>
-                            <div class="mb-4">
-                                <label for="attendance_count" class="block text-sm font-medium mb-2">Days Present</label>
-                                <select name="attendance_count" id="attendance_count" 
-                                    x-ref="attendanceSelect"
-                                    class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 focus:ring-indigo-500"
-                                    x-on:change="attendanceScore = $event.target.options[$event.target.selectedIndex].dataset.score">
-                                    <option value="0" selected>Select attendance</option>
-                                    @foreach($attendanceScores as $attendance)
-                                        <option value="{{ $attendance->attendance_count }}" data-score="{{ $attendance->score }}">
-                                            {{ $attendance->attendance_count }} days ({{ $attendance->score }} points)
-                                        </option>
-                                    @endforeach
-                                </select>
-                                @error('attendance_count')
-                                    <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
-                                @enderror
-                            </div>
-                        </div>
+						<!-- Attendance Section -->
+						<div class="mb-6">
+							<h4 class="text-lg font-medium mb-4 border-b pb-2">Attendance [<span x-text="attendanceScore + ' Marks'"></span>]</h4>
+							<div class="mb-4">
+								<label for="attendance_count" class="block text-sm font-medium mb-2">Days Present</label>
+								
+								<div class="flex items-center gap-4">
+									<!-- Slider -->
+									<div class="flex-1">
+										<input 
+											type="range" 
+											id="attendance_slider"
+											x-ref="attendanceSlider"
+											name="attendance_count"
+											min="1" 
+											max="12" 
+											step="1" 
+											value="1"
+											x-on:input="
+												$refs.attendanceInput.value = $event.target.value;
+												calculateAttendanceScore($event.target.value);
+											"
+											class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"
+										>
+										
+										<!-- Slider Labels -->
+										<div class="flex justify-between text-xs text-gray-500 dark:text-gray-400 mt-1">
+											<template x-for="i in 12">
+												<span 
+													x-text="i" 
+													:class="{ 
+														'font-bold text-indigo-600 dark:text-indigo-400': i == attendanceDays,
+														'opacity-50': i > attendanceDays 
+													}">
+												</span>
+											</template>
+										</div>
+									</div>
+									
+									<!-- Input Box -->
+									<div class="w-20">
+										<input 
+											type="number" 
+											x-ref="attendanceInput"
+											name="attendance_input"
+											min="1" 
+											max="12" 
+											x-model="attendanceDays"
+											x-on:change="
+												if ($event.target.value > 12) $event.target.value = 12;
+												if ($event.target.value < 1) $event.target.value = 1;
+												$refs.attendanceSlider.value = $event.target.value;
+												calculateAttendanceScore($event.target.value);
+											"
+											class="w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 focus:ring-indigo-500"
+										>
+									</div>
+								</div>
+								
+								{{-- <!-- Display days to points mapping -->
+								<div class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+									<span x-text="attendanceDays + ' day(s)'"></span> = 
+									<span x-text="attendanceScore + ' point(s)'"></span>
+								</div>
+								 --}}
+								@error('attendance_count')
+									<p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+								@enderror
+							</div>
+						</div>
 
                         <!-- Commitment Section -->
                         <div class="mb-6">
