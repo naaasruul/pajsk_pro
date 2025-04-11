@@ -11,10 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('commitments', function (Blueprint $table) {
+        Schema::create('attendance_scores', function (Blueprint $table) {
             $table->id();
-            $table->string('commitment_name');
-            $table->string('score');
+            $table->integer('attendance_count');
+            $table->integer('score');
             $table->timestamps();
         });
     }
@@ -24,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('commitments');
+        Schema::dropIfExists('attendance_scores');
     }
 };

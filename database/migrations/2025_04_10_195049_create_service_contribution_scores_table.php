@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('service_contributions', function (Blueprint $table) {
+        Schema::create('service_contribution_scores', function (Blueprint $table) {
             $table->id();
             $table->string('service_name'); // atlet/peserta, kemahiran khusus, persembahan, sokongan
             $table->integer('score');
@@ -25,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('service_contributions');
+        Schema::dropIfExists('service_contribution_scores');
     }
 };

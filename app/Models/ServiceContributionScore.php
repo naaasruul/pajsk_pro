@@ -4,11 +4,15 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class ServiceContribution extends Model
+class ServiceContributionScore extends Model
 {
     protected $fillable = [
         'service_name',
+        'description',
         'score',
-        'description'
+    ];
+
+    protected $casts = [
+        'score' => 'decimal:2',
     ];
 }

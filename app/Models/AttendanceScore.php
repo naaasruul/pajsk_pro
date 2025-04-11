@@ -4,10 +4,14 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Attendance extends Model
+class AttendanceScore extends Model
 {
     protected $fillable = [
         'attendance_count',
-        'score'
+        'score',
+    ];
+
+    protected $casts = [
+        'score' => 'decimal:2',
     ];
 }
