@@ -127,8 +127,8 @@ class PAJSKController extends Controller
         $validated = $request->validate([
             'attendance_count' => 'required|integer|min:1|max:12',
             'commitments' => 'required|array|size:4',
-            'commitments.*' => 'required|exists:commitments,id',
-            'service_contribution_id' => 'required|exists:service_contributions,id',
+            'commitments.*' => 'required|exists:commitment_scores,id',
+            'service_contribution_id' => 'required|exists:service_contribution_scores,id',
         ]);
 
         $teacher = auth()->user()->teacher;
