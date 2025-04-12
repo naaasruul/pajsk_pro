@@ -10,4 +10,8 @@ class ClubPosition extends Model
         'position_name',
         'point',
     ];
+
+    public function student(){
+        return $this->belongsToMany(Student::class);
+    }
 }
