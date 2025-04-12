@@ -44,7 +44,7 @@
 
                 {{-- COLUMN 2 --}}
                 <div class="mt-6">
-                    <label for="represent" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                    <label for="involvement" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
                         Select Involvement Type
                     </label>
                     <select id="involvement" name="involvement"
@@ -55,9 +55,71 @@
                     </select>
                 </div>
 
+                {{-- COLUMN 6 Activity Date Start --}}
+                <div class="flex ">
+                    <div class="mt-6 w-1/2">
+                        <label for="involvement" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                            Start Date of Trip
+                        </label>
+                        <div class="relative max-w-sm">
+                            <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+                               <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                                  <path d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z"/>
+                                </svg>
+                            </div>
+                            <input id="date-start" datepicker datepicker-format="yyyy-mm-dd"  type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Select date">
+                          </div>
+                    </div>
+
+                    <div class="mt-6 w-1/2">
+                        <label for="involvement" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                            Start Time of Trip
+                        </label>
+                        <div class="relative max-w-sm">
+                            <div class="absolute inset-y-0 end-0 top-0 flex items-center pe-3.5 pointer-events-none">
+                                <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
+                                    <path fill-rule="evenodd" d="M2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10S2 17.523 2 12Zm11-4a1 1 0 1 0-2 0v4a1 1 0 0 0 .293.707l3 3a1 1 0 0 0 1.414-1.414L13 11.586V8Z" clip-rule="evenodd"/>
+                                </svg>
+                            </div>
+                            <input type="time" id="time-start" class="bg-gray-50 border leading-none border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" min="09:00" max="18:00" value="00:00" required />
+                        </div>
+                    </div>
+                </div>
+
+                {{-- COLUMN 6 Activity Date End --}}
+                <div class="flex ">
+                    <div class="mt-6 w-1/2">
+                        <label for="involvement" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                            End Date of Trip
+                        </label>
+                        <div class="relative max-w-sm">
+                            <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+                               <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                                  <path d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z"/>
+                                </svg>
+                            </div>
+                            <input id="date-end" datepicker datepicker-format="yyyy-mm-dd"  type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Select date">
+                          </div>
+                    </div>
+
+                    <div class="mt-6 w-1/2">
+                        <label for="involvement" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                            End Time of Trip
+                        </label>
+                        <div class="relative max-w-sm">
+                            <div class="absolute inset-y-0 end-0 top-0 flex items-center pe-3.5 pointer-events-none">
+                                <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
+                                    <path fill-rule="evenodd" d="M2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10S2 17.523 2 12Zm11-4a1 1 0 1 0-2 0v4a1 1 0 0 0 .293.707l3 3a1 1 0 0 0 1.414-1.414L13 11.586V8Z" clip-rule="evenodd"/>
+                                </svg>
+                            </div>
+                            <input type="time" id="time-end" class="bg-gray-50 border leading-none border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" min="09:00" max="18:00" value="00:00" required />
+                        </div>
+                    </div>
+                </div>
+
                 {{-- COLUMN 3 --}}
                 <div class="mt-6">
-                    <label for="represent" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                    <label for="club" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
                         Select Club
                     </label>
                     <select id="club" name="club"
@@ -73,7 +135,7 @@
                     <label for="represent" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
                         Select Achievement Stage
                     </label>
-                    <select id="club" name="club"
+                    <select id="achievement" name="achievement"
                         class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
                         @foreach ( $achievementTypes as $achievementType )
                         <option value="{{ $achievementType->id }}" selected>{{ $achievementType->achievement_name }}
@@ -81,6 +143,31 @@
                         @endforeach
                     </select>
                 </div>
+
+                
+
+                {{-- COLUMN 6 Activity Category --}}
+                <div class="mt-6">
+                    <label for="represent" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                        Select Activity Category
+                    </label>
+                    <select id="category" name="category"
+                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                        <option value="Badan Beruniform" selected>Badan Beruniform</option>
+                        <option value="Kelab & Persatuan">Kelab & Persatuan</option>
+                        <option value="Sukan & Permainan">Sukan & Permainan</option>
+                    </select>
+                </div>
+
+                {{-- COLUMN 5 Activity Address --}}
+                <div class="mt-6">
+                    <label for="address" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                        Actitivity Address
+                    </label>
+                    <textarea id="address" rows="4" class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Activity address here..."></textarea>
+                </div>
+
+
             </div>
 
             <!-- Step 2: Teachers List -->
@@ -245,7 +332,6 @@
                                 </th>
                                 <th scope="col" class="px-6 py-3">Name</th>
                                 <th scope="col" class="px-6 py-3">Email</th>
-                                <th scope="col" class="px-6 py-3">Action</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -268,12 +354,6 @@
                                     </div>
                                 </th>
                                 <td class="px-6 py-4">{{ $student->user->email }}</td>
-                                <td class="px-6 py-4">
-                                    <button type="button" data-student-id="{{ $student->id }}"
-                                        class="assign-student-leader-btn font-medium text-blue-600 dark:text-blue-500 hover:underline">
-                                        Assign Leader
-                                    </button>
-                                </td>
                             </tr>
                             @endforeach
                         </tbody>
@@ -314,6 +394,80 @@
     <script src="{{ asset('js/add-teachers-list.js') }}"></script>
     <script src="{{ asset('js/add-students-list.js') }}"></script>
 
+    <script>
+        $(document).ready(function () {
+            $('#submit-button').on('click', function () {
+                // Collect data from the form
+                console.log(`Represent: ${$('#represent').val()}`);
+                console.log(`Achievement Placement ID: ${$('#achievement').val()}`);
+                console.log(`Involvement ID: ${$('#involvement').val()}`);
+                console.log($('#achievement').val());
+                console.log($('#involvement').val());
+                
+                let formData = {
+                    represent: $('#represent').val(),
+                    achievement_id: $('#achievement').val(),
+                    involvement_id: $('#involvement').val(),
+                    club_id: $('#club').val(),
+                    activity_place: $('#address').val(), // Collect the address from the textarea
+                    category: $('#category').val(), // Collect the category dynamically
+                    datetime_start: $('#date-start').val(), // Collect the start date
+                    time_start: $('#time-start').val(), // Collect the start time
+                    datetime_end: $('#date-end').val(), // Collect the end date
+                    time_end: $('#time-end').val(), // Collect the end time
+                    teachers: [],
+                    students: [],
+                    _token: '{{ csrf_token() }}' // Include CSRF token
+                };
+                
+                // Collect selected teachers
+                $('.teacher-tr input[type="checkbox"]:checked').each(function () {
+                    formData.teachers.push($(this).attr('id').replace('checkbox-table-search-', ''));
+                });
+                
+                // Collect selected students
+                $('.student-tr input[type="checkbox"]:checked').each(function () {
+                    formData.students.push($(this).attr('id').replace('checkbox-student-', ''));
+                });
+    
+                // Collect selected teachers
+                $('.teacher-tr input[type="checkbox"]:checked').each(function () {
+                    formData.teachers.push($(this).attr('id').replace('checkbox-table-search-', ''));
+                });
+    
+                // Collect selected students
+                $('.student-tr input[type="checkbox"]:checked').each(function () {
+                    formData.students.push($(this).attr('id').replace('checkbox-student-', ''));
+                });
+    
+                // Send data to the API
+                $.ajax({
+                    url: '{{ route('activity.store') }}', // API endpoint
+                    method: 'POST',
+                    data: formData,
+                    success: function (response) {
+                                            // Display success message
+                    alert(response.message || 'Activity submitted successfully!');
+
+                        // Optionally, redirect or reset the form
+                        window.location.href = '{{ route('activity.index') }}';
+                    },
+                    error: function (xhr) {
+                        // Handle validation errors or other errors
+                    if (xhr.status === 422) {
+                        // Validation errors
+                        let errors = xhr.responseJSON.errors;
+                        let errorMessages = Object.values(errors).map(errorArray => errorArray.join(', ')).join('\n');
+                        alert('Validation Errors:\n' + errorMessages);
+                    } else {
+                        // Other errors
+                        alert('An error occurred: ' + (xhr.responseJSON.message || xhr.statusText));
+                    }
+                    }
+                });
+            });
+        });
+    </script>
 
 
 
