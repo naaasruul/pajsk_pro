@@ -19,6 +19,7 @@
                     <th scope="col" class="px-6 py-3">Phone Number</th>
                     <th scope="col" class="px-6 py-3">Home Number</th>
                     <th scope="col" class="px-6 py-3">Address</th>
+                    <th scope="col" class="px-6 py-3">Club</th>
                     <th scope="col" class="px-6 py-3">Actions</th>
                 </tr>
             </thead>
@@ -30,7 +31,9 @@
                         <td class="px-6 py-4">{{ $teacher->phone_number }}</td>
                         <td class="px-6 py-4">{{ $teacher->home_number }}</td>
                         <td class="px-6 py-4">{{ $teacher->address }}</td>
+                        <td class="px-6 py-4">{{ $teacher->club->club_name ?? 'No Club' }}</td>
                         <td class="px-6 py-4">
+
                             <a href="{{ route('teachers.edit', $teacher) }}" class="font-medium text-blue-600 dark:text-blue-500 hover:underline">Edit</a>
                         </td>
                     </tr>

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Club;
 use App\Models\Teacher;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -17,8 +18,9 @@ class TeacherController extends Controller
     }
 
     public function create()
-    {
-        return view('teacher.create');
+    {   
+        $clubs = Club::all();
+        return view('teacher.create',compact('clubs'));
     }
 
     public function store(Request $request)
@@ -30,6 +32,7 @@ class TeacherController extends Controller
             'address' => 'required|string|max:255',
             'phone_number' => 'required|string|max:20',
             'home_number' => 'required|string|max:20',
+            'club_id' => '|exists:clubs,id',
         ]);
 
         DB::transaction(function () use ($validated) {
@@ -45,6 +48,7 @@ class TeacherController extends Controller
                 'address' => $validated['address'],
                 'phone_number' => $validated['phone_number'],
                 'home_number' => $validated['home_number'],
+                'club_id' => $validated['club_id'],
             ]);
         });
 
