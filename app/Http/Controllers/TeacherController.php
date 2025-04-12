@@ -32,9 +32,12 @@ class TeacherController extends Controller
             'address' => 'required|string|max:255',
             'phone_number' => 'required|string|max:20',
             'home_number' => 'required|string|max:20',
-            'club_id' => '|exists:clubs,id',
+            'club_id' => 'nullable|exists:clubs,id', // Validate club_id if provided
         ]);
 
+
+        $validated['club_id'] = empty($validated['club_id']) ? null : $validated['club_id'];
+        
         DB::transaction(function () use ($validated) {
             $user = User::create([
                 'name' => $validated['name'],
@@ -48,7 +51,7 @@ class TeacherController extends Controller
                 'address' => $validated['address'],
                 'phone_number' => $validated['phone_number'],
                 'home_number' => $validated['home_number'],
-                'club_id' => $validated['club_id'],
+                'club_id' => $validated['club_id'] ?? null,
             ]);
         });
 

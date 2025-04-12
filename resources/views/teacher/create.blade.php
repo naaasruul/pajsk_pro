@@ -10,7 +10,23 @@
         <p class="my-2 text-lg text-gray-500">Kindly complete the form below to submit a new teacher application. Ensure
             all required fields are filled out accurately and thoroughly to facilitate a smooth and timely processing of
             your request.</p>
+  <!-- Display Success Message -->
+  @if (session('success'))
+  <div class="mb-4 text-sm text-green-600 dark:text-green-400">
+      {{ session('success') }}
+  </div>
+@endif
 
+<!-- Display Validation Errors -->
+@if ($errors->any())
+  <div class="mb-4 text-sm text-red-600 dark:text-red-400">
+      <ul>
+          @foreach ($errors->all() as $error)
+              <li>{{ $error }}</li>
+          @endforeach
+      </ul>
+  </div>
+@endif
         <form method="POST" action="{{ route('teachers.store') }}" class="space-y-6">
             @csrf
             <!-- User Information -->
@@ -55,8 +71,9 @@
                 </label>
                 <select id="club_id" name="club_id"
                     class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                    <option value="" selected>No Club</option> <!-- Set value to an empty string -->
                     @foreach ( $clubs as $club )
-                    <option value="{{ $club->id }}" selected>{{ $club->club_name }}</option>
+                    <option value="{{ $club->id }}" >{{ $club->club_name }}</option>
                     @endforeach
                 </select>
             </div>
