@@ -15,6 +15,9 @@
 
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <script src="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.css" rel="stylesheet" />
+
     
     {{-- ADD STACK NI UNTUK DAPAT PUSH CHILD --}}
     @stack('scripts')
@@ -30,7 +33,7 @@
     <div class="min-h-screen bg-gray-100 dark:bg-gray-900">
         @include('layouts.side-navigation')
 
-        <div class="p-4 sm:ml-64">
+        <div class="p-4 sm:ml-64 h-full overflow-y-auto">
             <!-- Page Heading -->
             @isset($header)
             <header class="bg-white dark:bg-gray-800 shadow mb-4 rounded-lg">
