@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Achievement extends Model
 {
-    protected $fillable = ['name', 'description'];
+    protected $fillable = ['achievement_name'];
 
     public function involvements()
     {

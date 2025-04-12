@@ -5,7 +5,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class InvolvementType extends Model
 {
-    protected $fillable = ['name', 'description'];
+    protected $fillable = ['type', 'description'];
 
     public function achievements()
     {
