@@ -11,4 +11,9 @@ class InvolvementType extends Model
     {
         return $this->belongsToMany(Achievement::class, 'achievement_involvement')->withPivot('score');
     }
+
+    public function activities()
+    {
+        return $this->belongsToMany(Activity::class);
+    }
 }
