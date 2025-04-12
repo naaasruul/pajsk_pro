@@ -16,7 +16,6 @@ return new class extends Migration
             $table->foreignId('involvement_types_id')->constrained()->onDelete('cascade');
             $table->foreignId('achievement_id')->constrained()->onDelete('cascade');
             $table->string('score')->default('ongoing');
-            $table->integer('score');
             $table->timestamps();
         });
     }
