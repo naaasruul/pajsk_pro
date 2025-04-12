@@ -30,7 +30,7 @@ class CocuriculumController extends Controller
 
 
 
-        return view('cocuriculum.cocuriculum', compact('club', 'studentsWithPositions'));
+        return view('cocuriculum.cocuriculum', compact('studentsWithPositions','club','teacher'));
         
 
     }

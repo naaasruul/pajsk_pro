@@ -50,4 +50,9 @@ class Student extends Model
                     ->withPivot(['achievement_id', 'placement_id'])
                     ->withTimestamps();
     }
+
+    public function position()
+    {
+        return $this->hasOne(ClubPosition::class, 'club_position');
+    }
 }
