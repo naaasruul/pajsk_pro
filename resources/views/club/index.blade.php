@@ -21,6 +21,12 @@
 					<p class="text-gray-600 dark:text-gray-400">Advisor: {{ auth()->user()->name }}</p>
 				</div>
 
+				<div class="grid grid-cols-3 gap-4 mb-6">
+					<x-card title="{{ $genderCounts['male'] ?? 0 }}" content="Male" />
+					<x-card title="{{ $genderCounts['female'] ?? 0 }}" content="Female" />
+					<x-card title="{{ count($studentsWithPositions) }}" content="Total" />
+				</div>
+
 				<div class="relative overflow-x-auto">
 					@include('club.partials.club-table')
 				</div>
