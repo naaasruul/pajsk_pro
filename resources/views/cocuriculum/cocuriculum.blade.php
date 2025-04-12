@@ -27,7 +27,11 @@
 
             {{-- TABLE STUDENTS CLUB --}}
             <x-container>
-                <h3 class="text-2xl font-bold dark:text-white mt-6">Students in {{ $club->club_name }}</h3>
+                @if( $teacher->club)
+                    <h3 class="text-2xl font-bold dark:text-white mt-6">Students in {{ $teacher->club->club_name }}</h3>
+                @else
+                    <h3 class="text-2xl font-bold dark:text-white mt-6">You have no club</h3>
+                @endif
                 <div class="relative z-0 overflow-x-auto mt-4">
                     <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
                         <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
