@@ -4,9 +4,9 @@
             <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
                 {{ __('Activity') }}
             </h2>
-            <a href="{{ route('cocuriculum.create') }}"
+            <a href="{{ route('activity.create') }}"
                 class="inline-flex items-center px-4 py-2 bg-gray-800 dark:bg-gray-200 border border-transparent rounded-md font-semibold text-xs text-white dark:text-gray-800 uppercase tracking-widest hover:bg-gray-700 dark:hover:bg-white focus:bg-gray-700 dark:focus:bg-white active:bg-gray-900 dark:active:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
-                {{ __('Create New') }}
+                {{ __('Request New Activity') }}
             </a>
         </div>
     </x-slot>
@@ -18,7 +18,7 @@
                 {{-- <h3 class="text-2xl font-bold dark:text-white mt-6">Students in {{ $activity->club_name }}</h3> --}}
                 <h2 class="text-4xl font-extrabold dark:text-white">My Activities</h2>
                 <div class="my-4  flex flex-col md:flex-row gap-4">
-                    <div class="w-full md:w-1/4">
+                    {{-- <div class="w-full md:w-1/4">
                         <label for="class" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Class</label>
                         <select id="class" name="class" onchange="updateFilters()"
                             class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
@@ -29,8 +29,8 @@
                                 </option>
                             @endforeach
                         </select>
-                    </div>
-                    <div class="w-full md:w-1/4">
+                    </div> --}}
+                    {{-- <div class="w-full md:w-1/4">
                         <label for="activity" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Activity</label>
                         <select id="activity" name="activity" onchange="updateFilters()"
                             class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
@@ -41,7 +41,7 @@
                                 </option>
                             @endforeach
                         </select>
-                    </div>
+                    </div> --}}
                 </div>
 
                 <div class="relative z-0 overflow-x-auto">
@@ -49,12 +49,17 @@
                         <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                             <tr>
                                 <th scope="col" class="px-6 py-3">#</th>
-                                <th scope="col" class="px-6 py-3">Name</th>
-                                <th scope="col" class="px-6 py-3">No Maktab</th>
-                                <th scope="col" class="px-6 py-3">Class</th>
-                                <th scope="col" class="px-6 py-3">Activity</th>
-                                <th scope="col" class="px-6 py-3">Marks</th>
-                                <th scope="col" class="px-6 py-3"></th>
+                                <th scope="col" class="px-6 py-3">Activity Name</th>
+                                {{-- BORANG ASAS --}}
+                                {{-- BORANG Mo1/Mo2 --}}
+                                {{-- BORANG KEBENARAN IBU BAPA --}}
+                                {{-- SIJIL PENGHARGAAN --}}
+                                {{-- NO BORANG --}}
+                                {{-- DATE --}}
+                                <th scope="col" class="px-6 py-3">Date</th>
+                                {{-- EDIT --}}
+                                {{-- LAPOR PENCAPAIAN (UPDATE PLACEMENT) --}}
+                                {{-- DELETE) --}}
                             </tr>
                         </thead>
                         <tbody>
@@ -63,11 +68,8 @@
                                 <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                                     {{ $activities->firstItem() + $loop->index }}
                                 </th>
-                                <td class="px-6 py-4">{{ $activity->student->user->name }}</td>
-                                <td class="px-6 py-4">{{ $activity->no_maktab }}</td>
-                                <td class="px-6 py-4">{{ $activity->class }}</td>
-                                <td class="px-6 py-4">{{ $activity->activity }}</td>
-                                <td class="px-6 py-4">{{ $activity->marks }}</td>
+                                <td class="px-6 py-4">{{ $activity->represent }} {{ $activity->involvement->description }} dalam {{ $activity->club->club_name ?? 'NULL' }} {{ $activity->achievement->achievement_name}}</td>
+                                <td class="px-6 py-4">{{ $activity->date_start }}</td>
                                 <td class="px-6 py-4">
                                     <a href="{{ route('cocuriculum.edit', $activity) }}" class="font-medium text-blue-600 dark:text-blue-500 hover:underline">Edit</a>
                                     <form action="{{ route('cocuriculum.destroy', $activity) }}" method="POST" class="inline">
@@ -84,6 +86,8 @@
                             @endforelse
                         </tbody>
                     </table>
+
+
                     <nav class="flex items-center flex-column flex-wrap md:flex-row justify-between pt-4" aria-label="Table navigation">
                         <span class="text-sm font-normal text-gray-500 dark:text-gray-400 mb-4 md:mb-0 block w-full md:inline md:w-auto">
                             Showing <span class="font-semibold text-gray-900 dark:text-white">{{ $activities->firstItem() ?? 0 }}-{{ $activities->lastItem() ?? 0 }}</span> of 

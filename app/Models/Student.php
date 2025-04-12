@@ -40,4 +40,9 @@ class Student extends Model
     {
         return $this->belongsToMany(Activity::class);
     }
+
+    public function position()
+    {
+        return $this->hasOne(ClubPosition::class, 'club_position');
+    }
 }
