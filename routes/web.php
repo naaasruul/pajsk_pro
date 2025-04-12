@@ -50,6 +50,9 @@ Route::middleware('auth')->group(function () {
 
     // Routes accessible by admin only
     Route::middleware('role:admin')->group(function () {
+        Route::prefix('activity')->name('activity.')->group(function(){
+            Route::get('/applications', [ActivityController::class, 'adminApproval'])->name('approval');
+        });
         Route::resource('teachers', TeacherController::class);
     });
 });

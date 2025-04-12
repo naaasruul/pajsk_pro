@@ -163,4 +163,10 @@ class ActivityController extends Controller
     {
         //
     }
+
+    public function adminApproval()
+    {
+        $activities = Activity::all();
+        return view('cocuriculum.approval', compact('activities'));
+    }
 }

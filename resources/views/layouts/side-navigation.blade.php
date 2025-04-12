@@ -36,6 +36,9 @@
             <x-sidebar-item class="pl-11" :route="route('students.index')" :role="request()->routeIs('students.*')">Students</x-sidebar-item>
               
             </ul>
+
+            <x-sidebar-item class="" :route="route('activity.approval')" :role="request()->routeIs('teachers.*')">Teachers</x-sidebar-item>
+
             @endhasrole
 
 
