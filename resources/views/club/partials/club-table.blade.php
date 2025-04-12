@@ -32,6 +32,10 @@
 						Remove
 					</button>
 				</form>
+				<a href="{{ route('club.edit-student', $student['id']) }}"
+					class="font-medium text-blue-600 dark:text-blue-500 hover:underline ml-2">
+					Edit Position
+				</a>
 			</td>
 		</tr>
 		@empty

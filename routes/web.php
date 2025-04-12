@@ -56,6 +56,8 @@ Route::middleware('auth')->group(function () {
             Route::get('/', [ClubController::class, 'index'])->name('index');
             Route::get('/add-student', [ClubController::class, 'showAddStudentForm'])->name('add-student');
             Route::post('/add-student', [ClubController::class, 'addStudent'])->name('store-student');
+            Route::get('/{student}/edit', [ClubController::class, 'editStudent'])->name('edit-student');
+            Route::put('/{student}/update', [ClubController::class, 'updateStudent'])->name('update-student');
             Route::delete('/remove-student/{student}', [ClubController::class, 'removeStudent'])->name('remove-student');
         });
     });

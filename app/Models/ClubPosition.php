@@ -9,6 +9,7 @@ class ClubPosition extends Model
     protected $fillable = [
         'position_name',
         'point',
+        'ranking',
     ];
 
     public function student(){
