@@ -67,6 +67,8 @@ Route::middleware('auth')->group(function () {
     Route::middleware('role:admin')->group(function () {
         Route::prefix('activity')->name('activity.')->group(function(){
             Route::get('/applications', [ActivityController::class, 'adminApproval'])->name('approval');
+            Route::post('/applications/{id}/approve', [ActivityController::class, 'applications_approved'])->name('approve');
+            Route::post('/applications/{id}/reject', [ActivityController::class, 'applications_rejected'])->name('reject');
         });
         Route::resource('teachers', TeacherController::class);
     });

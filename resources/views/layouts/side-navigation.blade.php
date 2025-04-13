@@ -36,6 +36,9 @@
                     Students
                 </x-sidebar-item>
             </ul>
+            <x-sidebar-item class="" :route="route('activity.approval')" :role="request()->routeIs('activity.approval')">
+                Activity
+            </x-sidebar-item>
             @endhasrole
 
             {{-- TEACHER SIDEBAR --}}
