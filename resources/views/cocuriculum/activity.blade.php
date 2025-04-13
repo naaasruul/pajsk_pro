@@ -57,6 +57,8 @@
                                 {{-- NO BORANG --}}
                                 {{-- DATE --}}
                                 <th scope="col" class="px-6 py-3">Date</th>
+                                <th scope="col" class="px-6 py-3">Status</th>
+                                <th scope="col" class="px-6 py-3">Actions</th>
                                 {{-- EDIT --}}
                                 {{-- LAPOR PENCAPAIAN (UPDATE PLACEMENT) --}}
                                 {{-- DELETE) --}}
@@ -68,8 +70,17 @@
                                 <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                                     {{ $activities->firstItem() + $loop->index }}
                                 </th>
-                                <td class="px-6 py-4">{{ $activity->represent }} {{ $activity->involvement->description }} dalam {{ $activity->club->club_name ?? 'NULL' }} {{ $activity->achievement->achievement_name}}</td>
+                                <td class="px-6 py-4">{{ $activity->represent }} {{ $activity->involvement->description }} dalam {{ $activity->club->club_name ?? 'NULL' }} peringkat {{ $activity->achievement->achievement_name}}</td>
                                 <td class="px-6 py-4">{{ $activity->date_start }}</td>
+                                <td class="px-6 py-4">
+                                    <span class="{{ 
+                                        strtolower($activity->status) === 'approved' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' : 
+                                        (strtolower($activity->status) === 'rejected' ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300' : 
+                                        'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300') 
+                                    }} text-sm font-medium me-2 px-2.5 py-0.5 rounded-sm">
+                                        {{ ucfirst($activity->status) }}
+                                    </span>
+                                </td>
                                 <td class="px-6 py-4">
                                     <a href="{{ route('cocuriculum.edit', $activity) }}" class="font-medium text-blue-600 dark:text-blue-500 hover:underline">Edit</a>
                                     <form action="{{ route('cocuriculum.destroy', $activity) }}" method="POST" class="inline">
