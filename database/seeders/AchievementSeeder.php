@@ -4,7 +4,7 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use App\Models\Achievement;
-
+use DB;
 class AchievementSeeder extends Seeder
 {
     /**
@@ -12,22 +12,18 @@ class AchievementSeeder extends Seeder
      */
     public function run(): void
     {
-        // Seed example achievements
-        Achievement::create([
-            'achievement_name' => 'Anugerah Cemerlang',
-        ]);
+        $stages = [
+            'Antarabangsa', 'Kebangsaan', 'Negeri',
+            'Bahagian (Sabah/Sarawak)', 'Zon/Daerah', 'Sekolah',
+        ];
 
-        Achievement::create([
-            'achievement_name' => 'Juara Sukan',
-        ]);
-
-        Achievement::create([
-            'achievement_name' => 'Penyertaan Aktif',
-        ]);
-
-        Achievement::create([
-            'achievement_name' => 'Kepimpinan Terbaik',
-        ]);
+        foreach ($stages as $stage) {
+            DB::table('achievements')->insert([
+                'achievement_name' => $stage,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        }
 
         $this->command->info('Achievements seeded successfully!');
     }

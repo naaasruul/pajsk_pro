@@ -20,7 +20,7 @@ class CommitmentSeeder extends Seeder
             ['commitment_name' => 'Mengemas Peralatan', 'score' => 2],
         ];
 
-        foreach ($commitments as $commitment); {
+        foreach ($commitments as $commitment) {
             Commitment::create($commitment);
         }
     }

@@ -27,7 +27,7 @@ class AttendanceSeeder extends Seeder
             ['attendance_count' => '12', 'score' => 40],
         ];
 
-        foreach ($attendances as $attendance); {
+        foreach ($attendances as $attendance) {
             Attendance::create($attendance);
         }
     }
