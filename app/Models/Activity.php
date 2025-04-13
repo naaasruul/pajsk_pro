@@ -28,16 +28,23 @@ class Activity extends Model
         return $this->belongsToMany(Teacher::class);
     }
 
-    public function placement() {
-        return $this->hasOne(Placement::class);
+    public function placement()
+    {
+        return $this->belongsTo(Placement::class);
     }
 
-    public function involvement() {
-        return $this->belongsTo(InvolvementType::class);
+    public function involvement()
+    {
+        return $this->belongsTo(InvolvementType::class, 'involvement_id')
+            ->select(['id', 'type', 'description']); // Ensure we get the type field
     }
 
-    public function achievement() {
-        return $this->belongsTo(Achievement::class);
+    public function achievement()
+    {
+        return $this->belongsTo(Achievement::class)
+            ->with(['involvements' => function($query) {
+                $query->withPivot(['score']);
+            }]);
     }
 
     public function students() {

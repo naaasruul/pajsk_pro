@@ -14,9 +14,7 @@ return new class extends Migration
     {
         Schema::create('involvement_types', function (Blueprint $table) {
             $table->id();
-            $table->integer('involvement_type'); // 1 = Penglibatan I, 2 = Penglibatan II, 3 = Penglibatan III
-            $table->string('involvement_stage'); // Antarabangsa, Kebangsaan, Negeri, Bahagian, Daerah
-            $table->string('involvement_score');
+            $table->integer('type'); // 1 = Penglibatan I, 2 = Penglibatan II, 3 = Penglibatan III
             $table->string('description')->nullable(); // "penglibatan I/II/III"
             $table->timestamps();
         });

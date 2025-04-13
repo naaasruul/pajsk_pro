@@ -14,90 +14,83 @@
     aria-label="Sidebar">
     <div class="h-full px-3 py-4 overflow-y-auto bg-gray-50 dark:bg-gray-800">
         <ul class="space-y-2 font-medium">
-            <x-sidebar-item :route="route('dashboard')" :role="request()->routeIs('dashboard')">Dashboard
+            <x-sidebar-item :route="route('dashboard')" :role="request()->routeIs('dashboard')">
+                Dashboard
             </x-sidebar-item>
-
-
 
             {{-- ADMIN SIDEBAR --}}
             @hasrole('admin')
             <button type="button"
                 class="flex items-center w-full p-2 text-base text-gray-900 transition duration-75 rounded-lg group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
-                aria-controls="dropdown-example" data-collapse-toggle="dropdown-user">
+                aria-controls="dropdown-user" data-collapse-toggle="dropdown-user">
                 <span class="flex-1 ms-3 text-left rtl:text-right whitespace-nowrap">Users</span>
-                <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
-                    viewBox="0 0 10 6">
-                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="m1 1 4 4 4-4" />
+                <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
+                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4" />
                 </svg>
             </button>
             <ul id="dropdown-user" class="hidden py-2 space-y-2">
-                <x-sidebar-item class="pl-11" :route="route('teachers.index')" :role="request()->routeIs('teachers.*')">Teachers</x-sidebar-item>
-            <x-sidebar-item class="pl-11" :route="route('students.index')" :role="request()->routeIs('students.*')">Students</x-sidebar-item>
-              
+                <x-sidebar-item class="pl-11" :route="route('teachers.index')" :role="request()->routeIs('teachers.*')">
+                    Teachers
+                </x-sidebar-item>
+                <x-sidebar-item class="pl-11" :route="route('students.index')" :role="request()->routeIs('students.*')">
+                    Students
+                </x-sidebar-item>
             </ul>
-
-            <x-sidebar-item class="" :route="route('activity.approval')" :role="request()->routeIs('teachers.*')">Teachers</x-sidebar-item>
-
             @endhasrole
 
-
             {{-- TEACHER SIDEBAR --}}
-            {{-- @hasanyrole('teacher|admin') --}}
             @hasanyrole('teacher')
             <button type="button"
                 class="flex items-center w-full p-2 text-base text-gray-900 transition duration-75 rounded-lg group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
-                aria-controls="dropdown-example" data-collapse-toggle="dropdown-student">
-                <span class="flex-1 ms-3 text-left rtl:text-right whitespace-nowrap">Students</span>
-                <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
-                    viewBox="0 0 10 6">
-                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="m1 1 4 4 4-4" />
+                aria-controls="dropdown-student" data-collapse-toggle="dropdown-student">
+                <span class="flex-1 ms-3 text-left rtl:text-right whitespace-nowrap">Student Management</span>
+                <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
+                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4" />
                 </svg>
             </button>
             <ul id="dropdown-student" class="hidden py-2 space-y-2">
-                <x-sidebar-item class="pl-11" :route="route('students.index')" :role="request()->routeIs('students.*')">
-                    PAJSK</x-sidebar-item>
-                <x-sidebar-item class="pl-11" :route="route('students.index')" :role="request()->routeIs('students.*')">
-                    SEGAK</x-sidebar-item>
+                <x-sidebar-item class="pl-11" :route="route('club.index')" :role="request()->routeIs('club.*')">
+                    Club Management
+                </x-sidebar-item>
+                <x-sidebar-item class="pl-11" :route="route('pajsk.index')" :role="request()->routeIs('pajsk.*')">
+                    PAJSK Assessment
+                </x-sidebar-item>
             </ul>
 
             <button type="button"
                 class="flex items-center w-full p-2 text-base text-gray-900 transition duration-75 rounded-lg group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
-                aria-controls="dropdown-example" data-collapse-toggle="dropdown-activity">
+                aria-controls="dropdown-activity" data-collapse-toggle="dropdown-activity">
                 <span class="flex-1 ms-3 text-left rtl:text-right whitespace-nowrap">Activities</span>
                 <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
                     <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4" />
                 </svg>
             </button>
             <ul id="dropdown-activity" class="hidden py-2 space-y-2">
-                <x-sidebar-item class="pl-11" :route="route('activity.index')" :role="request()->routeIs('activity.index')">Activity
+                <x-sidebar-item class="pl-11" :route="route('activity.index')" :role="request()->routeIs('activity.*')">
+                    Activity List
                 </x-sidebar-item>
-                <x-sidebar-item class="pl-11" :route="route('cocuriculum.index')" :role="request()->routeIs('cocuriculum.index')">Co-curiculum
+                <x-sidebar-item class="pl-11" :route="route('cocuriculum.index')" :role="request()->routeIs('cocuriculum.*')">
+                    Co-curriculum
                 </x-sidebar-item>
-                <x-sidebar-item class="pl-11" :route="route('cocuriculum.extra-cocuriculum')" :role="request()->routeIs('cocuriculum.extra-cocuriculum')">Extra
-                    Co-curiculum
-                </x-sidebar-item>
-                <x-sidebar-item class="pl-11" :route="route('students.index')" :role="request()->routeIs('students.index')">
-                    Presentations
+                <x-sidebar-item class="pl-11" :route="route('cocuriculum.extra-cocuriculum')" :role="request()->routeIs('cocuriculum.extra-cocuriculum')">
+                    Extra Co-curriculum
                 </x-sidebar-item>
             </ul>
 
-            <x-sidebar-item :route="route('students.index')" :role="request()->routeIs('students.*')">Report
+            <x-sidebar-item :route="route('activity.index')" :role="request()->routeIs('activity.*')">
+                Reports
             </x-sidebar-item>
             @endhasanyrole
 
-
-
-
             <div class="pt-4 mt-4 space-y-2 border-t border-gray-200 dark:border-gray-700">
-                <x-sidebar-item :route="route('profile.edit')" :role="request()->routeIs('profile.*')">Profile
+                <x-sidebar-item :route="route('profile.edit')" :role="request()->routeIs('profile.*')">
+                    Profile
                 </x-sidebar-item>
                 <x-sidebar-item>
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
                         <button type="submit"
-                            class="flex text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
+                            class="flex w-full text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
                             <span class="">Logout</span>
                         </button>
                     </form>

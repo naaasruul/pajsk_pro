@@ -9,9 +9,11 @@ use App\Models\Club;
 use Illuminate\Http\Request;
 use App\Models\CocuriculumActivity;
 use App\Models\InvolvementType;
+use App\Models\Placement;
 use App\Models\Student;
 use App\Models\Teacher;
 use Illuminate\Support\Facades\Log;
+use DB;
 
 class ActivityController extends Controller
 {
@@ -35,33 +37,19 @@ class ActivityController extends Controller
      */
     public function create()
     {
-        // Get the logged-in teacher
         $teacher = auth()->user()->teacher;
-
-        // Get all involvement types
-        $involvementTypes = InvolvementType::all();
-
-        // Get all students
-        $students = Student::with('user')->get();
-
-        // Get all teachers
-        $teachers = Teacher::with('user')->get();
-
-        // Get all clubs
-        $clubs = Club::all();
-
-        // Get all achievement types
-        $achievementTypes = Achievement::all();
-
-        return view('cocuriculum.create-activity', compact(
-            'teacher', 
-            'students', 
-            'teachers',
-            'involvementTypes',
-            'clubs',
-            'achievementTypes'
-        ));
+        
+        return view('cocuriculum.create-activity', [
+            'teacher' => $teacher,
+            'students' => Student::with('user')->get(),
+            'teachers' => Teacher::with('user')->get(),
+            'involvementTypes' => InvolvementType::orderBy('type')->get(),
+            'clubs' => Club::all(),
+            'achievementTypes' => Achievement::all(), // Add this line
+            'placements' => Placement::all()
+        ]);
     }
+
     /**
      * Store a newly created resource in storage.
      */
@@ -70,8 +58,9 @@ class ActivityController extends Controller
         // Validate the incoming request
         $validated = $request->validate([
             'represent' => 'required',
-            'achievement_id' => 'required|exists:achievements,id',
+            'placement_id' => 'exists:placements,id',
             'involvement_id' => 'required|exists:involvement_types,id',
+            'achievement_id' => 'required|exists:achievements,id',
             'club_id' => 'required|exists:clubs,id',
             'activity_place' => 'required|string|max:255',
             'category' => 'required|string|max:255',
@@ -84,10 +73,26 @@ class ActivityController extends Controller
             'students' => 'nullable|array',
             'students.*' => 'exists:students,id',
         ]);
-        Log::info($validated);
+
+        // Get the score from pivot table based on involvement type and achievement
+        $involvementType = InvolvementType::find($validated['involvement_id']);
+        $score = DB::table('achievement_involvement')
+            ->where([
+                'involvement_type_id' => $involvementType->type, // Use the type column
+                'achievement_id' => $validated['achievement_id']
+            ])
+            ->value('score');
+
+        Log::info('Activity Score', [
+            'involvement_type' => $involvementType->type,
+            'achievement_id' => $validated['achievement_id'],
+            'score' => $score
+        ]);
+
         // Create the activity
         $activity = Activity::create([
             'represent' => $validated['represent'],
+            // 'placement_id' => $validated['placement_id'], // Add this line
             'involvement_id' => $validated['involvement_id'],
             'achievement_id' => $validated['achievement_id'],
             'club_id' => $validated['club_id'],
@@ -116,10 +121,6 @@ class ActivityController extends Controller
             'activity' => $activity,
         ], 201);
     }
-
-
-
-
 
     /**
      * Display the specified resource.

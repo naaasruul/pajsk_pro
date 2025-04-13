@@ -47,10 +47,10 @@
                     <label for="involvement" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
                         Select Involvement Type
                     </label>
-                    <select id="involvement" name="involvement"
+                    <select id="involvement" name="involvement_id"
                         class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
                         @foreach ( $involvementTypes as $involvementType )
-                        <option value="{{ $involvementType->id }}" selected>{{ $involvementType->description }}</option>
+                        <option value="{{ $involvementType->id }}">{{ $involvementType->description }}</option>
                         @endforeach
                     </select>
                 </div>
@@ -122,7 +122,7 @@
                     <label for="club" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
                         Select Club
                     </label>
-                    <select id="club" name="club"
+                    <select id="club" name="club_id"
                         class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
                         @foreach ( $clubs as $club )
                         <option value="{{ $club->id }}" selected>{{ $club->club_name }}</option>
@@ -135,7 +135,7 @@
                     <label for="represent" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
                         Select Achievement Stage
                     </label>
-                    <select id="achievement" name="achievement"
+                    <select id="achievement" name="achievement_id"
                         class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
                         @foreach ( $achievementTypes as $achievementType )
                         <option value="{{ $achievementType->id }}" selected>{{ $achievementType->achievement_name }}
@@ -144,7 +144,15 @@
                     </select>
                 </div>
 
-                
+                {{-- <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Placement</label>
+                    <select id="placement" name="placement_id" required class="mt-1 block w-full rounded-md border-gray-300">
+                        <option value="">Select Placement</option>
+                        @foreach($placements as $placement)
+                            <option value="{{ $placement->id }}">{{ $placement->name }}</option>
+                        @endforeach
+                    </select>
+                </div> --}}
 
                 {{-- COLUMN 6 Activity Category --}}
                 <div class="mt-6">
@@ -406,8 +414,10 @@
                 
                 let formData = {
                     represent: $('#represent').val(),
+                    placement_id: $('#placement').val(),
                     achievement_id: $('#achievement').val(),
                     involvement_id: $('#involvement').val(),
+                    placement_id: $('#placement').val(), // Add this line
                     club_id: $('#club').val(),
                     activity_place: $('#address').val(), // Collect the address from the textarea
                     category: $('#category').val(), // Collect the category dynamically
