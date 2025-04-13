@@ -9,6 +9,7 @@ use App\Http\Controllers\CocuriculumController;
 use App\Http\Controllers\ExtraCocuriculumController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\ClubController;
 
 Route::get('/', [AuthenticatedSessionController::class, 'create'])
         ->name('login');
@@ -47,6 +48,19 @@ Route::middleware('auth')->group(function () {
             Route::delete('/{activity}', [ActivityController::class, 'destroy'])->name('destroy');
         });
     });
+
+    // Routes accessible by teachers only
+    Route::middleware('role:teacher')->group(function () {
+        Route::prefix('club')->name('club.')->group(function () {
+            Route::get('/', [ClubController::class, 'index'])->name('index');
+            Route::get('/add-student', [ClubController::class, 'showAddStudentForm'])->name('add-student');
+            Route::post('/add-student', [ClubController::class, 'addStudent'])->name('store-student');
+            Route::get('/{student}/edit', [ClubController::class, 'editStudent'])->name('edit-student');
+            Route::put('/{student}/update', [ClubController::class, 'updateStudent'])->name('update-student');
+            Route::delete('/remove-student/{student}', [ClubController::class, 'removeStudent'])->name('remove-student');
+        });
+    });
+
 
     // Routes accessible by admin only
     Route::middleware('role:admin')->group(function () {
