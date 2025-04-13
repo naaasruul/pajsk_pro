@@ -7,6 +7,7 @@ use App\Http\Controllers\TeacherController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\CocuriculumController;
 use App\Http\Controllers\ExtraCocuriculumController;
+use App\Http\Controllers\PAJSKController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 
@@ -54,6 +55,16 @@ Route::middleware('auth')->group(function () {
             Route::get('/applications', [ActivityController::class, 'adminApproval'])->name('approval');
         });
         Route::resource('teachers', TeacherController::class);
+    });
+
+    // Routes accessible by teachers only
+    Route::middleware('role:teacher')->group(function () {
+        Route::prefix('pajsk')->name('pajsk.')->group(function () {
+            Route::get('/', [PAJSKController::class, 'index'])->name('index');
+            Route::get('/evaluate-pajsk/{student}', [PAJSKController::class, 'evaluateStudent'])->name('evaluate-student');
+            Route::get('/evaluate-student/{student}', [PAJSKController::class, 'evaluateStudent'])->name('evaluate-student');
+            Route::post('/evaluate-student/{student}', [PAJSKController::class, 'storeEvaluation'])->name('store-evaluation');
+        });
     });
 });
 
