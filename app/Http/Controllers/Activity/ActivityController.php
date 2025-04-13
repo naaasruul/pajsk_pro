@@ -162,12 +162,36 @@ class ActivityController extends Controller
      */
     public function destroy(string $id)
     {
+
         //
     }
 
-    public function adminApproval()
+    public function adminApproval(Request $request)
     {
-        $activities = Activity::all();
+        $activities = Activity::orderBy('created_at', 'desc')->paginate(10);
+    
         return view('cocuriculum.approval', compact('activities'));
     }
+
+    public function applications_approved($id)
+    {
+        $activity = Activity::findOrFail($id); // Find the activity by ID
+        $activity->update(['status' => 'approved']); // Update the status to 'approved'
+        Log::info('Activity approved: ' . $activity->id);
+
+        return redirect()->back()
+            ->with('success', 'Activity approved successfully.');
+    }
+
+    public function applications_rejected($id)
+    {
+        $activity = Activity::findOrFail($id); // Find the activity by ID
+        $activity->update(['status' => 'rejected']); // Update the status to 'rejected'
+        Log::info('Activity rejected: ' . $activity->id);
+
+        return redirect()->back()
+            ->with('success', 'Activity rejected successfully.');
+    }
+
+
 }
