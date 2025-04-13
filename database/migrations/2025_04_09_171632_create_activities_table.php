@@ -11,19 +11,33 @@ return new class extends Migration
      */
     public function up(): void
     {
+        Schema::create('placements', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->text('description')->nullable();
+            $table->timestamps();
+        });
+
+        
         Schema::create('activities', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('involvement_type_id')->constrained()->onDelete('cascade');
-            $table->foreignId('achievement_score_id')->constrained()->onDelete('cascade');
-            $table->foreignId('placement_score_id')->constrained()->onDelete('cascade');
-            $table->string('activity_place');
-            $table->string('category');
-            $table->dateTime('datetime_start');
-            $table->dateTime('datetime_end');
-            $table->text('description')->nullable();
-            $table->boolean('is_active')->default(true);
+            $table->unsignedBigInteger('placement_id')->nullable(); // FK for placement
+            $table->unsignedBigInteger('involvement_id')->nullable(); // FK for involvement
+            $table->string('category')->nullable();
+            $table->string('activity_place')->nullable();
+            $table->date('date_start')->nullable();
+            $table->time('time_start')->nullable();
+            $table->date('date_end')->nullable();
+            $table->time('time_end')->nullable();
+            $table->json('activity_teachers_id')->nullable(); // List of teacher IDs
+            $table->json('activity_students_id')->nullable(); // List of student IDs
+            $table->unsignedBigInteger('leader_id')->nullable(); // Leader ID
             $table->timestamps();
-            $table->softDeletes();
+
+            // Add foreign key constraints
+            $table->foreign('placement_id')->references('id')->on('placements')->onDelete('set null');
+            $table->foreign('involvement_id')->references('id')->on('involvement_types')->onDelete('set null');
+            $table->foreign('leader_id')->references('id')->on('teachers')->onDelete('set null');
         });
     }
 
