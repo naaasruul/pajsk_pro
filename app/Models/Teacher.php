@@ -36,4 +36,9 @@ class Teacher extends Model
     {
         return $this->belongsToMany(Activity::class);
     }
+
+    public function createdActivities()
+    {
+        return $this->hasMany(Activity::class, 'created_by');
+    }
 }

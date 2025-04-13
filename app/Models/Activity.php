@@ -22,6 +22,7 @@ class Activity extends Model
         'activity_students_id',
         'leader_id',
         'created_by',
+        'status',
     ];
 
     public function teachers() {
@@ -53,5 +54,10 @@ class Activity extends Model
 
     public function club(){
         return $this->belongsTo(Club::class); // Reference the club_id column
+    }
+
+    public function createdBy()
+    {
+        return $this->belongsTo(Teacher::class, 'created_by');
     }
 }
