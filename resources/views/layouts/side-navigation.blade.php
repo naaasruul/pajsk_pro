@@ -49,9 +49,9 @@
                 </svg>
             </button>
             <ul id="dropdown-student" class="hidden py-2 space-y-2">
-                {{-- <x-sidebar-item class="pl-11" :route="route('club.index')" :role="request()->routeIs('club.*')">
+                <x-sidebar-item class="pl-11" :route="route('club.index')" :role="request()->routeIs('club.*')">
                     Club Management
-                </x-sidebar-item> --}}
+                </x-sidebar-item>
                 <x-sidebar-item class="pl-11" :route="route('pajsk.index')" :role="request()->routeIs('pajsk.*')">
                     PAJSK Assessment
                 </x-sidebar-item>
