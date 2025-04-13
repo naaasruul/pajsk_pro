@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Student extends Model
 {
@@ -22,27 +24,100 @@ class Student extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function clubs()
+    public function clubs(): BelongsToMany
     {
         return $this->belongsToMany(Club::class, 'club_student')
-                    ->withPivot('club_position_id') // Include position in the pivot table
+                    ->withPivot('club_position_id')
                     ->withTimestamps();
     }
 
-    public function uniformedBodies()
+    public function activities(): BelongsToMany
     {
-        return $this->belongsToMany(UniformedBody::class, 'club_student')
-                    ->withPivot('uniformed_body_position_id') // Include position in the pivot table
+        return $this->belongsToMany(Activity::class, 'activity_student')
+                    ->with(['involvement', 'achievement'])
                     ->withTimestamps();
     }
 
-    public function activities()
+    // Involvement scoring methods
+    public function getInvolvementScore(): int
     {
-        return $this->belongsToMany(Activity::class);
+        $maxScore = 0;
+        $activities = $this->activities()
+            ->with(['involvement', 'achievement'])
+            ->get();
+
+        foreach ($activities as $activity) {
+            if (!$activity->involvement || !$activity->achievement) {
+                \Log::debug('Missing relationship', [
+                    'activity_id' => $activity->id,
+                    'has_involvement' => (bool)$activity->involvement,
+                    'has_achievement' => (bool)$activity->achievement
+                ]);
+                continue;
+            }
+
+            // Use involvement type instead of ID
+            $score = \DB::table('achievement_involvement')
+                ->where([
+                    'achievement_id' => $activity->achievement_id,
+                    'involvement_type_id' => $activity->involvement->type // Use type here
+                ])
+                ->value('score');
+
+            \Log::debug('Score calculation', [
+                'activity_id' => $activity->id,
+                'achievement_id' => $activity->achievement_id,
+                'involvement_type' => $activity->involvement->type,
+                'score' => $score
+            ]);
+
+            $maxScore = max($maxScore, (int)$score);
+        }
+
+        return min($maxScore, 20);
     }
 
-    public function position()
+    public function getCurrentClubAttribute()
     {
-        return $this->hasOne(ClubPosition::class, 'club_position');
+        return $this->clubs()->first();
+    }
+
+    public function clubPosition()
+    {
+        return $this->clubs()
+            ->wherePivot('club_position_id', '!=', null)
+            ->first()?->pivot?->club_position_id;
+    }
+
+    public function getCurrentPositionAttribute()
+    {
+        $positionId = $this->clubPosition();
+        return $positionId ? ClubPosition::find($positionId) : null;
+    }
+
+    // Calculate total PAJSK score
+    public function calculatePajskScore($attendanceScore, $commitmentScore, $serviceScore)
+    {
+        $positionScore = $this->getCurrentPosition()?->point ?? 0;
+        $involvementScore = $this->getInvolvementScore();
+        
+        $total = $attendanceScore + // Max 40
+                $positionScore + // Max 10
+                $involvementScore + // Max 20
+                $commitmentScore + // Max 10
+                $serviceScore; // Max 10
+                // Achievement (20) to be added later
+
+        return [
+            'total' => $total,
+            'percentage' => round(($total / 110) * 100, 2),
+            'breakdown' => [
+                'attendance' => $attendanceScore,
+                'position' => $positionScore,
+                'involvement' => $involvementScore,
+                'commitment' => $commitmentScore,
+                'service' => $serviceScore
+            ]
+        ];
     }
 }
