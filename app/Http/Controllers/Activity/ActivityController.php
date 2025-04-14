@@ -61,9 +61,8 @@ class ActivityController extends Controller
             'placement_id' => 'exists:placements,id',
             'involvement_id' => 'required|exists:involvement_types,id',
             'achievement_id' => 'required|exists:achievements,id',
-            'club_id' => 'required|exists:clubs,id',
+            'club_id' => 'required|exists:clubs,id', // Ensure the club exists
             'activity_place' => 'required|string|max:255',
-            'category' => 'required|string|max:255',
             'datetime_start' => 'required|date',
             'time_start' => 'required|date_format:H:i',
             'datetime_end' => 'required|date|after_or_equal:datetime_start',
@@ -73,6 +72,9 @@ class ActivityController extends Controller
             'students' => 'nullable|array',
             'students.*' => 'exists:students,id',
         ]);
+
+        // Retrieve the club to get its category
+        $club = Club::findOrFail($validated['club_id']);
 
         // Get the score from pivot table based on involvement type and achievement
         $involvementType = InvolvementType::find($validated['involvement_id']);
@@ -88,6 +90,7 @@ class ActivityController extends Controller
             'achievement_id' => $validated['achievement_id'],
             'score' => $score
         ]);
+        Log::info('Activity Data', $validated);
 
         // Create the activity
         $activity = Activity::create([
@@ -96,7 +99,7 @@ class ActivityController extends Controller
             'involvement_id' => $validated['involvement_id'],
             'achievement_id' => $validated['achievement_id'],
             'club_id' => $validated['club_id'],
-            'category' => $validated['category'],
+            'category' => $club->category, // Assign the category from the club
             'activity_place' => $validated['activity_place'],
             'date_start' => $validated['datetime_start'],
             'time_start' => $validated['time_start'],

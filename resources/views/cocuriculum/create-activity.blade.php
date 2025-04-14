@@ -155,7 +155,7 @@
                 </div> --}}
 
                 {{-- COLUMN 6 Activity Category --}}
-                <div class="mt-6">
+                {{-- <div class="mt-6">
                     <label for="represent" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
                         Select Activity Category
                     </label>
@@ -165,7 +165,7 @@
                         <option value="Kelab & Persatuan">Kelab & Persatuan</option>
                         <option value="Sukan & Permainan">Sukan & Permainan</option>
                     </select>
-                </div>
+                </div> --}}
 
                 {{-- COLUMN 5 Activity Address --}}
                 <div class="mt-6">
