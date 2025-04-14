@@ -56,6 +56,7 @@
                                 {{-- SIJIL PENGHARGAAN --}}
                                 {{-- NO BORANG --}}
                                 {{-- DATE --}}
+                                <th scope="col" class="px-6 py-3">Category</th>
                                 <th scope="col" class="px-6 py-3">Date</th>
                                 {{-- EDIT --}}
                                 {{-- LAPOR PENCAPAIAN (UPDATE PLACEMENT) --}}
@@ -69,6 +70,7 @@
                                     {{ $activities->firstItem() + $loop->index }}
                                 </th>
                                 <td class="px-6 py-4">{{ $activity->represent }} {{ $activity->involvement->description }} dalam {{ $activity->club->club_name ?? 'NULL' }} {{ $activity->achievement->achievement_name}}</td>
+                                <td class="px-6 py-4">{{ $activity->category }}</td>
                                 <td class="px-6 py-4">{{ $activity->date_start }}</td>
                                 <td class="px-6 py-4">
                                     <a href="{{ route('cocuriculum.edit', $activity) }}" class="font-medium text-blue-600 dark:text-blue-500 hover:underline">Edit</a>
