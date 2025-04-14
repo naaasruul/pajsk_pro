@@ -37,6 +37,7 @@
 							commitmentScore: 0,
 							serviceScore: 0,
                             involvementScore: {{ $involvementScore }},
+                            achievementScore: {{ $achievementScore }},
 							
 							// Preload attendance scores from backend
 							attendanceScores: {
@@ -53,7 +54,12 @@
 							},
 							
 							calculateTotal() {
-								return this.attendanceScore + this.positionScore + this.commitmentScore + this.serviceScore;
+								return this.attendanceScore + 
+                                       this.positionScore + 
+                                       this.involvementScore + 
+                                       this.commitmentScore + 
+                                       this.serviceScore +
+                                       this.achievementScore;
 							},
 							calculatePercentage() {
 								return ((this.calculateTotal() / 110) * 100).toFixed(2);
@@ -250,7 +256,7 @@
                                 </p>
                                 <p class="flex justify-between">
                                     <span>Commitment Score:</span>
-                                    <span x-text="commitmentScore + '/40'"></span>
+                                    <span x-text="commitmentScore + '/10'"></span>
                                 </p>
                                 <p class="flex justify-between">
                                     <span>Service Score:</span>
