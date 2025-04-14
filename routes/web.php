@@ -80,6 +80,8 @@ Route::middleware('auth')->group(function () {
             Route::get('/evaluate-pajsk/{student}', [PAJSKController::class, 'evaluateStudent'])->name('evaluate-student');
             Route::get('/evaluate-student/{student}', [PAJSKController::class, 'evaluateStudent'])->name('evaluate-student');
             Route::post('/evaluate-student/{student}', [PAJSKController::class, 'storeEvaluation'])->name('store-evaluation');
+            Route::get('/review/{student}', [PAJSKController::class, 'review'])->name('review');
+            Route::get('/evaluations', [PAJSKController::class, 'evaluations'])->name('evaluations');
         });
     });
 });

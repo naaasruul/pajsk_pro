@@ -58,6 +58,9 @@
                 <x-sidebar-item class="pl-11" :route="route('pajsk.index')" :role="request()->routeIs('pajsk.*')">
                     PAJSK Assessment
                 </x-sidebar-item>
+                <x-sidebar-item class="pl-11" :route="route('pajsk.evaluations')" :role="request()->routeIs('pajsk.evaluations')">
+                    {{ __('Evaluations History') }}
+                </x-sidebar-item>
             </ul>
 
             <button type="button"

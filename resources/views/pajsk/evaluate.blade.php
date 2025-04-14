@@ -28,7 +28,7 @@
                         </div>
                     </div>
 
-                    <form method="POST" action="{{ route('pajsk.store-evaluation', $student) }}" x-data="{ 
+                    <form x-ref="form" method="POST" action="{{ route('pajsk.store-evaluation', $student) }}" x-data="{ 
 							selectedCommitments: [],
 							maxCommitments: 4,
 							attendanceDays: 0,  // Track days separately
@@ -81,7 +81,7 @@
                                     <!-- Slider -->
                                     <div class="flex-1">
                                         <input type="range" id="attendance_slider" x-ref="attendanceSlider"
-                                            name="attendance_count" min="1" max="12" step="1" value="1" x-on:input="
+                                            name="attendance" min="1" max="12" step="1" value="1" x-on:input="
 												$refs.attendanceInput.value = $event.target.value;
 												calculateAttendanceScore($event.target.value);
 											" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700">
@@ -100,7 +100,9 @@
 
                                     <!-- Input Box -->
                                     <div class="w-20">
-                                        <input type="number" x-ref="attendanceInput" name="attendance_input" min="1"
+                                        <!-- Add a hidden input for the attendance ID -->
+                                        <input type="hidden" name="attendance" :value="attendanceDays">
+                                        <input type="number" x-ref="attendanceInput" min="1"
                                             max="12" x-model="attendanceDays" x-on:change="
 												if ($event.target.value > 12) $event.target.value = 12;
 												if ($event.target.value < 1) $event.target.value = 1;
@@ -277,7 +279,24 @@
                                 Cancel
                             </a>
 
-                            <button type="submit"
+                            <button type="button"
+                                x-on:click="
+                                    if (attendanceDays < 1) {
+                                        alert('Please select attendance days');
+                                        return;
+                                    }
+                                    if (selectedCommitments.length !== 4) {
+                                        alert('Please select exactly 4 commitments');
+                                        return;
+                                    }
+                                    if (!$refs.form.querySelector('input[name=service_contribution_id]:checked')) {
+                                        alert('Please select a service contribution');
+                                        return;
+                                    }
+                                    if (confirm('Are you sure you want to save this evaluation?')) {
+                                        $refs.form.submit();
+                                    }
+                                "
                                 class="inline-flex items-center px-4 py-2 bg-gray-800 dark:bg-gray-200 border border-transparent rounded-md font-semibold text-xs text-white dark:text-gray-800 uppercase tracking-widest hover:bg-gray-700 dark:hover:bg-white focus:bg-gray-700 dark:focus:bg-white active:bg-gray-900 dark:active:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
                                 Save Evaluation
                             </button>
