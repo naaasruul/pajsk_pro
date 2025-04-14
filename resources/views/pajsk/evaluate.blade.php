@@ -37,7 +37,7 @@
 							commitmentScore: 0,
 							serviceScore: 0,
                             involvementScore: {{ $involvementScore }},
-                            achievementScore: {{ $achievementScore }},
+                            placementScore: {{ $placementScore }},
 							
 							// Preload attendance scores from backend
 							attendanceScores: {
@@ -56,13 +56,13 @@
 							calculateTotal() {
 								return this.attendanceScore + 
                                        this.positionScore + 
-                                       this.involvementScore + 
+                                       this.involvementScore +
+                                       this.placementScore +
                                        this.commitmentScore + 
-                                       this.serviceScore +
-                                       this.achievementScore;
+                                       this.serviceScore;
 							},
 							calculatePercentage() {
-								return ((this.calculateTotal() / 110) * 100).toFixed(2);
+								return ((this.calculateTotal() / 130) * 100).toFixed(2); // Updated total to 130
 							}
 						}" x-init="
 							// Initialize with first day selected
@@ -163,6 +163,39 @@
                             </div>
                         </div>
 
+                        <!-- Placement section -->
+                        <div class="space-y-2 mb-6">
+                            <h4 class="text-lg font-medium mb-4 border-b pb-2">Placement Stage [{{ $placementScore }} Marks]</h4>
+                            <div class="space-y-2">
+                                <h5 class="font-medium">Placement:</h5>
+                                @forelse($student->activities as $activity)
+                                <div class="flex justify-between p-2 bg-gray-100 rounded dark:bg-gray-600">
+                                    <span>
+                                        {{ $activity->represent }} {{ $activity->involvement->description }} Dalam {{ $activity->club->club_name ?? 'NULL' }},
+                                        @if($activity->placement)
+                                            {{ $activity->placement->name }} Peringkat {{ $activity->achievement->achievement_name }}
+                                            @php
+                                                $placementScore = DB::table('achievement_placement')
+                                                    ->where([
+                                                        'achievement_id' => $activity->achievement_id,
+                                                        'placement_id' => $activity->placement_id
+                                                    ])
+                                                    ->value('score');
+                                            @endphp
+                                            @if($placementScore)
+                                                <span class="text-green-500 dark:text-green-400">[Score: {{ $placementScore }}]</span>
+                                            @endif
+                                        @else
+                                            Peringkat {{ $activity->achievement->achievement_name }}
+                                        @endif
+                                    </span>
+                                </div>
+                                @empty
+                                <p class="text-gray-500">No activities recorded</p>
+                                @endforelse
+                            </div>
+                        </div>
+
                         <!-- Commitment Section -->
                         <div class="mb-6">
                             <h4 class="text-lg font-medium">Commitment [<span
@@ -248,11 +281,11 @@
                                 </p>
                                 <p class="flex justify-between">
                                     <span>Involvement Score:</span>
-                                    <span x-text="involvementScore + '/20'"></span>
+                                    <span>{{ $involvementScore }}/20</span>
                                 </p>
                                 <p class="flex justify-between">
                                     <span>Placement Score:</span>
-                                    <span class="text-yellow-300">not implemented yet</span>
+                                    <span>{{ $placementScore }}/20</span>
                                 </p>
                                 <p class="flex justify-between">
                                     <span>Commitment Score:</span>
@@ -264,7 +297,7 @@
                                 </p>
                                 <p class="flex justify-between font-semibold">
                                     <span>Total Score:</span>
-                                    <span x-text="calculateTotal() + '/110'"></span>
+                                    <span x-text="calculateTotal() + '/130'"></span>
                                 </p>
                                 <p class="flex justify-between font-semibold">
                                     <span>Percentage:</span>
@@ -275,7 +308,17 @@
 
                         <!-- Action Buttons -->
                         <div class="flex justify-end space-x-4">
-                            <button type="button" x-on:click="/* reset logic */"
+                            <button type="reset" x-on:click="
+                                    attendanceDays = 1;
+                                    attendanceScore = calculateAttendanceScore(1);
+                                    selectedCommitments = [];
+                                    commitmentScore = 0;
+                                    serviceScore = 0;
+                                    $refs.attendanceSlider.value = 1;
+                                    $refs.attendanceInput.value = 1;
+                                    $refs.form.querySelectorAll('input[type=checkbox]').forEach(cb => cb.checked = false);
+                                    $refs.form.querySelectorAll('input[type=radio]').forEach(rb => rb.checked = false);
+                                "
                                 class="inline-flex items-center px-4 py-2 bg-gray-200 dark:bg-gray-600 rounded-md font-semibold text-xs text-gray-800 dark:text-gray-200 uppercase tracking-widest hover:bg-gray-300 dark:hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition ease-in-out duration-150">
                                 Reset Form
                             </button>

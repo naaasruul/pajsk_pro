@@ -89,10 +89,18 @@
 								<div class="py-2 border-b dark:border-gray-600">
                                     <div class="flex justify-between items-center">
                                         <span class="font-medium">Placement Score</span>
-                                        <span class="text-lg"><span class="text-yellow-300">??</span>/20</span>
+                                        <span class="text-lg">{{ $scores['placement_score'] }}/20</span>
                                     </div>
                                     <div class="text-sm text-gray-600 dark:text-gray-300">
-                                        <p class="text-yellow-300">not implemented yet</p>
+                                        @forelse($student->activities as $activity)
+                                            @if($activity->placement)
+                                                <div class="text-sm text-gray-500 dark:text-gray-400">
+                                                    <p>{{ $activity->placement->name }} {{ $activity->represent }} {{ $activity->involvement->description }} Peringkat {{ $activity->achievement->achievement_name }}</p>
+                                                </div>
+                                            @endif
+                                        @empty
+                                            <p class="text-gray-500 italic">No placement achievements recorded</p>
+                                        @endforelse
                                     </div>
                                 </div>
 

@@ -17,7 +17,7 @@ return new class extends Migration
             $table->integer('involvement_score'); 
             $table->integer('commitment_score');
             $table->integer('service_score');
-            $table->integer('achievement_score');
+            $table->integer('placement_score');
             $table->integer('total_score');
             $table->decimal('percentage', 5, 2);
             $table->json('commitment_ids'); // Store selected commitment IDs

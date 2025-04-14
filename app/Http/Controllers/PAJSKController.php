@@ -67,7 +67,7 @@ class PAJSKController extends Controller
             'commitments' => Commitment::all(),
             'serviceContributions' => ServiceContribution::all(),
             'involvementScore' => $student->getInvolvementScore(),
-            'achievementScore' => $this->calculateAchievementScore($student)
+            'placementScore' => $student->getPlacementScore()
         ]);
     }
 
@@ -76,20 +76,27 @@ class PAJSKController extends Controller
         $maxScore = 0;
         
         foreach ($student->activities as $activity) {
-            if (!$activity->achievement || !$activity->placement_id) continue;
+            // Skip if missing required relations
+            if (!$activity->achievement) continue;
             
-            // Get score from achievement_placement pivot
-            $placementScore = $activity->achievement->placements()
-                ->where('placement_id', $activity->placement_id)
-                ->first()?->pivot->score ?? 0;
-                
-            // Get score from achievement_involvement pivot
+            // Get score based on placement if exists
+            if ($activity->placement_id) {
+                $placementScore = $activity->achievement->placements()
+                    ->where('placement_id', $activity->placement_id)
+                    ->first()?->pivot->score ?? 0;
+                    
+                if ($placementScore > 0) {
+                    $maxScore = max($maxScore, $placementScore);
+                    continue; // Skip involvement check if we got placement score
+                }
+            }
+
+            // Fallback to involvement score if no placement or placement score
             $involvementScore = $activity->achievement->involvements()
                 ->where('involvement_type_id', $activity->involvement_id)
                 ->first()?->pivot->score ?? 0;
             
-            // Take highest score found
-            $maxScore = max($maxScore, $placementScore + $involvementScore);
+            $maxScore = max($maxScore, $involvementScore);
         }
         
         return min($maxScore, 20); // Cap at 20 points
@@ -112,13 +119,19 @@ class PAJSKController extends Controller
             'attendance_score' => $attendance->score,
             'position_score' => $student->getCurrentPositionAttribute()?->point ?? 0,
             'involvement_score' => $student->getInvolvementScore(),
+            'placement_score' => $student->getPlacementScore(),
             'commitment_score' => $commitments->sum('score'),
-            'service_score' => $serviceContribution->score,
-            'achievement_score' => $this->calculateAchievementScore($student)
+            'service_score' => $serviceContribution->score
         ];
 
-        $total = array_sum($scores);
-        $percentage = ($total / 110) * 100;
+        $total = $scores['attendance_score'] + 
+                 $scores['position_score'] + 
+                 $scores['involvement_score'] + // Include both scores
+                 $scores['placement_score'] +   // Include both scores 
+                 $scores['commitment_score'] + 
+                 $scores['service_score'];
+
+        $percentage = ($total / 130) * 100; // Updated total to 130 to account for both scores
 
         // Create new PAJSK assessment record
         $assessment = PajskAssessment::create([
@@ -127,9 +140,9 @@ class PAJSKController extends Controller
             'attendance_score' => $scores['attendance_score'],
             'position_score' => $scores['position_score'],
             'involvement_score' => $scores['involvement_score'],
+            'placement_score' => $scores['placement_score'],
             'commitment_score' => $scores['commitment_score'],
             'service_score' => $scores['service_score'],
-            'achievement_score' => $scores['achievement_score'],
             'total_score' => $total,
             'percentage' => $percentage,
             'commitment_ids' => $validated['commitments'],
@@ -156,6 +169,7 @@ class PAJSKController extends Controller
             'involvement_score' => $evaluation->involvement_score,
             'commitment_score' => $evaluation->commitment_score,
             'service_score' => $evaluation->service_score,
+            'placement_score' => $evaluation->placement_score,
             'achievement_score' => $evaluation->achievement_score,
         ];
 

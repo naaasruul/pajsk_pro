@@ -15,6 +15,7 @@ class PajskAssessment extends Model
         'involvement_score',
         'commitment_score',
         'service_score',
+        'placement_score', // Add this line
         'achievement_score',
         'total_score',
         'percentage',
