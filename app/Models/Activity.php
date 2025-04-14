@@ -31,7 +31,10 @@ class Activity extends Model
 
     public function placement()
     {
-        return $this->belongsTo(Placement::class);
+        return $this->belongsTo(Placement::class)
+            ->with(['achievements' => function($query) {
+                $query->withPivot(['score']);
+            }]);
     }
 
     public function involvement()

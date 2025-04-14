@@ -44,8 +44,8 @@ Route::middleware('auth')->group(function () {
             Route::get('/', [ActivityController::class, 'index'])->name('index');
             Route::get('/create', [ActivityController::class, 'create'])->name('create');
             Route::post('/', [ActivityController::class, 'store'])->name('store');
-            Route::get('/{activity}/edit', [ActivityController::class, 'edit'])->name('edit');
-            Route::put('/{activity}', [ActivityController::class, 'update'])->name('update');
+            Route::get('/{activity}/edit', [ActivityController::class, 'editActivity'])->name('edit');
+            Route::put('/{activity}', [ActivityController::class, 'updateActivity'])->name('update');
             Route::delete('/{activity}', [ActivityController::class, 'destroy'])->name('destroy');
         });
     });

@@ -50,17 +50,11 @@
                             <tr>
                                 <th scope="col" class="px-6 py-3">#</th>
                                 <th scope="col" class="px-6 py-3">Activity Name</th>
-                                {{-- BORANG ASAS --}}
-                                {{-- BORANG Mo1/Mo2 --}}
-                                {{-- BORANG KEBENARAN IBU BAPA --}}
-                                {{-- SIJIL PENGHARGAAN --}}
-                                {{-- NO BORANG --}}
-                                {{-- DATE --}}
                                 <th scope="col" class="px-6 py-3">Category</th>
                                 <th scope="col" class="px-6 py-3">Date</th>
-                                {{-- EDIT --}}
-                                {{-- LAPOR PENCAPAIAN (UPDATE PLACEMENT) --}}
-                                {{-- DELETE) --}}
+                                <th scope="col" class="px-6 py-3">Placement</th>
+                                <th scope="col" class="px-6 py-3">Status</th>
+                                <th scope="col" class="px-6 py-3">Action</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -73,7 +67,18 @@
                                 <td class="px-6 py-4">{{ $activity->category }}</td>
                                 <td class="px-6 py-4">{{ $activity->date_start }}</td>
                                 <td class="px-6 py-4">
-                                    <a href="{{ route('cocuriculum.edit', $activity) }}" class="font-medium text-blue-600 dark:text-blue-500 hover:underline">Edit</a>
+                                    {{ $activity->placement->name ?? 'No Placement' }}
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="px-2 py-1 text-xs font-semibold rounded-full
+                                        {{ $activity->status == 'pending' ? 'bg-yellow-100 text-yellow-800' : '' }}
+                                        {{ $activity->status == 'approved' ? 'bg-green-100 text-green-800' : '' }}
+                                        {{ $activity->status == 'rejected' ? 'bg-red-100 text-red-800' : '' }}">
+                                        {{ ucfirst($activity->status ?? 'pending') }}
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <a href="{{ route('activity.edit', $activity) }}" class="font-medium text-blue-600 dark:text-blue-500 hover:underline">Edit</a>
                                     <form action="{{ route('cocuriculum.destroy', $activity) }}" method="POST" class="inline">
                                         @csrf
                                         @method('DELETE')

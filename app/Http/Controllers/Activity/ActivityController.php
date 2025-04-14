@@ -136,9 +136,77 @@ class ActivityController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(CocuriculumActivity $cocuriculum)
+    public function editActivity(Activity $activity)
     {
-        return view('cocuriculum.edit', compact('cocuriculum'));
+        $teacher = auth()->user()->teacher;
+        
+        // Load relationships for the activity
+        $activity->load(['teachers', 'students', 'club', 'involvement', 'achievement']);
+    
+        return view('cocuriculum.edit-activity', [
+            'activity' => $activity,
+            'teacher' => $teacher,
+            'students' => Student::with('user')->get(),
+            'teachers' => Teacher::with('user')->get(), 
+            'involvementTypes' => InvolvementType::orderBy('type')->get(),
+            'clubs' => Club::all(),
+            'achievementTypes' => Achievement::all(),
+            'placements' => Placement::all()
+        ]);
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function updateActivity(Request $request, Activity $activity) 
+    {
+        $validated = $request->validate([
+            'represent' => 'required',
+            'placement_id' => 'nullable|exists:placements,id',
+            'involvement_id' => 'required|exists:involvement_types,id',
+            'achievement_id' => 'required|exists:achievements,id',
+            'club_id' => 'required|exists:clubs,id',
+            'activity_place' => 'required|string|max:255',
+            'datetime_start' => 'required|date',
+            'time_start' => ['required', 'date_format:H:i'],
+            'datetime_end' => 'required|date|after_or_equal:datetime_start',
+            'time_end' => ['required', 'date_format:H:i'],
+            'teachers' => 'nullable|array',
+            'teachers.*' => 'exists:teachers,id',
+            'students' => 'nullable|array',
+            'students.*' => 'exists:students,id'
+        ]);
+
+        $club = Club::findOrFail($validated['club_id']);
+
+        // Update activity
+        $activity->update([
+            'represent' => $validated['represent'],
+            'placement_id' => $validated['placement_id'], // Add placement_id
+            'involvement_id' => $validated['involvement_id'],
+            'achievement_id' => $validated['achievement_id'],
+            'club_id' => $validated['club_id'],
+            'category' => $club->category,
+            'activity_place' => $validated['activity_place'],
+            'date_start' => $validated['datetime_start'],
+            'time_start' => $validated['time_start'],
+            'date_end' => $validated['datetime_end'],
+            'time_end' => $validated['time_end']
+        ]);
+
+        // Sync relationships
+        if (!empty($validated['teachers'])) {
+            $activity->teachers()->sync($validated['teachers']);
+        }
+
+        if (!empty($validated['students'])) {
+            $activity->students()->sync($validated['students']);
+        }
+
+        return response()->json([
+            'message' => 'Activity updated successfully!',
+            'activity' => $activity
+        ]);
     }
 
     /**
