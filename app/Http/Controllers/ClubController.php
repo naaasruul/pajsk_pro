@@ -24,6 +24,7 @@ class ClubController extends Controller
     {
         $teacher = Auth::user()->teacher;
         $club = $teacher ? $teacher->club : null;
+        $students = $club->students()->with('user')->paginate(10);
         $positions = ClubPosition::all();
 
         $studentsWithPositions = collect();
@@ -61,7 +62,8 @@ class ClubController extends Controller
             'club',
             'studentsWithPositions',
             'positions',
-            'genderCounts'
+            'genderCounts',
+            'students' 
         ));
     }
 
