@@ -34,7 +34,7 @@ class Student extends Model
     public function activities(): BelongsToMany
     {
         return $this->belongsToMany(Activity::class, 'activity_student')
-                    ->with(['involvement', 'achievement'])
+                    ->with(['involvement', 'achievement', 'placement'])
                     ->withTimestamps();
     }
 
@@ -68,6 +68,40 @@ class Student extends Model
                 'activity_id' => $activity->id,
                 'achievement_id' => $activity->achievement_id,
                 'involvement_type' => $activity->involvement->type,
+                'score' => $score
+            ]);
+
+            $maxScore = max($maxScore, (int)$score);
+        }
+
+        return min($maxScore, 20);
+    }
+
+    // Placement scoring methods
+    public function getPlacementScore(): int
+    {
+        $maxScore = 0;
+        $activities = $this->activities()
+            ->with(['achievement', 'placement'])
+            ->whereNotNull('placement_id')
+            ->get();
+
+        foreach ($activities as $activity) {
+            if (!$activity->achievement || !$activity->placement) {
+                continue;
+            }
+
+            $score = \DB::table('achievement_placement')
+                ->where([
+                    'achievement_id' => $activity->achievement_id,
+                    'placement_id' => $activity->placement_id
+                ])
+                ->value('score');
+
+            \Log::debug('Placement Score', [
+                'activity_id' => $activity->id,
+                'achievement_id' => $activity->achievement_id,
+                'placement_id' => $activity->placement_id,
                 'score' => $score
             ]);
 
