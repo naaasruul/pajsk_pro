@@ -14,7 +14,7 @@
 				<div class="mb-6">
 					<h2 class="text-2xl font-semibold text-gray-800 dark:text-white">{{ $club->club_name }}</h2>
 					<p class="text-gray-600 dark:text-gray-400">Category: {{ $club->category }}</p>
-					<p class="text-gray-600 dark:text-gray-400">Advisor: {{ auth()->user()->name }}</p>
+					<p class="text-gray-600 dark:text-gray-400">Advisor: {{ $teacher->user->name }}</p>
 				</div>
 
 				<div class="relative overflow-x-auto">
@@ -59,10 +59,8 @@
 					</table>
 				</div>
 
-				<div class="mt-4 flex justify-between items-center">
-					<div class="text-sm text-gray-600 dark:text-gray-400">
-						Total Students: {{ count($studentsWithPositions) }}
-					</div>
+				<div class="mt-4">
+					<x-paginator :paginator="$students"/>
 				</div>
 				@else
 				<div class="text-center py-8">

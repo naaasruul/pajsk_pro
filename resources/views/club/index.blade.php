@@ -33,7 +33,7 @@
 
 				<div class="mt-4 flex justify-between items-center">
 					<div class="text-sm text-gray-600 dark:text-gray-400">
-						Total Students: {{ count($studentsWithPositions) }}
+						<x-paginator :paginator="$students" />
 					</div>
 				</div>
 				@else

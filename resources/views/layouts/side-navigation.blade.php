@@ -52,11 +52,14 @@
                 </svg>
             </button>
             <ul id="dropdown-student" class="hidden py-2 space-y-2">
-                <x-sidebar-item class="pl-11" :route="route('club.index')" :role="request()->routeIs('club.*')">
+                <x-sidebar-item class="pl-11" :route="route('club.index')" :role="request()->routeIs('club.index')">
                     Club Management
                 </x-sidebar-item>
-                <x-sidebar-item class="pl-11" :route="route('pajsk.index')" :role="request()->routeIs('pajsk.*')">
+                <x-sidebar-item class="pl-11" :route="route('pajsk.index')" :role="request()->routeIs('pajsk.index')">
                     PAJSK Assessment
+                </x-sidebar-item>
+                <x-sidebar-item class="pl-11" :route="route('pajsk.evaluations')" :role="request()->routeIs('pajsk.evaluations')">
+                    {{ __('Evaluations History') }}
                 </x-sidebar-item>
             </ul>
 
