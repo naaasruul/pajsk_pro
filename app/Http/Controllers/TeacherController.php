@@ -31,7 +31,7 @@ class TeacherController extends Controller
             'password' => 'required|min:8',
             'address' => 'required|string|max:255',
             'phone_number' => 'required|string|max:20',
-            'home_number' => 'required|string|max:20',
+            'gender' => 'required',
             'club_id' => 'nullable|exists:clubs,id', // Validate club_id if provided
         ]);
 
@@ -42,6 +42,7 @@ class TeacherController extends Controller
             $user = User::create([
                 'name' => $validated['name'],
                 'email' => $validated['email'],
+                'gender' => $validated['gender'],
                 'password' => Hash::make($validated['password']),
             ]);
 
@@ -50,7 +51,7 @@ class TeacherController extends Controller
             $user->teacher()->create([
                 'address' => $validated['address'],
                 'phone_number' => $validated['phone_number'],
-                'home_number' => $validated['home_number'],
+                'home_number' => $validated['home_number'] ?? null,
                 'club_id' => $validated['club_id'] ?? null,
             ]);
         });

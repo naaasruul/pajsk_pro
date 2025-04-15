@@ -29,14 +29,15 @@ class StudentController extends Controller
             'password' => 'required|min:8',
             'address' => 'required|string|max:255',
             'phone_number' => 'required|string|max:20',
-            'home_number' => 'required|string|max:20',
             'class' => 'required|string|max:50',
+            'gender' => 'required',
         ]);
 
         DB::transaction(function () use ($validated) {
             $user = User::create([
                 'name' => $validated['name'],
                 'email' => $validated['email'],
+                'gender' => $validated['gender'],
                 'password' => Hash::make($validated['password']),
             ]);
 
@@ -45,7 +46,7 @@ class StudentController extends Controller
             $user->student()->create([
                 'address' => $validated['address'],
                 'phone_number' => $validated['phone_number'],
-                'home_number' => $validated['home_number'],
+                'home_number' => $validated['home_number'] ?? null,
                 'class' => $validated['class'],
             ]);
         });
