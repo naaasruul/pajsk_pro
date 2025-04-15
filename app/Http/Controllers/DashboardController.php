@@ -14,11 +14,11 @@ class DashboardController extends Controller
         $user = $request->user();
 
         if ($user->hasRole('admin')) {
-            $activities = Activity::count(); // Total activities
-            $teachers = Teacher::count(); // Total teachers
-            $students = Student::count(); // Total students
+            $activitiesCount = Activity::count(); // Total activities
+            $teachersCount = Teacher::count(); // Total teachers
+            $studentsCount = Student::count(); // Total students
 
-            return view('dashboard.admin', compact('activities', 'teachers', 'students'));
+            return view('dashboard.admin', compact('activitiesCount', 'teachersCount', 'studentsCount'));
         } elseif ($user->hasRole('teacher')) {
             $teacher = $user->teacher; // Get the teacher associated with the user
             $activities = $teacher->activities()->count(); // Activities assigned to the teacher

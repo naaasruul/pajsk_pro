@@ -7,11 +7,11 @@
     <x-container>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             {{-- Total Students --}}
-            <x-card title="3" content="Student" />
+            <x-card :title="$studentsCount" content="Students" />
             {{-- Total Teachers --}}
-            <x-card title="3" content="Teacher" />
+            <x-card :title="$teachersCount" content="Teachers" />
             {{-- Total New Applications --}}
-            <x-card title="3" content="New Applications" />
+            <x-card :title="$activitiesCount" content="New Applications" />
         </div>
     </x-container>
     
