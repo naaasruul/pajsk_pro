@@ -11,38 +11,36 @@
 		</div>
 	</x-slot>
 
-	<div class="relative overflow-x-auto">
-		<div class="p-4 border-2 border-gray-200 rounded-lg dark:border-gray-700">
-			<div class="relative overflow-x-auto shadow-md sm:rounded-lg">
-				@if($club)
-				<div class="mb-6">
-					<h2 class="text-2xl font-semibold text-gray-800 dark:text-white">{{ $club->club_name }}</h2>
-					<p class="text-gray-600 dark:text-gray-400">Category: {{ $club->category }}</p>
-					<p class="text-gray-600 dark:text-gray-400">Advisor: {{ auth()->user()->name }}</p>
-				</div>
+	<x-container>
+		
+		<x-club-overview :clubName="$club->club_name ?? 'No Club'" :clubCategory="$club->category ?? ''">
+			<x-card title="{{ $genderCounts['male'] ?? 0 }}" content="Male" />
+			<x-card title="{{ $genderCounts['female'] ?? 0 }}" content="Female" />
+			<x-card title="{{ count($studentsWithPositions) }}" content="Total" />
+		</x-club-overview>
 
-				<div class="grid grid-cols-3 gap-4 mb-6">
-					<x-card title="{{ $genderCounts['male'] ?? 0 }}" content="Male" />
-					<x-card title="{{ $genderCounts['female'] ?? 0 }}" content="Female" />
-					<x-card title="{{ count($studentsWithPositions) }}" content="Total" />
-				</div>
-
-				<div class="relative overflow-x-auto">
-					@include('club.partials.club-table')
-				</div>
-
-				<div class="mt-4 flex justify-between items-center">
-					<div class="text-sm text-gray-600 dark:text-gray-400">
-						<x-paginator :paginator="$students" />
+		<div class="relative overflow-x-auto">
+			<div class=" rounded-lg dark:border-gray-700">
+				<div class="relative overflow-x-auto shadow-md sm:rounded-lg">
+					@if($club)
+					<div class="relative overflow-x-auto">
+						@include('club.partials.club-table')
 					</div>
+	
+					<div class="mt-4 flex justify-between items-center">
+						<div class="text-sm text-gray-600 dark:text-gray-400">
+							<x-paginator :paginator="$students" />
+						</div>
+					</div>
+					@else
+					<div class="text-center py-8">
+						<p class="text-gray-500 dark:text-gray-400">You are not assigned to any club yet. Please contact the
+							administrator.</p>
+					</div>
+					@endif
 				</div>
-				@else
-				<div class="text-center py-8">
-					<p class="text-gray-500 dark:text-gray-400">You are not assigned to any club yet. Please contact the
-						administrator.</p>
-				</div>
-				@endif
 			</div>
 		</div>
-	</div>
+	</x-container>
+	
 </x-app-layout>
