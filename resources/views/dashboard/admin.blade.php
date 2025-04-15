@@ -133,5 +133,5 @@
 
     
 
-    <script src="{{ asset('js/chart.js') }}"></script>
+    <script src="{{ asset('js/admin-dashboard-chart.js') }}"></script>
 </x-app-layout>
