@@ -75,17 +75,17 @@
                 <x-sidebar-item class="pl-11" :route="route('activity.index')" :role="request()->routeIs('activity.*')">
                     Activity List
                 </x-sidebar-item>
-                <x-sidebar-item class="pl-11" :route="route('cocuriculum.index')" :role="request()->routeIs('cocuriculum.*')">
+                {{-- <x-sidebar-item class="pl-11" :route="route('cocuriculum.index')" :role="request()->routeIs('cocuriculum.*')">
                     Co-curriculum
                 </x-sidebar-item>
                 <x-sidebar-item class="pl-11" :route="route('cocuriculum.extra-cocuriculum')" :role="request()->routeIs('cocuriculum.extra-cocuriculum')">
                     Extra Co-curriculum
-                </x-sidebar-item>
+                </x-sidebar-item> --}}
             </ul>
 
-            <x-sidebar-item :route="route('activity.index')" :role="request()->routeIs('activity.*')">
+            {{-- <x-sidebar-item :route="route('activity.index')" :role="request()->routeIs('activity.*')">
                 Reports
-            </x-sidebar-item>
+            </x-sidebar-item> --}}
             @endhasanyrole
 
             <div class="pt-4 mt-4 space-y-2 border-t border-gray-200 dark:border-gray-700">
