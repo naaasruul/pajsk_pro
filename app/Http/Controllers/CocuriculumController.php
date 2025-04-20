@@ -15,10 +15,12 @@ class CocuriculumController extends Controller
         $teacher = auth()->user()->teacher; // Assuming the logged-in user is a teacher
         $club = $teacher ? $teacher->club : null;
 
-        // Preload all students with their positions
-        $studentsWithPositions = $club ? $club->students->map(function ($student) {
+        // Preload all students with their positions in the specific club
+        $studentsWithPositions = $club ? $club->students->map(function ($student) use ($club) {
             $position = $student->pivot->club_position_id
-                ? ClubPosition::find($student->pivot->club_position_id)
+                ? ClubPosition::where('id', $student->pivot->club_position_id)
+                    ->where('club_id', $club->id) // Ensure the position is for the specific club
+                    ->first()
                 : null;
 
             return [
@@ -28,11 +30,7 @@ class CocuriculumController extends Controller
             ];
         }) : [];
 
-
-
-        return view('cocuriculum.cocuriculum', compact('studentsWithPositions','club','teacher'));
-        
-
+        return view('cocuriculum.cocuriculum', compact('studentsWithPositions', 'club', 'teacher'));
     }
 
     public function create()
