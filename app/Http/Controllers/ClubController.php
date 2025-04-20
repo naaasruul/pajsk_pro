@@ -31,11 +31,12 @@ class ClubController extends Controller
         $genderCounts = ['male' => 0, 'female' => 0];
 
         if ($club) {
-            $studentsWithPositions = $club->students->map(function ($student) use ($positions, &$genderCounts) {
-                // Access pivot data through the relationship
-                $clubPosition = $student->clubs->first();
-                $position = $clubPosition && $clubPosition->pivot->club_position_id
-                    ? $positions->find($clubPosition->pivot->club_position_id)
+            $studentsWithPositions = $club->students->map(function ($student) use ($club, $positions, &$genderCounts) {
+                // Access pivot data for the specific club
+                $pivotData = $student->clubs->where('id', $club->id)->first()?->pivot;
+
+                $position = $pivotData && $pivotData->club_position_id
+                    ? $positions->find($pivotData->club_position_id)
                     : null;
 
                 // Count genders

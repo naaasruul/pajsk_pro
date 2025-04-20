@@ -54,7 +54,7 @@ class DatabaseSeeder extends Seeder
             AttendanceSeeder::class,
             ClubPositionSeeder::class,
             ClubSeeder::class,
-            // ClubStudentSeeder::class,
+            ClubStudentSeeder::class,
             CocurriculumSeeder::class,
             CommitmentSeeder::class,
             ServiceContributionSeeder::class,
