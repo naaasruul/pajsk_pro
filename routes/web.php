@@ -82,6 +82,10 @@ Route::middleware('auth')->group(function () {
             Route::post('/evaluate-student/{student}', [PAJSKController::class, 'storeEvaluation'])->name('store-evaluation');
             Route::get('/review/student/{student}/evaluation/{evaluation}', [PAJSKController::class, 'review'])->name('review');
             Route::get('/evaluations', [PAJSKController::class, 'evaluations'])->name('evaluations');
+
+            // Extra cocuriculum routes
+            Route::get('/extra-cocuriculum', [ExtraCocuriculumController::class, 'index'])->name('extra-cocuriculum');
+            // Route::get('/extra-cocuriculum/create', [ExtraCocuriculumController::class, 'create'])->name('extra-cocuriculum.create');
         });
     });
 });
