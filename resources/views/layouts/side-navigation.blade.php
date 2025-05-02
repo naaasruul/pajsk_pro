@@ -61,6 +61,9 @@
                 <x-sidebar-item class="pl-11" :route="route('pajsk.evaluations')" :role="request()->routeIs('pajsk.evaluations')">
                     {{ __('Evaluations History') }}
                 </x-sidebar-item>
+                <x-sidebar-item class="pl-11" :route="route('pajsk.extra-cocuriculum')" :role="request()->routeIs('pajsk.extra-cocuriculum')">
+                    {{ __('Extra-Cocuriculum') }}
+                </x-sidebar-item>
             </ul>
 
             <button type="button"
