@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Models\Student;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class ExtraCocuriculumController extends Controller
 {
@@ -13,7 +15,10 @@ class ExtraCocuriculumController extends Controller
     public function index()
     {
         //
-        return view('cocuriculum.extra-cocuriculum');
+        $teacher = auth()->user()->teacher; // Assuming the logged-in user is a teacher
+        $students = Student::where('mentor_id', $teacher->id)->paginate(10);
+        Log::info('Students:', ['students' => $students]);
+        return view('cocuriculum.extra-cocuriculum',compact('students'));
     }
 
     /**
@@ -22,6 +27,7 @@ class ExtraCocuriculumController extends Controller
     public function create()
     {
         //
+        return view('cocuriculum.create-extra-cocuriculum');
     }
 
     /**
