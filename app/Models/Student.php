@@ -38,6 +38,16 @@ class Student extends Model
                     ->withTimestamps();
     }
 
+    public function mentor()
+    {
+        return $this->belongsTo(Teacher::class, 'mentor_id');
+    }
+
+    public function extraCocuriculum()
+    {
+        return $this->hasOne(ExtraCocuricullum::class);
+    }
+
     // Involvement scoring methods
     public function getInvolvementScore(): int
     {
