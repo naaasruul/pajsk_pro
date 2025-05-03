@@ -3,7 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Models\Achievement;
+use App\Models\CommunityServices;
+use App\Models\ExtraCocuricullum;
+use App\Models\Services;
+use App\Models\SpecialAward;
 use App\Models\Student;
+use App\Models\Tier;
+use App\Models\TimmsAndPisa;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
@@ -17,6 +24,8 @@ class ExtraCocuriculumController extends Controller
         //
         $teacher = auth()->user()->teacher; // Assuming the logged-in user is a teacher
         $students = Student::where('mentor_id', $teacher->id)->paginate(10);
+
+
         Log::info('Students:', ['students' => $students]);
         return view('cocuriculum.extra-cocuriculum',compact('students'));
     }
@@ -24,18 +33,89 @@ class ExtraCocuriculumController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create(Student $student)
     {
         //
-        return view('cocuriculum.create-extra-cocuriculum');
+        $student = Student::find($student->id);
+        Log::info('Student:', ['student' => $student]);
+
+        $services = Services::all();
+        Log::info('Services:', ['services' => $services]);
+
+        $special_awards = SpecialAward::all();
+        Log::info('Special Awards:', ['specialAwards' => $special_awards]);
+
+        $community_services = CommunityServices::all();
+        Log::info('Community Services:', ['community_services' => $community_services]);
+
+        $achievements = Achievement::all();
+        Log::info('Achievements:', ['achievements' => $achievements]);
+
+        $tiers = Tier::all();
+        Log::info('Tiers:', ['tiers' => $tiers]);
+
+        $timms_pisa= TimmsAndPisa::all();
+        Log::info('Timms and Pisa:', ['timms_pisa' => $timms_pisa]);
+
+
+
+        return view('cocuriculum.create-extra-cocuriculum',compact('student','services','special_awards','community_services','achievements','tiers','timms_pisa'));
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(Request $request, $studentId)
     {
-        //
+        // Validate the incoming request
+        $validated = $request->validate([
+            'service_point' => 'required|exists:services,id',
+            'special_award_point' => 'required|exists:special_awards,id',
+            'community_service_point' => 'required|exists:community_services,id',
+            'achievement' => 'required|exists:achievements,id',
+            'tiers' => 'required|exists:tiers,id',
+            'timms_and_pisa_point' => 'required|exists:timms_and_pisa,id',
+        ]);
+
+        // Retrieve the Nilam point based on achievement and tier
+        $achievementId = $validated['achievement'];
+        $tierId = $validated['tiers'];
+
+        $nilamPoint = Achievement::where('id', $achievementId)
+            ->whereHas('tiers', function ($query) use ($tierId) {
+                $query->where('tiers.id', $tierId); // Explicitly specify the table name
+            })
+            ->first()
+            ->tiers()
+            ->where('tiers.id', $tierId) // Explicitly specify the table name
+            ->first()
+            ->pivot
+            ->point ?? 0;
+
+        // Calculate the total points
+        $servicePoint = Services::find($validated['service_point'])->point ?? 0;
+        $specialAwardPoint = SpecialAward::find($validated['special_award_point'])->point ?? 0;
+        $communityServicePoint = CommunityServices::find($validated['community_service_point'])->point ?? 0;
+        $timmsAndPisaPoint = TimmsAndPisa::find($validated['timms_and_pisa_point'])->point ?? 0;
+        Log::info('servicePoint = '.$servicePoint);
+        Log::info('specialAwardPoint = '.$specialAwardPoint);
+        Log::info('communityServicePoint = '.$communityServicePoint);
+        Log::info('nilamPoint = '.$nilamPoint);
+        Log::info('timmsAndPisaPoint = '.$timmsAndPisaPoint);
+        $totalPoint = $servicePoint + $specialAwardPoint + $communityServicePoint + $nilamPoint + $timmsAndPisaPoint;
+
+        // Create the ExtraCocuricullum record
+        ExtraCocuricullum::create([
+            'student_id' => $studentId,
+            'service_id' => $validated['service_point'],
+            'special_award_id' => $validated['special_award_point'],
+            'community_service_id' => $validated['community_service_point'],
+            'nilam_id' => $achievementId, // Store the achievement ID as Nilam
+            'timms_pisa_id' => $validated['timms_and_pisa_point'],
+            'total_point' => $totalPoint,
+        ]);
+
+        return redirect()->back()->with('success', 'Extra Cocuricculum data added successfully!');
     }
 
     /**
