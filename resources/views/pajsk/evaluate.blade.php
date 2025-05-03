@@ -28,51 +28,50 @@
                         </div>
                     </div>
 
-                    <form x-ref="form" method="POST" action="{{ route('pajsk.store-evaluation', $student) }}" x-data="{ 
-							selectedCommitments: [],
-							maxCommitments: 4,
-							attendanceDays: 0,  // Track days separately
-							attendanceScore: 0,
-							positionScore: {{ $position ? $position->point : 0 }},
-							commitmentScore: 0,
-							serviceScore: 0,
-                            involvementScore: {{ $involvementScore }},
-                            placementScore: {{ $placementScore }},
-							
-							// Preload attendance scores from backend
-							attendanceScores: {
-								@foreach($attendanceScores as $attendance)
-									{{ $attendance->attendance_count }}: {{ $attendance->score }},
-								@endforeach
-							},
-							
-							// Calculate score based on days
-							calculateAttendanceScore(days) {
-								this.attendanceDays = days;
-								this.attendanceScore = this.attendanceScores[days] || 0;
-								return this.attendanceScore;
-							},
-							
-							calculateTotal() {
-								return this.attendanceScore + 
-                                       this.positionScore + 
-                                       this.involvementScore +
-                                       this.placementScore +
-                                       this.commitmentScore + 
-                                       this.serviceScore;
-							},
-							calculatePercentage() {
-								return ((this.calculateTotal() / 130) * 100).toFixed(2); // Updated total to 130
-							}
-						}" x-init="
-							// Initialize with first day selected
-							$nextTick(() => {
-								if ($refs.attendanceSlider) {
-									$refs.attendanceSlider.value = 1;
-									attendanceScore = calculateAttendanceScore(1);
-								}
-							});
-						">
+                    <form x-ref="form" method="POST" action="{{ route('pajsk.store-evaluation', $student) }}" 
+                    x-data="{
+                        selectedCommitments: JSON.parse(localStorage.getItem('selectedCommitments') || '[]'),
+                        maxCommitments: 4,
+                        attendanceDays: parseInt(localStorage.getItem('attendanceDays')) || 1,
+                        attendanceScore: 0,
+                        positionScore: {{ $position ? $position->point : 0 }},
+                        commitmentScore: parseFloat(localStorage.getItem('commitmentScore')) || 0,
+                        serviceScore: parseFloat(localStorage.getItem('serviceScore')) || 0,
+                        involvementScore: {{ $involvementScore }},
+                        placementScore: {{ $placementScore }},
+                        attendanceScores: {
+                            @foreach($attendanceScores as $attendance)
+                                {{ $attendance->attendance_count }}: {{ $attendance->score }},
+                            @endforeach
+                        },
+                        calculateAttendanceScore(days) {
+                            this.attendanceDays = days;
+                            this.attendanceScore = this.attendanceScores[days] || 0;
+                            localStorage.setItem('attendanceDays', days);
+                            return this.attendanceScore;
+                        },
+                        updateCommitments() {
+                           localStorage.setItem('selectedCommitments', JSON.stringify(this.selectedCommitments));
+                           localStorage.setItem('commitmentScore', this.commitmentScore);
+                        },
+                        updateServiceScore(score) {
+                           this.serviceScore = score;
+                           localStorage.setItem('serviceScore', score);
+                        },
+                        calculateTotal() {
+                           return this.attendanceScore + this.positionScore + this.involvementScore + this.placementScore + this.commitmentScore + this.serviceScore;
+                        },
+                        calculatePercentage() {
+                           return ((this.calculateTotal() / 110) * 100).toFixed(2);
+                        }
+                    }" 
+                    x-init="$nextTick(() => {
+                        if ($refs.attendanceSlider) {
+                             $refs.attendanceSlider.value = attendanceDays;
+                             $refs.attendanceInput.value = attendanceDays;
+                             attendanceScore = calculateAttendanceScore(attendanceDays);
+                        }
+                    })">
                         @csrf
 
                         <!-- Attendance Section -->
@@ -82,7 +81,6 @@
                             <div class="mb-4">
                                 <label for="attendance_count" class="block text-sm font-medium mb-2">Days
                                     Present</label>
-
                                 <div class="flex items-center gap-4">
                                     <!-- Slider -->
                                     <div class="flex-1">
@@ -95,7 +93,7 @@
                                         <!-- Slider Labels -->
                                         <div class="flex justify-between text-xs text-gray-500 dark:text-gray-400 mt-1">
                                             <template x-for="i in 12">
-                                                <span x-text="i" :class="{ 
+                                                <span x-text="i" :class="{
 														'font-bold text-indigo-600 dark:text-indigo-400': i == attendanceDays,
 														'opacity-50': i > attendanceDays 
 													}">
@@ -108,8 +106,7 @@
                                     <div class="w-20">
                                         <!-- Add a hidden input for the attendance ID -->
                                         <input type="hidden" name="attendance" :value="attendanceDays">
-                                        <input type="number" x-ref="attendanceInput" min="1"
-                                            max="12" x-model="attendanceDays" x-on:change="
+                                        <input type="number" x-ref="attendanceInput" min="1" max="12" x-model="attendanceDays" x-on:change="
 												if ($event.target.value > 12) $event.target.value = 12;
 												if ($event.target.value < 1) $event.target.value = 1;
 												$refs.attendanceSlider.value = $event.target.value;
@@ -118,13 +115,6 @@
                                     </div>
                                 </div>
 
-                                {{--
-                                <!-- Display days to points mapping -->
-                                <div class="mt-2 text-sm text-gray-500 dark:text-gray-400">
-                                    <span x-text="attendanceDays + ' day(s)'"></span> =
-                                    <span x-text="attendanceScore + ' point(s)'"></span>
-                                </div>
-                                --}}
                                 @error('attendance_count')
                                 <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
                                 @enderror
@@ -140,13 +130,11 @@
                                 <div class="flex justify-between p-2 bg-gray-100 rounded dark:bg-gray-600">
                                     <span>
                                         {{ $activity->represent }} {{ $activity->involvement->description }} Dalam {{ $activity->club->club_name ?? 'NULL' }}, Peringkat {{ $activity->achievement->achievement_name}}
-                                        {{-- [Type: {{ $activity->involvement?->type ?? 'N/A' }},
-                                        Level: {{ $activity->achievement?->achievement_name ?? 'N/A' }}]
                                         @php
                                             $debug = DB::table('achievement_involvement')
                                                 ->where([
+                                                    'involvement_type_id' => $activity->involvement->type,
                                                     'achievement_id' => $activity->achievement_id,
-                                                    'involvement_type_id' => $activity->involvement->type
                                                 ])
                                                 ->first();
                                             if ($debug) {
@@ -154,7 +142,7 @@
                                             } else {
                                                 echo " - No score found [Achievement: {$activity->achievement_id}, Type: {$activity->involvement->type}]";
                                             }
-                                        @endphp --}}
+                                        @endphp
                                     </span>
                                 </div>
                                 @empty
@@ -177,8 +165,8 @@
                                             @php
                                                 $placementScore = DB::table('achievement_placement')
                                                     ->where([
+                                                        'placement_id' => $activity->placement_id,
                                                         'achievement_id' => $activity->achievement_id,
-                                                        'placement_id' => $activity->placement_id
                                                     ])
                                                     ->value('score');
                                             @endphp
@@ -198,8 +186,7 @@
 
                         <!-- Commitment Section -->
                         <div class="mb-6">
-                            <h4 class="text-lg font-medium">Commitment [<span
-                                    x-text="commitmentScore + ' Marks'"></span>]</h4>
+                            <h4 class="text-lg font-medium">Commitment [<span x-text="commitmentScore + ' Marks'"></span>]</h4>
                             <p class="text-sm text-gray-600 dark:text-gray-400 pb-2 border-b mb-4">Select 4 commitments
                                 only.</p>
                             <div class="space-y-3">
@@ -219,7 +206,9 @@
                                                         selectedCommitments = selectedCommitments.filter(id => id !== $event.target.value);
                                                         commitmentScore -= {{ $commitment->score }};
                                                     }
+                                                    updateCommitments();
                                                 "
+                                            :checked="selectedCommitments.includes('{{ $commitment->id }}')"
                                             :disabled="!selectedCommitments.includes('{{ $commitment->id }}') && selectedCommitments.length >= maxCommitments"
                                             class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500 dark:border-gray-700 dark:bg-gray-900">
                                     </div>
@@ -228,8 +217,7 @@
                                             {{ $commitment->commitment_name }} ({{ $commitment->score }} points)
                                         </label>
                                         @if($commitment->description)
-                                        <p class="text-sm text-gray-500 dark:text-gray-400">{{ $commitment->description
-                                            }}</p>
+                                        <p class="text-sm text-gray-500 dark:text-gray-400">{{ $commitment->description }}</p>
                                         @endif
                                     </div>
                                 </div>
@@ -248,7 +236,7 @@
                                     <div class="flex items-start">
                                         <div class="flex items-center h-6">
                                             <input type="radio" id="service_contribution_id-{{ $service->id }}" name="service_contribution_id" value="{{ $service->id }}"
-                                                x-on:change="serviceScore = {{ $service->score }}"
+                                                x-on:change="updateServiceScore({{ $service->score }})"
                                                 class="border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500 dark:border-gray-700 dark:bg-gray-900">
                                         </div>
                                         <div class="ml-3">
@@ -297,7 +285,7 @@
                                 </p>
                                 <p class="flex justify-between font-semibold">
                                     <span>Total Score:</span>
-                                    <span x-text="calculateTotal() + '/130'"></span>
+                                    <span x-text="calculateTotal() + '/110'"></span>
                                 </p>
                                 <p class="flex justify-between font-semibold">
                                     <span>Percentage:</span>
@@ -309,17 +297,20 @@
                         <!-- Action Buttons -->
                         <div class="flex justify-end space-x-4">
                             <button type="reset" x-on:click="
-                                    attendanceDays = 1;
-                                    attendanceScore = calculateAttendanceScore(1);
-                                    selectedCommitments = [];
-                                    commitmentScore = 0;
-                                    serviceScore = 0;
-                                    $refs.attendanceSlider.value = 1;
-                                    $refs.attendanceInput.value = 1;
-                                    $refs.form.querySelectorAll('input[type=checkbox]').forEach(cb => cb.checked = false);
-                                    $refs.form.querySelectorAll('input[type=radio]').forEach(rb => rb.checked = false);
-                                "
-                                class="inline-flex items-center px-4 py-2 bg-gray-200 dark:bg-gray-600 rounded-md font-semibold text-xs text-gray-800 dark:text-gray-200 uppercase tracking-widest hover:bg-gray-300 dark:hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                                attendanceDays = 1;
+                                attendanceScore = calculateAttendanceScore(1);
+                                selectedCommitments = [];
+                                commitmentScore = 0;
+                                serviceScore = 0;
+                                $refs.attendanceSlider.value = 1;
+                                $refs.attendanceInput.value = 1;
+                                $refs.form.querySelectorAll('input[type=checkbox]').forEach(cb => cb.checked = false);
+                                $refs.form.querySelectorAll('input[type=radio]').forEach(rb => rb.checked = false);
+                                localStorage.removeItem('attendanceDays');
+                                localStorage.removeItem('selectedCommitments');
+                                localStorage.removeItem('commitmentScore');
+                                localStorage.removeItem('serviceScore');
+                            " class="inline-flex items-center px-4 py-2 bg-gray-200 dark:bg-gray-600 rounded-md font-semibold text-xs text-gray-800 dark:text-gray-200 uppercase tracking-widest hover:bg-gray-300 dark:hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition ease-in-out duration-150">
                                 Reset Form
                             </button>
 
@@ -345,6 +336,10 @@
                                     if (confirm('Are you sure you want to save this evaluation?')) {
                                         $refs.form.submit();
                                     }
+                                    localStorage.removeItem('attendanceDays');
+                                    localStorage.removeItem('selectedCommitments');
+                                    localStorage.removeItem('commitmentScore');
+                                    localStorage.removeItem('serviceScore');
                                 "
                                 class="inline-flex items-center px-4 py-2 bg-gray-800 dark:bg-gray-200 border border-transparent rounded-md font-semibold text-xs text-white dark:text-gray-800 uppercase tracking-widest hover:bg-gray-700 dark:hover:bg-white focus:bg-gray-700 dark:focus:bg-white active:bg-gray-900 dark:active:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
                                 Save Evaluation
