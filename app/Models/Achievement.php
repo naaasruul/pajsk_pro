@@ -17,4 +17,16 @@ class Achievement extends Model
     {
         return $this->belongsToMany(Placement::class, 'achievement_placement')->withPivot('score');
     }
+
+    public function nilams()
+    {
+        return $this->hasMany(Nilam::class, 'achievement_id');
+    }
+
+    public function tiers()
+    {
+        return $this->belongsToMany(Tier::class, 'nilams', 'achievement_id', 'tier_id')
+                    ->withPivot('point'); // Include the pivot column 'point'
+    }
+    
 }
