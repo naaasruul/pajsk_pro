@@ -85,7 +85,8 @@ Route::middleware('auth')->group(function () {
 
             // Extra cocuriculum routes
             Route::get('/extra-cocuriculum', [ExtraCocuriculumController::class, 'index'])->name('extra-cocuriculum');
-            // Route::get('/extra-cocuriculum/create', [ExtraCocuriculumController::class, 'create'])->name('extra-cocuriculum.create');
+            Route::get('/extra-cocuriculum/{student}/create', [ExtraCocuriculumController::class, 'create'])->name('extra-cocuriculum.create');
+            Route::post('/extra-cocuriculum/{student}/store', [ExtraCocuriculumController::class, 'store'])->name('extra-cocuriculum.store');
         });
     });
 });
