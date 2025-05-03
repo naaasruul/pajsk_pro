@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use App\Models\Classroom;
 
 class Student extends Model
 {
@@ -16,7 +17,7 @@ class Student extends Model
         'address',
         'phone_number',
         'home_number',
-        'class'
+        'class_id'
     ];
 
     public function user()
@@ -46,6 +47,11 @@ class Student extends Model
     public function extraCocuriculum()
     {
         return $this->hasOne(ExtraCocuricullum::class);
+    }
+
+    public function classroom(): BelongsTo
+    {
+        return $this->belongsTo(Classroom::class, 'class_id');
     }
 
     // Involvement scoring methods
