@@ -127,12 +127,12 @@ class PAJSKController extends Controller
 
         $total = $scores['attendance_score'] + 
                  $scores['position_score'] + 
-                 $scores['involvement_score'] + // Include both scores
-                 $scores['placement_score'] +   // Include both scores 
+                 $scores['involvement_score'] + 
+                 $scores['placement_score'] + 
                  $scores['commitment_score'] + 
                  $scores['service_score'];
 
-        $percentage = ($total / 130) * 100; // Updated total to 130 to account for both scores
+        $percentage = ($total / 110) * 100; // Updated total to 110
 
         // Create new PAJSK assessment record
         $assessment = PajskAssessment::create([
