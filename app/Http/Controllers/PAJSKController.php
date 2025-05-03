@@ -150,10 +150,10 @@ class PAJSKController extends Controller
             'service_contribution_id' => $validated['service_contribution_id']
         ]);
 
-        return redirect()->route('pajsk.review', ['student' => $student, 'evaluation' => $assessment]);
+        return redirect()->route('pajsk.result', ['student' => $student, 'evaluation' => $assessment]);
     }
 
-    public function review(Student $student, PajskAssessment $evaluation)
+    public function result(Student $student, PajskAssessment $evaluation)
     {
 
         // Authorization check to ensure evaluation belongs to student
@@ -185,10 +185,10 @@ class PAJSKController extends Controller
             'assessment' => $evaluation,
         ];
 
-        return view('pajsk.review', $review);
+        return view('pajsk.result', $result);
     }
 
-    public function evaluations()
+    public function history()
     {
         $teacher = Teacher::with('club')->whereNotNull('club_id')->first();
         if (!$teacher || !$teacher->club) {
@@ -201,6 +201,6 @@ class PAJSKController extends Controller
             ->latest()
             ->paginate(10);
 
-        return view('pajsk.evaluations', compact('evaluations', 'club', 'teacher'));
+        return view('pajsk.history', compact('evaluations', 'club', 'teacher'));
     }
 }
