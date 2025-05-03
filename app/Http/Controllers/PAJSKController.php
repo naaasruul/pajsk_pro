@@ -36,9 +36,10 @@ class PAJSKController extends Controller
                 'id' => $student->id,
                 'user' => [
                     'name' => $student->user->name,
-                    'student' => [
-                        'class' => $student->class
-                    ]
+                    'classroom' => [
+                        'year' => $student->classroom->year,
+                        'class_name' => $student->classroom->class_name,
+                    ],
                 ],
                 'position_name' => $position ? $position->position_name : 'No Position',
             ];
