@@ -42,4 +42,19 @@ class PajskAssessment extends Model
     {
         return $this->belongsTo(ServiceContribution::class);
     }
+
+    public function classroom(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(\App\Models\Classroom::class, 'class_id');
+    }
+
+    public function club(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(\App\Models\Club::class, 'club_id');
+    }
+
+    public function clubPosition(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(\App\Models\ClubPosition::class, 'club_position_id');
+    }
 }
