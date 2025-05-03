@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Classroom;
 use App\Models\Student;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -10,44 +11,61 @@ use Illuminate\Support\Facades\DB;
 
 class StudentController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $students = Student::with('user')->paginate(10);
-        return view('student.index', compact('students'));
+        $query = Student::with('user', 'classroom');
+        
+        if ($request->filled('year')) {
+            $query->whereHas('classroom', function ($q) use ($request) {
+                $q->where('year', $request->year);
+            });
+        }
+
+        if ($request->filled('class_name')) {
+            $query->whereHas('classroom', function ($q) use ($request) {
+                $q->where('class_name', 'LIKE', '%' . $request->class_name . '%');
+            });
+        }
+
+        $students = $query->paginate(10)->appends($request->query());
+        $years = Classroom::select('year')->distinct()->pluck('year');
+
+        return view('student.index', compact('students', 'years'));
     }
 
     public function create()
     {
-        return view('student.create');
+        $classroomsGrouped = Classroom::all()->groupBy('year');
+        return view('student.create', compact('classroomsGrouped'));
     }
 
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email',
-            'password' => 'required|min:8',
-            'address' => 'required|string|max:255',
-            'phone_number' => 'required|string|max:20',
-            'class' => 'required|string|max:50',
-            'gender' => 'required',
+            'name'          => 'required|string|max:255',
+            'email'         => 'required|email|unique:users,email',
+            'password'      => 'required|min:8',
+            'address'       => 'required|string|max:255',
+            'phone_number'  => 'required|string|max:20',
+            'class_id'      => 'required|exists:classrooms,id',
+            'gender'        => 'required',
         ]);
 
         DB::transaction(function () use ($validated) {
             $user = User::create([
-                'name' => $validated['name'],
-                'email' => $validated['email'],
-                'gender' => $validated['gender'],
+                'name'     => $validated['name'],
+                'email'    => $validated['email'],
+                'gender'   => $validated['gender'],
                 'password' => Hash::make($validated['password']),
             ]);
 
             $user->assignRole('student');
 
             $user->student()->create([
-                'address' => $validated['address'],
-                'phone_number' => $validated['phone_number'],
-                'home_number' => $validated['home_number'] ?? null,
-                'class' => $validated['class'],
+                'address'       => $validated['address'],
+                'phone_number'  => $validated['phone_number'],
+                'home_number'   => $request->home_number ?? null,
+                'class_id'  => $validated['class_id'],
             ]);
         });
 
@@ -57,31 +75,32 @@ class StudentController extends Controller
 
     public function edit(Student $student)
     {
-        return view('student.edit', compact('student'));
+        $classroomsGrouped = Classroom::all()->groupBy('year');
+        return view('student.edit', compact('student', 'classroomsGrouped'));
     }
 
     public function update(Request $request, Student $student)
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email,'.$student->user->id,
-            'address' => 'required|string|max:255',
-            'phone_number' => 'required|string|max:20',
-            'home_number' => 'required|string|max:20',
-            'class' => 'required|string|max:50',
+            'name'          => 'required|string|max:255',
+            'email'         => 'required|email|unique:users,email,'.$student->user->id,
+            'address'       => 'required|string|max:255',
+            'phone_number'  => 'required|string|max:20',
+            'home_number'   => 'required|string|max:20',
+            'class_id'      => 'required|exists:classrooms,id',
         ]);
 
         DB::transaction(function () use ($validated, $student) {
             $student->user->update([
-                'name' => $validated['name'],
+                'name'  => $validated['name'],
                 'email' => $validated['email'],
             ]);
 
             $student->update([
-                'address' => $validated['address'],
+                'address'      => $validated['address'],
                 'phone_number' => $validated['phone_number'],
-                'home_number' => $validated['home_number'],
-                'class' => $validated['class'],
+                'home_number'  => $validated['home_number'],
+                'class_id'     => $validated['class_id'],
             ]);
         });
 
