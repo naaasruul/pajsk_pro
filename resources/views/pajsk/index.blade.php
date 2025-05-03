@@ -28,7 +28,7 @@
 						<td class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
 							{{ $student['user']['name'] }}
 						</td>
-						<td class="px-6 py-4">{{ $student['user']['student']['class'] }}</td>
+						<td class="px-6 py-4">{{ $student['user']['classroom']['year'] }} {{ $student['user']['classroom']['class_name'] }}</td>
 						<td class="px-6 py-4">{{ $student['position_name'] }}</td>
 						<td class="px-6 py-4">
 							{{ $student['position_name'] !== 'No Position' ?

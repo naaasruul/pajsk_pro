@@ -137,6 +137,9 @@ class PAJSKController extends Controller
         // Create new PAJSK assessment record
         $assessment = PajskAssessment::create([
             'student_id' => $student->id,
+            'class_id' => $student->classroom->id,
+            'club_id' => $student->current_club->id,
+            'club_position_id' => $student->clubPosition(),
             'teacher_id' => auth()->user()->teacher->id,
             'attendance_score' => $scores['attendance_score'],
             'position_score' => $scores['position_score'],
@@ -174,11 +177,15 @@ class PAJSKController extends Controller
             'achievement_score' => $evaluation->achievement_score,
         ];
 
-        $review = [
+        $result = [
             'scores' => $scores,
             'total' => $evaluation->total_score,
             'percentage' => $evaluation->percentage,
             'student' => $student,
+            'year' => $evaluation->classroom->year,         // using the stored class_id relationship
+            'class_name' => $evaluation->classroom->class_name,
+            'club' => $evaluation->club->club_name,            // using the stored club_id relationship
+            'position' => $evaluation->clubPosition->position_name, // using the stored club_position_id relationship
             'attendance' => $attendance,
             'commitments' => Commitment::whereIn('id', $evaluation->commitment_ids)->get(),
             'service' => ServiceContribution::find($evaluation->service_contribution_id),

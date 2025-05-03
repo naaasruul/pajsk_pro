@@ -9,7 +9,10 @@ class PajskAssessment extends Model
 {
     protected $fillable = [
         'student_id',
-        'teacher_id', 
+        'class_id',
+        'teacher_id',
+        'club_id',
+        'club_position_id',
         'attendance_score',
         'position_score',
         'involvement_score',
