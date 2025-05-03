@@ -18,7 +18,13 @@
 							<tr>
 								<th
 									class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+									Year</th>
+								<th
+									class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
 									Student</th>
+								<th
+									class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+									Class</th>
 								<th
 									class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
 									Date</th>
@@ -36,13 +42,16 @@
 						<tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
 							@foreach($evaluations as $evaluation)
 							<tr>
+								<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+									{{ $evaluation->classroom->year }}
+								</td>
 								<td class="px-6 py-4 whitespace-nowrap">
 									<div class="text-sm font-medium text-gray-900 dark:text-gray-100">
 										{{ $evaluation->student->user->name }}
 									</div>
-									<div class="text-sm text-gray-500 dark:text-gray-400">
-										{{ $evaluation->student->class }}
-									</div>
+								</td>
+								<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+									{{ $evaluation->classroom->year . ' ' . $evaluation->classroom->class_name }}
 								</td>
 								<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
 									{{ $evaluation->created_at->format('d/m/Y H:i') }}
@@ -57,7 +66,7 @@
 									</span>
 								</td>
 								<td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-									<a href="{{ route('pajsk.review', ['student' => $evaluation->student, 'evaluation' => $evaluation]) }}"
+									<a href="{{ route('pajsk.result', ['student' => $evaluation->student, 'evaluation' => $evaluation]) }}"
 										class="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300">
 										View Details
 									</a>
