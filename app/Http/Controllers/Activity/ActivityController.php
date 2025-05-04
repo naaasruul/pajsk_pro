@@ -70,6 +70,7 @@ class ActivityController extends Controller
             'teachers' => 'nullable|array',
             'teachers.*' => 'exists:teachers,id',
             'students' => 'nullable|array',
+            'leader_id' => 'required|exists:teachers,id',
             'students.*' => 'exists:students,id',
         ]);
 
@@ -107,6 +108,7 @@ class ActivityController extends Controller
             'time_end' => $validated['time_end'],
             'activity_teachers_id' => $validated['teachers'] ?? [],
             'activity_students_id' => $validated['students'] ?? [],
+            'leader_id' => $validated['leader_id'],
             'created_by' => auth()->user()->teacher->id // Assuming the logged-in user is a teacher
         ]);
     
