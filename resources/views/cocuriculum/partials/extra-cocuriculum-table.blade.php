@@ -4,7 +4,7 @@
 			<th scope="col" class="px-6 py-3">Name</th>
 			<th scope="col" class="px-6 py-3">Class</th>
 			<th scope="col" class="px-6 py-3">Points</th>
-			<th scope="col" class="px-6 py-3">Actions</th>
+			<th scope="col" class="px-6 py-3"></th>
 		</tr>
 	</thead>
 	<tbody>
@@ -18,12 +18,21 @@
 			</td>
 			<td class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
 				{{-- keluar kan markah extra cocuriculum.. kalau 0 tulis la 0 lamak --}}
-				{{ $student->extraCocuriculum->total_point }}
+				{{ $student->extraCocuriculum->total_point ?? 0 }}
 			</td>
 			<td class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-				<a href="{{ route('pajsk.extra-cocuriculum.create', $student->id) }}" class="text-blue-600 hover:text-blue-900 dark:text-blue-500 dark:hover:text-blue-700">
+				
+				
+				@if ($student->extraCocuriculum)
+				<span class="text-green-600 dark:text-green-500">
+					Student is evaluated
+				</span>
+				@else
+				<a href="{{ route('pajsk.extra-cocuriculum.create', $student->id) }}"
+					class="text-blue-600 hover:text-blue-900 dark:text-blue-500 dark:hover:text-blue-700">
 					Evaluate
 				</a>
+				@endif
 			</td>
 		</tr>
 		@empty
