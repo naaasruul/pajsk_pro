@@ -152,7 +152,7 @@ $(document).ready(function () {
         let isValid = true;
 
         // Validate all required fields
-        $('#date-start, #date-end, #time-start, #time-end, #involvement, #club, #achievement').each(function () {
+        $('#date-start, #date-end, #time-start, #time-end, #involvement, #club, #achievement, #address').each(function () {
             if (!$(this).val()) {
                 showError($(this), 'This field is required.');
                 isValid = false;
