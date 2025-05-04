@@ -379,6 +379,7 @@
             const [dd, mm, yyyy] = date.split('-'); // Split the date by '-'
             return `${yyyy}-${mm}-${dd}`; // Rearrange to yyyy-mm-dd
             }
+
             $('#submit-button').on('click', function () {
                 // Collect data from the form
                 console.log(`Represent: ${$('#represent').val()}`);
@@ -402,6 +403,7 @@
                     time_end: $('#time-end').val(), // Collect the end time
                     teachers: [],
                     students: [],
+                    leader_id: window.selectedLeaderId,
                     _token: '{{ csrf_token() }}' // Include CSRF token
                 };
                 
