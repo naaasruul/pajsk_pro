@@ -182,6 +182,7 @@ class PAJSKController extends Controller
             'total' => $evaluation->total_score,
             'percentage' => $evaluation->percentage,
             'student' => $student,
+            'teacher' => $evaluation->teacher, // using the stored teacher_id relationship
             'year' => $evaluation->classroom->year,         // using the stored class_id relationship
             'class_name' => $evaluation->classroom->class_name,
             'club' => $evaluation->club->club_name,            // using the stored club_id relationship
@@ -208,10 +209,14 @@ class PAJSKController extends Controller
         $club_filter = $request->get('club_filter');
 
         // Retrieve all clubs to populate the filter dropdown
-        $clubs = \App\Models\Club::orderBy('club_name')->get();
+        $clubs = Club::orderBy('club_name')->get();
 
-        $query = PajskAssessment::with(['student.user', 'serviceContribution', 'classroom', 'club'])
-            ->where('teacher_id', auth()->user()->teacher->id);
+        if (auth()->user()->hasrole('admin')) {
+            $query = PajskAssessment::with(['student.user', 'serviceContribution', 'classroom', 'club']);
+        } else {
+            $query = PajskAssessment::with(['student.user', 'serviceContribution', 'classroom', 'club'])
+                ->where('teacher_id', auth()->user()->teacher->id);
+        }
 
         if ($search) {
             $query->whereHas('student.user', function ($q) use ($search) {
