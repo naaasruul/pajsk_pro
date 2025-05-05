@@ -231,10 +231,13 @@ class ActivityController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(string $activity)
     {
+        $activity = Activity::findOrFail($activity);
+        $activity->delete();
 
-        //
+        return redirect()->back()
+            ->with('success', 'Activity deleted successfully.');
     }
 
     public function adminApproval(Request $request)
