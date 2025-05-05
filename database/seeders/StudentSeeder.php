@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\Student;
 use App\Models\User;
+use App\Models\Classroom;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Models\Role;
@@ -13,6 +14,9 @@ class StudentSeeder extends Seeder
 {
     public function run()
     {
+        // Retrieve all classrooms from the database
+        $classrooms = Classroom::all();
+
         // Create 50 students with users
         $students = collect();
         for ($i = 1; $i <= 50; $i++) {
@@ -30,7 +34,7 @@ class StudentSeeder extends Seeder
                 'phone_number' => fake()->phoneNumber(),
                 'home_number' => fake()->phoneNumber(),
                 'address' => fake()->address(),
-                'class' => rand(1,6) . ' ' . fake()->word(),
+                'class_id' => $classrooms->random()->id,
             ]);
 
             $students->push($student);
