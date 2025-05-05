@@ -77,8 +77,7 @@
                                     <div class="text-sm text-gray-600 dark:text-gray-300">
                                         @forelse($student->activities as $activity)
 											<div class="text-sm text-gray-500 dark:text-gray-400">
-                                                <p>{{ $activity->represent }} {{ $activity->involvement->description }} In {{ $activity->club->club_name ?? 'Unknown Club' }} 
-                                                    ({{ $activity->achievement->achievement_name }})</p>
+                                                <p>{{ $activity->represent }} {{ $activity->involvement->description }} In {{ $activity->club->club_name ?? 'Unknown Club' }} Peringkat {{ $activity->achievement->achievement_name }}</p>
                                             </div>
                                         @empty
                                             <p class="text-gray-500 italic">No activities recorded</p>
