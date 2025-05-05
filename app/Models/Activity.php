@@ -25,6 +25,12 @@ class Activity extends Model
         'status',
     ];
 
+    // Add casts for JSON array conversion
+    protected $casts = [
+        'activity_teachers_id' => 'array',
+        'activity_students_id' => 'array',
+    ];
+
     public function teachers() {
         return $this->belongsToMany(Teacher::class);
     }
