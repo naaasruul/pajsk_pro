@@ -105,6 +105,8 @@ class ActivityController extends Controller
             'time_start' => $validated['time_start'],
             'date_end' => $validated['datetime_end'],
             'time_end' => $validated['time_end'],
+            'activity_teachers_id' => $validated['teachers'] ?? [],
+            'activity_students_id' => $validated['students'] ?? [],
             'created_by' => auth()->user()->teacher->id // Assuming the logged-in user is a teacher
         ]);
     
@@ -191,7 +193,9 @@ class ActivityController extends Controller
             'date_start' => $validated['datetime_start'],
             'time_start' => $validated['time_start'],
             'date_end' => $validated['datetime_end'],
-            'time_end' => $validated['time_end']
+            'time_end' => $validated['time_end'],
+            'activity_teachers_id' => $validated['teachers'] ?? [],
+            'activity_students_id' => $validated['students'] ?? []
         ]);
 
         // Sync relationships
