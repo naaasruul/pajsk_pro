@@ -195,7 +195,7 @@ class PAJSKController extends Controller
         return view('pajsk.result', $result);
     }
 
-    public function history()
+    public function history(Request $request)
     {
         $teacher = Teacher::with('club')->whereNotNull('club_id')->first();
         if (!$teacher || !$teacher->club) {
@@ -203,11 +203,32 @@ class PAJSKController extends Controller
         }
         $club = Club::with('students.user')->find($teacher->club_id);
 
-        $evaluations = PajskAssessment::with(['student.user', 'serviceContribution'])
-            ->where('teacher_id', auth()->user()->teacher->id)
-            ->latest()
-            ->paginate(10);
+        $search = $request->get('search');
+        $year_filter = $request->get('year_filter');
+        $club_filter = $request->get('club_filter');
 
-        return view('pajsk.history', compact('evaluations', 'club', 'teacher'));
+        // Retrieve all clubs to populate the filter dropdown
+        $clubs = \App\Models\Club::orderBy('club_name')->get();
+
+        $query = PajskAssessment::with(['student.user', 'serviceContribution', 'classroom', 'club'])
+            ->where('teacher_id', auth()->user()->teacher->id);
+
+        if ($search) {
+            $query->whereHas('student.user', function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%");
+            });
+        }
+        if ($year_filter) {
+            $query->whereHas('classroom', function ($q) use ($year_filter) {
+                $q->where('year', $year_filter);
+            });
+        }
+        if ($club_filter) {
+            $query->where('club_id', $club_filter);
+        }
+
+        $evaluations = $query->latest()->paginate(10);
+
+        return view('pajsk.history', compact('evaluations', 'club', 'teacher', 'clubs'));
     }
 }
