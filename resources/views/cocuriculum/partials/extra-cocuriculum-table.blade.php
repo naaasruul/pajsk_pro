@@ -14,11 +14,11 @@
 				{{ $student->user->name }}
 			</td>
 			<td class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-				{{ $student->class }}
+				{{ $student->classroom->year . ' ' . $student->classroom->class_name }}
 			</td>
 			<td class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
 				{{-- keluar kan markah extra cocuriculum.. kalau 0 tulis la 0 lamak --}}
-				{{ $student->extraCocuriculum->total_point }}
+				{{ $student->extraCocuriculum->total_point ?? 0 }}
 			</td>
 			<td class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
 				<a href="{{ route('pajsk.extra-cocuriculum.create', $student->id) }}" class="text-blue-600 hover:text-blue-900 dark:text-blue-500 dark:hover:text-blue-700">
