@@ -40,7 +40,7 @@
                                     </label>
                                     <select id="gender" name="gender"
                                         class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-                                        <option value="male" selected>Male</option> <!-- Set value to an empty string -->
+                                        <option value="male" selected>Male</option>
                                         <option value="female" >Female</option>
                                     </select>
                                 </div>
@@ -50,11 +50,33 @@
                             <div class="border-b border-gray-900/10 pb-6">
                                 <h2 class="text-base font-semibold leading-7">Student Information</h2>
                                 
-                                <div class="mt-4">
-                                    <x-input-label for="class" :value="__('Class')" />
-                                    <x-text-input id="class" name="class" type="text" class="mt-1 block w-full" :value="old('class')" required />
-                                    <x-input-error :messages="$errors->get('class')" class="mt-2" />
+                                <div class="flex flex-wrap -mx-2">
+                                    <!-- New Year select -->
+                                    <div class="w-full md:w-1/4 px-2 mt-4">
+                                        <x-input-label for="year-select" :value="__('Year')" />
+                                        <select id="year-select" name="year" class="mt-2 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" required>
+                                            <option value="">{{ __('Select Year') }}</option>
+                                            @foreach($classroomsGrouped as $year => $classes)
+                                                <option value="{{ $year }}">{{ $year }}</option>
+                                            @endforeach
+                                        </select>
+                                        <x-input-error :messages="$errors->get('year')" class="mt-2" />
+                                    </div>
+
+                                    <!-- Classroom select -->
+                                    <div class="w-full md:w-3/4 px-2 mt-4">
+                                        <x-input-label for="classroom-select" :value="__('Classroom')" />
+                                        <select data-tooltip-target="select-year-tooltip" data-tooltip-placement="bottom" id="classroom-select" name="class_id" class="mt-2 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 cursor-not-allowed" required disabled>
+                                            <option value="">{{ __('Select Classroom') }}</option>
+                                        </select>
+                                        <x-input-error :messages="$errors->get('class_id')" class="mt-2" />
+                                    </div>
+                                    <div id="select-year-tooltip" role="tooltip" class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-xs opacity-0 tooltip dark:bg-gray-700">
+                                        Select Year First
+                                        <div class="tooltip-arrow" data-popper-arrow></div>
+                                    </div>
                                 </div>
+                                
 
                                 <div class="mt-4">
                                     <x-input-label for="phone_number" :value="__('Phone Number')" />
@@ -87,4 +109,38 @@
             </div>
         </div>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function(){
+            var classrooms = @json($classroomsGrouped);
+            var yearSelect = document.getElementById('year-select');
+            var classSelect = document.getElementById('classroom-select');
+            var tooltip = document.getElementById('select-year-tooltip');
+            
+            yearSelect.addEventListener('change', function(){
+                var selectedYear = this.value;
+                // Reset classroom select options
+                classSelect.innerHTML = '<option value="">{{ __("Select Classroom") }}</option>';
+                if(selectedYear && classrooms[selectedYear]) {
+                    classrooms[selectedYear].forEach(function(cls){
+                        var option = document.createElement('option');
+                        option.value = cls.id;
+                        option.text = cls.year + ' ' + cls.class_name;
+                        classSelect.appendChild(option);
+                    });
+                    classSelect.disabled = false;
+                    classSelect.classList.remove('cursor-not-allowed');
+                    if(tooltip) {
+                        tooltip.classList.add('hidden');
+                    }
+                } else {
+                    classSelect.disabled = true;
+                    classSelect.classList.add('cursor-not-allowed');
+                    if(tooltip) {
+                        tooltip.classList.remove('hidden');
+                    }
+                }
+            });
+        });
+    </script>
 </x-app-layout>

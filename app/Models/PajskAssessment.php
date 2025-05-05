@@ -9,7 +9,10 @@ class PajskAssessment extends Model
 {
     protected $fillable = [
         'student_id',
-        'teacher_id', 
+        'class_id',
+        'teacher_id',
+        'club_id',
+        'club_position_id',
         'attendance_score',
         'position_score',
         'involvement_score',
@@ -41,5 +44,20 @@ class PajskAssessment extends Model
     public function serviceContribution(): BelongsTo
     {
         return $this->belongsTo(ServiceContribution::class);
+    }
+
+    public function classroom(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(\App\Models\Classroom::class, 'class_id');
+    }
+
+    public function club(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(\App\Models\Club::class, 'club_id');
+    }
+
+    public function clubPosition(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(\App\Models\ClubPosition::class, 'club_position_id');
     }
 }

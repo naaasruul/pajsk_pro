@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Classroom;
 use App\Models\Club;
 use App\Models\ClubPosition;
 use App\Models\Student;
@@ -50,9 +51,10 @@ class ClubController extends Controller
                     'user' => [
                         'name' => $student->user->name,
                         'gender' => $student->user->gender,
-                        'student' => [
-                            'class' => $student->class
-                        ]
+                        'classroom' => [
+                            'year' => $student->classroom->year,
+                            'class_name' => $student->classroom->class_name,
+                        ],
                     ],
                     'position_name' => $position ? $position->position_name : 'No Position',
                 ];
@@ -68,7 +70,7 @@ class ClubController extends Controller
         ));
     }
 
-    public function showAddStudentForm()
+    public function showAddStudentForm(Request $request)
     {
         $teacher = Auth::user()->teacher;
         $club = $teacher ? $teacher->club : null;
@@ -80,13 +82,30 @@ class ClubController extends Controller
 
         // Get students not already in this club
         $existingStudentIds = $club->students->pluck('id');
-        $availableStudents = Student::with('user')
-            ->whereNotIn('id', $existingStudentIds)
-            ->get();
+        $availableStudentsQuery = Student::with('user', 'classroom')
+            ->whereNotIn('id', $existingStudentIds);
 
+        if ($request->filled('year')) {
+            $availableStudentsQuery->whereHas('classroom', function ($q) use ($request) {
+                $q->where('year', $request->year);
+            });
+        }
+
+        if ($request->filled('class_name')) {
+            $availableStudentsQuery->whereHas('classroom', function ($q) use ($request) {
+                $q->where('class_name', 'LIKE', '%' . $request->class_name . '%');
+            });
+        }
+
+        // Group available students by year then by class_name
+        $availableStudents = $availableStudentsQuery->get();
+        $groupedStudents = $availableStudents->groupBy(fn($student) => $student->classroom->year)->map(function($students) {
+            return $students->groupBy(fn($student) => $student->classroom->class_name);
+        });
+        $years = Classroom::select('year')->distinct()->pluck('year');
         $positions = ClubPosition::all();
 
-        return view('club.add-student', compact('club', 'availableStudents', 'positions'));
+        return view('club.add-student', compact('club', 'availableStudents', 'groupedStudents', 'positions', 'years'));
     }
 
     public function addStudent(Request $request)

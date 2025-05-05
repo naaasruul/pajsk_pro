@@ -9,7 +9,6 @@
             </a>
         </div>
     </x-slot>
-
     <div class="relative overflow-x-auto">
         <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
             <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
@@ -28,7 +27,7 @@
                     <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
                         <td class="px-6 py-4">{{ $student->user->name }}</td>
                         <td class="px-6 py-4">{{ $student->user->email }}</td>
-                        <td class="px-6 py-4">{{ $student->class }}</td>
+                        <td class="px-6 py-4">{{ $student->classroom->year }} {{ $student->classroom->class_name }}</td>
                         <td class="px-6 py-4">{{ $student->phone_number }}</td>
                         <td class="px-6 py-4">{{ $student->home_number }}</td>
                         <td class="px-6 py-4">{{ $student->address }}</td>

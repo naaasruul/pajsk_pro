@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Attendance;
+use App\Models\Classroom;
 use App\Models\Student;
 use App\Models\Teacher;
 use App\Models\User;
@@ -39,14 +40,6 @@ class DatabaseSeeder extends Seeder
         ]);
         $userStudent->assignRole('student');
 
-        $userStudent = Student::create([
-            'user_id' => $userStudent->id,
-            'phone_number' => fake()->phoneNumber(),
-            'home_number' => fake()->phoneNumber(),
-            'address' => fake()->address(),
-            'class' => rand(1,6) . ' ' . fake()->word(),
-        ]);
-
         $this->call([
             InvolvementTypeSeeder::class,    // Add this first
             AchievementSeeder::class,        // Then this
@@ -62,6 +55,26 @@ class DatabaseSeeder extends Seeder
             AchievementPlacementSeeder::class,
             // StudentSeeder::class,
             // TeacherSeeder::class,
+        ]);
+
+        $class = Classroom::create([
+            'year' => 1,
+            'class_name' => 'Ikhlas',
+            'active_status' => 1,
+        ]);
+
+        Classroom::create([
+            'year' => 2,
+            'class_name' => 'Zuhud',
+            'active_status' => 1,
+        ]);
+
+        $userStudent = Student::create([
+            'user_id' => $userStudent->id,
+            'phone_number' => fake()->phoneNumber(),
+            'home_number' => fake()->phoneNumber(),
+            'address' => fake()->address(),
+            'class_id' => $class->id,
         ]);
 
         $userTeacher = Teacher::create([

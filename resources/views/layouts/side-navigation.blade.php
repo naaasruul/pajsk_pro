@@ -35,6 +35,9 @@
                 <x-sidebar-item class="pl-11" :route="route('students.index')" :role="request()->routeIs('students.*')">
                     Students
                 </x-sidebar-item>
+                <x-sidebar-item class="pl-11" :route="route('classrooms.index')" :role="request()->routeIs('classrooms.*')">
+                    Classrooms
+                </x-sidebar-item>
             </ul>
             <x-sidebar-item class="" :route="route('activity.approval')" :role="request()->routeIs('activity.approval')">
                 Activity
@@ -58,7 +61,7 @@
                 <x-sidebar-item class="pl-11" :route="route('pajsk.index')" :role="request()->routeIs('pajsk.index')">
                     PAJSK Assessment
                 </x-sidebar-item>
-                <x-sidebar-item class="pl-11" :route="route('pajsk.evaluations')" :role="request()->routeIs('pajsk.evaluations')">
+                <x-sidebar-item class="pl-11" :route="route('pajsk.history')" :role="request()->routeIs('pajsk.history')">
                     {{ __('Evaluations History') }}
                 </x-sidebar-item>
                 <x-sidebar-item class="pl-11" :route="route('pajsk.extra-cocuriculum')" :role="request()->routeIs('pajsk.extra-cocuriculum')">

@@ -19,7 +19,7 @@
 							<div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
 								<h4 class="font-medium text-sm text-gray-500 dark:text-gray-400 mb-2">Student Information</h4>
 								<div class="space-y-1">
-									<p class="text-gray-900 dark:text-gray-100">Class: {{ $student->class }}</p>
+									<p class="text-gray-900 dark:text-gray-100">Class: {{ $year . ' ' . $class_name  }}</p>
 								</div>
 							</div>
 							<div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
@@ -32,8 +32,8 @@
 						<div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 mb-6">
 							<h4 class="font-medium text-sm text-gray-500 dark:text-gray-400 mb-2">Club & Position Information</h4>
 							<div class="space-y-1">
-								<p class="text-gray-900 dark:text-gray-100">Club: {{ $student->current_club->club_name }}</p>
-								<p class="text-gray-900 dark:text-gray-100">Position: {{ $student->current_position ? $student->current_position->position_name : 'No Position' }}</p>
+								<p class="text-gray-900 dark:text-gray-100">Club: {{ $club }}</p>
+								<p class="text-gray-900 dark:text-gray-100">Position: {{ $position ? $position : 'No Position' }}</p>
 							</div>
 						</div>
                         

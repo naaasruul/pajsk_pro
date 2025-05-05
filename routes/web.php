@@ -10,6 +10,7 @@ use App\Http\Controllers\ExtraCocuriculumController;
 use App\Http\Controllers\PAJSKController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\ClassroomController;
 use App\Http\Controllers\ClubController;
 
 Route::get('/', [AuthenticatedSessionController::class, 'create'])
@@ -26,6 +27,9 @@ Route::middleware('auth')->group(function () {
     // Routes accessible by admin and teachers
     Route::middleware('role:admin|teacher')->group(function () {
         Route::resource('students', StudentController::class);
+        Route::resource('classrooms', ClassroomController::class);
+        // Added disable route for classrooms
+        Route::get('classrooms/{classroom}/disable', [ClassroomController::class, 'disable'])->name('classrooms.disable');
     });
 
     // Routes accessible by teachers only
@@ -80,8 +84,8 @@ Route::middleware('auth')->group(function () {
             Route::get('/evaluate-pajsk/{student}', [PAJSKController::class, 'evaluateStudent'])->name('evaluate-student');
             Route::get('/evaluate-student/{student}', [PAJSKController::class, 'evaluateStudent'])->name('evaluate-student');
             Route::post('/evaluate-student/{student}', [PAJSKController::class, 'storeEvaluation'])->name('store-evaluation');
-            Route::get('/review/student/{student}/evaluation/{evaluation}', [PAJSKController::class, 'review'])->name('review');
-            Route::get('/evaluations', [PAJSKController::class, 'evaluations'])->name('evaluations');
+            Route::get('/result/student/{student}/evaluation/{evaluation}', [PAJSKController::class, 'result'])->name('result');
+            Route::get('/evaluations', [PAJSKController::class, 'history'])->name('history');
 
             // Extra cocuriculum routes
             Route::get('/extra-cocuriculum', [ExtraCocuriculumController::class, 'index'])->name('extra-cocuriculum');

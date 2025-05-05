@@ -1,0 +1,32 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use App\Models\Student;
+use App\Models\User;
+
+class Classroom extends Model
+{
+    protected $fillable = [
+        'year',
+        'class_name',
+        'active_status',
+    ];
+
+    /**
+     * Get the students for the classroom.
+     */
+    public function students()
+    {
+        return $this->hasMany(Student::class);
+    }
+
+    /**
+     * Get the user for the classroom.
+     */
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+}

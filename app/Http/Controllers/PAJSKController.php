@@ -36,9 +36,10 @@ class PAJSKController extends Controller
                 'id' => $student->id,
                 'user' => [
                     'name' => $student->user->name,
-                    'student' => [
-                        'class' => $student->class
-                    ]
+                    'classroom' => [
+                        'year' => $student->classroom->year,
+                        'class_name' => $student->classroom->class_name,
+                    ],
                 ],
                 'position_name' => $position ? $position->position_name : 'No Position',
             ];
@@ -126,16 +127,19 @@ class PAJSKController extends Controller
 
         $total = $scores['attendance_score'] + 
                  $scores['position_score'] + 
-                 $scores['involvement_score'] + // Include both scores
-                 $scores['placement_score'] +   // Include both scores 
+                 $scores['involvement_score'] + 
+                 $scores['placement_score'] + 
                  $scores['commitment_score'] + 
                  $scores['service_score'];
 
-        $percentage = ($total / 130) * 100; // Updated total to 130 to account for both scores
+        $percentage = ($total / 110) * 100; // Updated total to 110
 
         // Create new PAJSK assessment record
         $assessment = PajskAssessment::create([
             'student_id' => $student->id,
+            'class_id' => $student->classroom->id,
+            'club_id' => $student->current_club->id,
+            'club_position_id' => $student->clubPosition(),
             'teacher_id' => auth()->user()->teacher->id,
             'attendance_score' => $scores['attendance_score'],
             'position_score' => $scores['position_score'],
@@ -149,10 +153,10 @@ class PAJSKController extends Controller
             'service_contribution_id' => $validated['service_contribution_id']
         ]);
 
-        return redirect()->route('pajsk.review', ['student' => $student, 'evaluation' => $assessment]);
+        return redirect()->route('pajsk.result', ['student' => $student, 'evaluation' => $assessment]);
     }
 
-    public function review(Student $student, PajskAssessment $evaluation)
+    public function result(Student $student, PajskAssessment $evaluation)
     {
 
         // Authorization check to ensure evaluation belongs to student
@@ -173,21 +177,25 @@ class PAJSKController extends Controller
             'achievement_score' => $evaluation->achievement_score,
         ];
 
-        $review = [
+        $result = [
             'scores' => $scores,
             'total' => $evaluation->total_score,
             'percentage' => $evaluation->percentage,
             'student' => $student,
+            'year' => $evaluation->classroom->year,         // using the stored class_id relationship
+            'class_name' => $evaluation->classroom->class_name,
+            'club' => $evaluation->club->club_name,            // using the stored club_id relationship
+            'position' => $evaluation->clubPosition->position_name, // using the stored club_position_id relationship
             'attendance' => $attendance,
             'commitments' => Commitment::whereIn('id', $evaluation->commitment_ids)->get(),
             'service' => ServiceContribution::find($evaluation->service_contribution_id),
             'assessment' => $evaluation,
         ];
 
-        return view('pajsk.review', $review);
+        return view('pajsk.result', $result);
     }
 
-    public function evaluations()
+    public function history(Request $request)
     {
         $teacher = Teacher::with('club')->whereNotNull('club_id')->first();
         if (!$teacher || !$teacher->club) {
@@ -195,11 +203,32 @@ class PAJSKController extends Controller
         }
         $club = Club::with('students.user')->find($teacher->club_id);
 
-        $evaluations = PajskAssessment::with(['student.user', 'serviceContribution'])
-            ->where('teacher_id', auth()->user()->teacher->id)
-            ->latest()
-            ->paginate(10);
+        $search = $request->get('search');
+        $year_filter = $request->get('year_filter');
+        $club_filter = $request->get('club_filter');
 
-        return view('pajsk.evaluations', compact('evaluations', 'club', 'teacher'));
+        // Retrieve all clubs to populate the filter dropdown
+        $clubs = \App\Models\Club::orderBy('club_name')->get();
+
+        $query = PajskAssessment::with(['student.user', 'serviceContribution', 'classroom', 'club'])
+            ->where('teacher_id', auth()->user()->teacher->id);
+
+        if ($search) {
+            $query->whereHas('student.user', function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%");
+            });
+        }
+        if ($year_filter) {
+            $query->whereHas('classroom', function ($q) use ($year_filter) {
+                $q->where('year', $year_filter);
+            });
+        }
+        if ($club_filter) {
+            $query->where('club_id', $club_filter);
+        }
+
+        $evaluations = $query->latest()->paginate(10);
+
+        return view('pajsk.history', compact('evaluations', 'club', 'teacher', 'clubs'));
     }
 }
