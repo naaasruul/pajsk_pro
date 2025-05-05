@@ -79,8 +79,8 @@ class ActivityAndPajskAssessmentSeeder extends Seeder
 
         // Seed 10 random PajskAssessment records
         for ($i = 1; $i <= 10; $i++) {
-            $attendance = $faker->numberBetween(1, 12);
-            $positionScore = $faker->numberBetween(1, 10);
+            $attendance = $faker->randomElements([3.33, 6.66, 9.99, 13.32, 16.65, 19.98, 23.21, 26.64, 29.97, 33.30, 36.63, 40], 1)[0];
+            $positionScore = $faker->randomElements([10, 8, 5, 4, 2], 1)[0];
             $involvementScore = $faker->numberBetween(1, 20);
             $placementScore = $faker->numberBetween(1, 20);
             $commitmentScore = $faker->numberBetween(1, 20);
