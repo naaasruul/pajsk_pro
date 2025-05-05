@@ -21,10 +21,12 @@ class ExtraCocuriculumController extends Controller
      */
     public function index()
     {
-        //
-        $teacher = auth()->user()->teacher; // Assuming the logged-in user is a teacher
-        $students = Student::where('mentor_id', $teacher->id)->paginate(10);
-
+        if (auth()->user()->hasrole('admin')) {
+            $students = Student::paginate(10);
+        } else {
+            $teacher = auth()->user()->teacher; // Assuming the logged-in user is a teacher
+            $students = Student::where('mentor_id', $teacher->id)->paginate(10);
+        }
 
         Log::info('Students:', ['students' => $students]);
         return view('cocuriculum.extra-cocuriculum',compact('students'));
@@ -104,9 +106,11 @@ class ExtraCocuriculumController extends Controller
         Log::info('timmsAndPisaPoint = '.$timmsAndPisaPoint);
         $totalPoint = $servicePoint + $specialAwardPoint + $communityServicePoint + $nilamPoint + $timmsAndPisaPoint;
 
+        $student = Student::find($studentId);
         // Create the ExtraCocuricullum record
         ExtraCocuricullum::create([
             'student_id' => $studentId,
+            'class_id' => $student->classroom->id,
             'service_id' => $validated['service_point'],
             'special_award_id' => $validated['special_award_point'],
             'community_service_id' => $validated['community_service_point'],
@@ -148,5 +152,60 @@ class ExtraCocuriculumController extends Controller
     public function destroy(string $id)
     {
         //
+    }
+
+    /**
+     * show history of extra cocuricullum
+     */
+    public function history(Request $request)
+    {
+        $query = ExtraCocuricullum::with(['student.user', 'classroom', 'service', 'specialAward', 'communityService', 'nilam', 'timmsAndPisa']);
+
+        if (auth()->user()->hasrole('admin')) {
+            $query->whereHas('student.user.roles', function ($q) {
+                $q->where('name', 'student');
+            });
+        } else {
+            $teacher = auth()->user()->teacher; // Assuming the logged-in user is a teacher
+            $query->whereHas('student.user', function ($q) use ($teacher) {
+                $q->where('mentor_id', $teacher->id);
+            });
+        }
+
+        $search = $request->get('search');
+        $year_filter = $request->get('year_filter');
+        
+        if ($search) {
+            $query->whereHas('student.user', function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%");
+            });
+        }
+        if ($year_filter) {
+            $query->whereHas('classroom', function ($q) use ($year_filter) {
+                $q->where('year', $year_filter);
+            });
+        }
+
+        $evaluations = $query->latest()->paginate(10);
+
+        return view('cocuriculum.extra-cocuriculum-history', compact('evaluations'));
+    }
+
+    /**
+     * show result of extra cocuricullum
+     */
+    public function result(Request $request, Student $student)
+    {
+        $extraCocuricullum = ExtraCocuricullum::where('student_id', $student->id)->first();
+        if (!$extraCocuricullum) {
+            return redirect()->back()->with('error', 'No extra cocuricullum data found for this student.');
+        }
+
+        $result = [
+            'student' => $student,
+            'extraCocuricullum' => $extraCocuricullum,
+        ];
+
+        return view('cocuriculum.extra-cocuriculum-result', compact('result'));
     }
 }
