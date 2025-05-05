@@ -35,6 +35,10 @@ Route::middleware('auth')->group(function () {
         Route::prefix('pajsk')->name('pajsk.')->group(function () {
             Route::get('/result/student/{student}/evaluation/{evaluation}', [PAJSKController::class, 'result'])->name('result');
             Route::get('/evaluations', [PAJSKController::class, 'history'])->name('history');
+
+            Route::get('/extra-cocuriculum', [ExtraCocuriculumController::class, 'index'])->name('extra-cocuriculum');
+            Route::get('/extra-cocuriculum/history', [ExtraCocuriculumController::class, 'history'])->name('extra-cocuriculum.history');
+            Route::get('/extra-cocuriculum/result/student/{student}/evaluation/{evaluation}', [ExtraCocuriculumController::class, 'result'])->name('extra-cocuriculum.result');
         });
     });
 
@@ -92,7 +96,6 @@ Route::middleware('auth')->group(function () {
             Route::post('/evaluate-student/{student}', [PAJSKController::class, 'storeEvaluation'])->name('store-evaluation');
 
             // Extra cocuriculum routes
-            Route::get('/extra-cocuriculum', [ExtraCocuriculumController::class, 'index'])->name('extra-cocuriculum');
             Route::get('/extra-cocuriculum/{student}/create', [ExtraCocuriculumController::class, 'create'])->name('extra-cocuriculum.create');
             Route::post('/extra-cocuriculum/{student}/store', [ExtraCocuriculumController::class, 'store'])->name('extra-cocuriculum.store');
         });
