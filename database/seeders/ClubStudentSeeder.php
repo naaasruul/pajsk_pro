@@ -18,7 +18,7 @@ class ClubStudentSeeder extends Seeder
 
 		// Assign each student to 1-2 random clubs
 		foreach ($students as $student) {
-			$numClubs = min(rand(1, 2), $clubs->count()); // cap it to available count
+			$numClubs = 1;
 			$selectedClubs = $clubs->random($numClubs);
 
 			foreach ($selectedClubs as $club) {

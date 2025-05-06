@@ -19,7 +19,7 @@
 							<div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
 								<h4 class="font-medium text-sm text-gray-500 dark:text-gray-400 mb-2">Student Information</h4>
 								<div class="space-y-1">
-									<p class="text-gray-900 dark:text-gray-100">Class: {{ $student->class }}</p>
+									<p class="text-gray-900 dark:text-gray-100">Class: {{ $year . ' ' . $class_name  }}</p>
 								</div>
 							</div>
 							<div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
@@ -32,8 +32,8 @@
 						<div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 mb-6">
 							<h4 class="font-medium text-sm text-gray-500 dark:text-gray-400 mb-2">Club & Position Information</h4>
 							<div class="space-y-1">
-								<p class="text-gray-900 dark:text-gray-100">Club: {{ $student->current_club->club_name }}</p>
-								<p class="text-gray-900 dark:text-gray-100">Position: {{ $student->current_position ? $student->current_position->position_name : 'No Position' }}</p>
+								<p class="text-gray-900 dark:text-gray-100">Club: {{ $club }}</p>
+								<p class="text-gray-900 dark:text-gray-100">Position: {{ $position ? $position : 'No Position' }}</p>
 							</div>
 						</div>
                         
@@ -77,8 +77,7 @@
                                     <div class="text-sm text-gray-600 dark:text-gray-300">
                                         @forelse($student->activities as $activity)
 											<div class="text-sm text-gray-500 dark:text-gray-400">
-                                                <p>{{ $activity->represent }} {{ $activity->involvement->description }} In {{ $activity->club->club_name ?? 'Unknown Club' }} 
-                                                    ({{ $activity->achievement->achievement_name }})</p>
+                                                <p>{{ $activity->represent }} {{ $activity->involvement->description }} In {{ $activity->club->club_name ?? 'Unknown Club' }} Peringkat {{ $activity->achievement->achievement_name }}</p>
                                             </div>
                                         @empty
                                             <p class="text-gray-500 italic">No activities recorded</p>
@@ -145,8 +144,15 @@
                         </div>
 
                         <!-- Action Buttons -->
-                        <div class="flex justify-end space-x-4">
-                            <a href="{{ route('pajsk.index') }}"
+                        <div class="flex justify-end space-x-2">
+                            <button onclick="window.print()"
+                                    class="inline-flex items-center px-4 py-2 bg-blue-600 dark:bg-blue-200 border border-transparent rounded-md font-semibold text-xs text-white dark:text-blue-800 uppercase tracking-widest hover:bg-blue-500 dark:hover:bg-blue-300">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 9V2h12v7M6 22h12a2 2 0 002-2v-5H4v5a2 2 0 002 2zm6-17v6m-3-3h6" />
+                                </svg>
+                                Print
+                            </button>
+                            <a href="{{ route('pajsk.history') }}"
                                class="inline-flex items-center px-4 py-2 bg-gray-800 dark:bg-gray-200 border border-transparent rounded-md font-semibold text-xs text-white dark:text-gray-800 uppercase tracking-widest hover:bg-gray-700 dark:hover:bg-white">
                                 Return to List
                             </a>

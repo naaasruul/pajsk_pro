@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Classroom; // Add this import if not already present
 
 class ExtraCocuricullum extends Model
 {   
@@ -11,6 +12,7 @@ class ExtraCocuricullum extends Model
     //
      protected $fillable = [
         'student_id',
+        'class_id',
         'service_id',
         'special_award_id',
         'community_service_id',
@@ -47,5 +49,11 @@ class ExtraCocuricullum extends Model
     public function nilam()
     {
         return $this->belongsTo(Achievement::class, 'nilam_id');
+    }
+
+    // Added classroom relationship
+    public function classroom()
+    {
+        return $this->belongsTo(Classroom::class, 'class_id');
     }
 }

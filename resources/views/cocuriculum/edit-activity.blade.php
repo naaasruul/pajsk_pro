@@ -443,16 +443,6 @@
                     formData.students.push($(this).attr('id').replace('checkbox-student-', ''));
                 });
     
-                // Collect selected teachers
-                $('.teacher-tr input[type="checkbox"]:checked').each(function () {
-                    formData.teachers.push($(this).attr('id').replace('checkbox-table-search-', ''));
-                });
-    
-                // Collect selected students
-                $('.student-tr input[type="checkbox"]:checked').each(function () {
-                    formData.students.push($(this).attr('id').replace('checkbox-student-', ''));
-                });
-    
                 // Send data to the API
                 $.ajax({
                     url: '{{ route('activity.update', $activity) }}', // Change to update route

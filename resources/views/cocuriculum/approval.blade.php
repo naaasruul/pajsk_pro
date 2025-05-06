@@ -59,7 +59,7 @@
                             {{ $activities->firstItem() + $loop->index }}
                         </th>
                         <td class="px-6 py-4">{{ $activity->represent }} {{ $activity->involvement->description }} dalam
-                            {{ $activity->club->club_name ?? 'NULL' }} {{ $activity->achievement->achievement_name}}
+                            {{ $activity->club->club_name ?? 'NULL' }}, peringkat {{ $activity->achievement->achievement_name}}
                         </td>
                         <td class="px-6 py-4">{{ $activity->date_start }}</td>
                         <td class="px-6 py-4">{{ $activity->createdBy->user->name }}</td>
@@ -94,7 +94,7 @@
                                 type="button">
                                 View Details
                             </button>
-                            @section('modals')
+                            @push('modals')
                             <!-- Main modal -->
                             <div id="modal-activity-{{ $activity->id }}" tabindex="-1" aria-hidden="true"
                                 class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
@@ -152,7 +152,7 @@
                                     </div>
                                 </div>
                             </div>
-                            @endsection
+                            @endpush
 
                         </td>
 
@@ -177,6 +177,7 @@
                 {{ $activities->withQueryString()->links() }}
             </nav>
         </div>
+        @stack('modals')
 
     </x-container>
 

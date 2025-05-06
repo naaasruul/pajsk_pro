@@ -35,6 +35,34 @@
                 <x-sidebar-item class="pl-11" :route="route('students.index')" :role="request()->routeIs('students.*')">
                     Students
                 </x-sidebar-item>
+                <x-sidebar-item class="pl-11" :route="route('classrooms.index')" :role="request()->routeIs('classrooms.*')">
+                    Classrooms
+                </x-sidebar-item>
+            </ul>
+            <button type="button"
+                class="flex items-center w-full p-2 text-base text-gray-900 transition duration-75 rounded-lg group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
+                aria-controls="dropdown-student" data-collapse-toggle="dropdown-student">
+                <span class="flex-1 ms-3 text-left rtl:text-right whitespace-nowrap">Student Management</span>
+                <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
+                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4" />
+                </svg>
+            </button>
+            <ul id="dropdown-student" class="hidden py-2 space-y-2">
+                {{-- <x-sidebar-item class="pl-11" :route="route('club.index')" :role="request()->routeIs('club.index')">
+                    Club Management
+                </x-sidebar-item>
+                <x-sidebar-item class="pl-11" :route="route('pajsk.index')" :role="request()->routeIs('pajsk.index')">
+                    PAJSK Assessment
+                </x-sidebar-item> --}}
+                <x-sidebar-item class="pl-11" :route="route('pajsk.history')" :role="request()->routeIs('pajsk.history')">
+                    {{ __('Evaluations History') }}
+                </x-sidebar-item>
+                <x-sidebar-item class="pl-11" :route="route('pajsk.extra-cocuriculum')" :role="request()->routeIs('pajsk.extra-cocuriculum')">
+                    {{ __('Extra-Cocuriculum') }}
+                </x-sidebar-item>
+                <x-sidebar-item class="pl-11" :route="route('pajsk.extra-cocuriculum.history')" :role="request()->routeIs('pajsk.extra-cocuriculum-history')">
+                    {{ __('Extra-Cocuriculum History') }}
+                </x-sidebar-item>
             </ul>
             <x-sidebar-item class="" :route="route('activity.approval')" :role="request()->routeIs('activity.approval')">
                 Activity
@@ -58,11 +86,14 @@
                 <x-sidebar-item class="pl-11" :route="route('pajsk.index')" :role="request()->routeIs('pajsk.index')">
                     PAJSK Assessment
                 </x-sidebar-item>
-                <x-sidebar-item class="pl-11" :route="route('pajsk.evaluations')" :role="request()->routeIs('pajsk.evaluations')">
+                <x-sidebar-item class="pl-11" :route="route('pajsk.history')" :role="request()->routeIs('pajsk.history')">
                     {{ __('Evaluations History') }}
                 </x-sidebar-item>
                 <x-sidebar-item class="pl-11" :route="route('pajsk.extra-cocuriculum')" :role="request()->routeIs('pajsk.extra-cocuriculum')">
                     {{ __('Extra-Cocuriculum') }}
+                </x-sidebar-item>
+                <x-sidebar-item class="pl-11" :route="route('pajsk.extra-cocuriculum.history')" :role="request()->routeIs('pajsk.extra-cocuriculum-history')">
+                    {{ __('Extra-Cocuriculum History') }}
                 </x-sidebar-item>
             </ul>
 
