@@ -426,7 +426,8 @@
                 $('.student-tr input[type="checkbox"]:checked').each(function () {
                     formData.students.push($(this).attr('id').replace('checkbox-student-', ''));
                 });
-    
+                
+                console.log(formData);
                 // Send data to the API
                 $.ajax({
                     url: '{{ route('activity.store') }}', // API endpoint
