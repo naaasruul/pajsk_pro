@@ -21,6 +21,7 @@ class ExtraCocuSeeder extends Seeder
         $this->call(ExtraCocuTIMMS_PISA::class);
 
 
+		$this->command->info('Extra Cocu. seeded successfully');
 
         
     }
