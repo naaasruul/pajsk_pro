@@ -53,6 +53,10 @@ class DatabaseSeeder extends Seeder
             ServiceContributionSeeder::class,
             PlacementSeeder::class,
             AchievementPlacementSeeder::class,
+
+            // For EXTRA COCU
+            ExtraCocuSeeder::class,
+
             // StudentSeeder::class,
             // TeacherSeeder::class,
         ]);
@@ -69,13 +73,6 @@ class DatabaseSeeder extends Seeder
             'active_status' => 1,
         ]);
 
-        $userStudent = Student::create([
-            'user_id' => $userStudent->id,
-            'phone_number' => fake()->phoneNumber(),
-            'home_number' => fake()->phoneNumber(),
-            'address' => fake()->address(),
-            'class_id' => $class->id,
-        ]);
 
         $userTeacher = Teacher::create([
             'user_id' => $userTeacher->id,
@@ -83,6 +80,16 @@ class DatabaseSeeder extends Seeder
             'address' => fake()->address(),
             'phone_number' => fake()->phoneNumber(),
             'home_number' => fake()->phoneNumber(),
+        ]);
+
+        
+        $userStudent = Student::create([
+            'user_id' => $userStudent->id,
+            'phone_number' => fake()->phoneNumber(),
+            'home_number' => fake()->phoneNumber(),
+            'address' => fake()->address(),
+            'class_id' => $class->id,
+            'mentor_id' => $userTeacher->id,
         ]);
     }
 }
