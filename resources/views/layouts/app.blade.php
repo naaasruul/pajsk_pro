@@ -53,6 +53,12 @@
             .mb-4 {
                 margin-bottom: 0.5rem !important;
             }
+            .page-break {
+                page-break-before: always;
+            }
+            .no-print {
+                display: none !important;
+            }
         }
     </style>
     
