@@ -23,6 +23,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::get('/evaluations', [PAJSKController::class, 'history'])->name('pajsk.history');
+    Route::get('/result/student/{student}/evaluation/{evaluation}', [PAJSKController::class, 'result'])->name('pajsk.result');
+
 
     // Routes accessible by admin and teachers
     Route::middleware('role:admin|teacher')->group(function () {
@@ -33,8 +36,6 @@ Route::middleware('auth')->group(function () {
 
         // PAJSK routes
         Route::prefix('pajsk')->name('pajsk.')->group(function () {
-            Route::get('/result/student/{student}/evaluation/{evaluation}', [PAJSKController::class, 'result'])->name('result');
-            Route::get('/evaluations', [PAJSKController::class, 'history'])->name('history');
 
             Route::get('/extra-cocuriculum', [ExtraCocuriculumController::class, 'index'])->name('extra-cocuriculum');
             Route::get('/extra-cocuriculum/history', [ExtraCocuriculumController::class, 'history'])->name('extra-cocuriculum.history');

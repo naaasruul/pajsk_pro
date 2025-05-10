@@ -213,9 +213,14 @@ class PAJSKController extends Controller
 
         if (auth()->user()->hasrole('admin')) {
             $query = PajskAssessment::with(['student.user', 'serviceContribution', 'classroom', 'club']);
-        } else {
+        } else if (auth()->user()->hasrole('teacher')) {
             $query = PajskAssessment::with(['student.user', 'serviceContribution', 'classroom', 'club'])
                 ->where('teacher_id', auth()->user()->teacher->id);
+        } else if (auth()->user()->hasrole('student')) {
+            $query = PajskAssessment::with(['student.user', 'serviceContribution', 'classroom', 'club'])
+                ->where('student_id', auth()->user()->student->id);
+        } else {
+            abort(403, 'Unauthorized action.');
         }
 
         if ($search) {

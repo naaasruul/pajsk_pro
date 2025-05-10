@@ -122,6 +122,12 @@
             </x-sidebar-item> --}}
             @endhasanyrole
 
+            @hasrole('student')
+                <x-sidebar-item :route="route('pajsk.history')" :role="request()->routeIs('pajsk.history')">
+                    Evaluations History
+                </x-sidebar-item>
+            @endhasanyrole
+
             <div class="pt-4 mt-4 space-y-2 border-t border-gray-200 dark:border-gray-700">
                 <x-sidebar-item :route="route('profile.edit')" :role="request()->routeIs('profile.*')">
                     Profile
