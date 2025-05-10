@@ -36,10 +36,98 @@
 								<p class="text-gray-900 dark:text-gray-100">Position: {{ $position ? $position : 'No Position' }}</p>
 							</div>
 						</div>
+
+                        @if($extracocuricullum)
+                        <!-- Extra Cocu Breakdown -->
+                        <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 mb-6">
+                            <h4 class="text-lg font-medium mb-4">Extra-Cocurricular Points Breakdown</h4>
+                            <div class="space-y-3">
+
+                                <div class="py-2 border-b dark:border-gray-600">
+                                    <div class="flex justify-between items-center">
+                                        <span class="font-medium">Service Point</span>
+                                        <span class="text-lg">
+                                            {{ $extracocuricullum->service ? $extracocuricullum->service->point . ' pts' : 'N/A' }}
+                                        </span>
+                                    </div>
+                                    <div class="text-sm text-gray-600 dark:text-gray-300">
+                                        <div class="text-sm text-gray-500 dark:text-gray-400">
+                                            <p>{{ $extracocuricullum->service->name ?? 'N/A' }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="py-2 border-b dark:border-gray-600">
+                                    <div class="flex justify-between items-center">
+                                        <span class="font-medium">Special Award Point</span>
+                                        <span class="text-lg">
+                                            {{ $extracocuricullum->specialAward ? $extracocuricullum->specialAward->point . ' pts' : 'N/A' }}
+                                        </span>
+                                    </div>
+                                    <div class="text-sm text-gray-600 dark:text-gray-300">
+                                        <div class="text-sm text-gray-500 dark:text-gray-400">
+                                            <p>{{ $extracocuricullum->specialAward->name ?? 'N/A' }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="py-2 border-b dark:border-gray-600">
+                                    <div class="flex justify-between items-center">
+                                        <span class="font-medium">Community Service Point</span>
+                                        <span class="text-lg">
+                                            {{ $extracocuricullum->communityService ? $extracocuricullum->communityService->point . ' pts' : 'N/A' }}
+                                        </span>
+                                    </div>
+                                    <div class="text-sm text-gray-600 dark:text-gray-300">
+                                        <div class="text-sm text-gray-500 dark:text-gray-400">
+                                            <p>{{ $extracocuricullum->communityService->name ?? 'N/A' }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="py-2 border-b dark:border-gray-600">
+                                    <div class="flex justify-between items-center">
+                                        <span class="font-medium">TIMMS & PISA Point</span>
+                                        <span class="text-lg">
+                                            {{ $extracocuricullum->timmsAndPisa ? $extracocuricullum->timmsAndPisa->point . ' pts' : 'N/A' }}
+                                        </span>
+                                    </div>
+                                    <div class="text-sm text-gray-600 dark:text-gray-300">
+                                        <div class="text-sm text-gray-500 dark:text-gray-400">
+                                            <p>{{ $extracocuricullum->timmsAndPisa->name ?? 'N/A' }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="py-2 dark:border-gray-600">
+                                    <div class="flex justify-between items-center">
+                                        <span class="font-medium">NILAM Point</span>
+                                        <span class="text-lg">
+                                            {{ $extracocuricullum->nilam ? $extracocuricullum->nilam->point . ' pts' : 'N/A' }}
+                                        </span>
+                                    </div>
+                                    <div class="text-sm text-gray-600 dark:text-gray-300">
+                                        <div class="text-sm text-gray-500 dark:text-gray-400">
+                                            <p>                                            
+                                                {{ $extracocuricullum->nilam ? $extracocuricullum->nilam->tier->name . ', ' . $extracocuricullum->nilam->achievement->achievement_name : 'N/A' }}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Total Points -->
+                                <div class="flex justify-between items-center pt-4 mt-4 border-t border-gray-300 dark:border-gray-500">
+                                    <div>
+                                        <span class="text-xl font-bold">Total Points</span>
+                                        <p class="text-sm text-gray-500 dark:text-gray-400">Overall Extra-Cocuricullar Performance Rating</p>
+                                    </div>
+                                    <div class="text-right">
+                                        <span class="text-2xl font-bold">{{ $extracocuricullum->total_point }} pts</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        @endif
                         
                         <!-- Score Breakdown -->
-                        <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-6 mb-6">
-                            <h4 class="text-lg font-medium mb-4">Score Breakdown</h4>
+                        <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 mb-6 page-break">
+                            <h4 class="text-lg font-medium mb-4">PAJSK Score Breakdown</h4>
                             <div class="space-y-3">
                                 <div class="py-2 border-b dark:border-gray-600">
                                     <div class="flex justify-between items-center">
@@ -131,7 +219,7 @@
                                 <div class="flex justify-between items-center pt-4 mt-4 border-t border-gray-300 dark:border-gray-500">
                                     <div>
                                         <span class="text-xl font-bold">Total Score</span>
-                                        <p class="text-sm text-gray-500 dark:text-gray-400">Overall Performance Rating</p>
+                                        <p class="text-sm text-gray-500 dark:text-gray-400">Overall PAJSK Performance Rating</p>
                                     </div>
                                     <div class="text-right">
                                         <span class="text-2xl font-bold">{{ $total }}/110</span>
@@ -144,7 +232,7 @@
                         </div>
 
                         <!-- Action Buttons -->
-                        <div class="flex justify-end space-x-2">
+                        <div class="flex justify-end space-x-2 no-print">
                             <button onclick="window.print()"
                                     class="inline-flex items-center px-4 py-2 bg-blue-600 dark:bg-blue-200 border border-transparent rounded-md font-semibold text-xs text-white dark:text-blue-800 uppercase tracking-widest hover:bg-blue-500 dark:hover:bg-blue-300">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">

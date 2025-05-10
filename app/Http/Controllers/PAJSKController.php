@@ -10,7 +10,9 @@ use App\Models\Commitment;
 use App\Models\PajskAssessment;
 use App\Models\ServiceContribution;
 use App\Models\Teacher;
+use App\Models\ExtraCocuricullum;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class PAJSKController extends Controller
 {
@@ -158,14 +160,23 @@ class PAJSKController extends Controller
 
     public function result(Student $student, PajskAssessment $evaluation)
     {
-
         // Authorization check to ensure evaluation belongs to student
         if ($evaluation->student_id !== $student->id) {
+            Log::error('PAJSK assessment authorization failed', [
+                'student_id' => $student->id,
+                'assessment_student_id' => $evaluation->student_id,
+                'assessment_id' => $evaluation->id
+            ]);
             abort(404);
         }
 
         // Get attendance record based on score
         $attendance = Attendance::where('score', $evaluation->attendance_score)->first();
+
+        // Add extracurricular data selecting by student_id and class_id
+        $extracocuricullum = ExtraCocuricullum::where('student_id', $student->id)
+                                ->where('class_id', $student->classroom->id)
+                                ->first();
 
         $scores = [
             'attendance_score' => $evaluation->attendance_score,
@@ -182,15 +193,16 @@ class PAJSKController extends Controller
             'total' => $evaluation->total_score,
             'percentage' => $evaluation->percentage,
             'student' => $student,
-            'teacher' => $evaluation->teacher, // using the stored teacher_id relationship
-            'year' => $evaluation->classroom->year,         // using the stored class_id relationship
+            'teacher' => $evaluation->teacher,
+            'year' => $evaluation->classroom->year,
             'class_name' => $evaluation->classroom->class_name,
-            'club' => $evaluation->club->club_name,            // using the stored club_id relationship
-            'position' => $evaluation->clubPosition->position_name, // using the stored club_position_id relationship
+            'club' => $evaluation->club->club_name,
+            'position' => $evaluation->clubPosition->position_name,
             'attendance' => $attendance,
             'commitments' => Commitment::whereIn('id', $evaluation->commitment_ids)->get(),
             'service' => ServiceContribution::find($evaluation->service_contribution_id),
             'assessment' => $evaluation,
+            'extracocuricullum' => $extracocuricullum,
         ];
 
         return view('pajsk.result', $result);
