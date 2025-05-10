@@ -48,7 +48,7 @@ class ExtraCocuricullum extends Model
 
     public function nilam()
     {
-        return $this->belongsTo(Achievement::class, 'nilam_id');
+        return $this->belongsTo(Nilam::class, 'nilam_id');
     }
 
     // Added classroom relationship
