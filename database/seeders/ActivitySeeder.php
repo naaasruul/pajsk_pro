@@ -8,6 +8,7 @@ use App\Models\InvolvementType;
 use App\Models\Achievement;
 use App\Models\Club;
 use App\Models\Teacher;
+use App\Models\Student;
 use Illuminate\Database\Seeder;
 
 class ActivitySeeder extends Seeder
@@ -51,6 +52,13 @@ class ActivitySeeder extends Seeder
         $leaderId = Teacher::first()->id;
         $createdBy = Teacher::first()->id;
 
+        // Fetch random teachers and students IDs
+        $randomTeacherIds = Teacher::inRandomOrder()->limit(3)->pluck('id')->toArray();
+        $randomStudentIds = Student::inRandomOrder()->limit(3)->pluck('id')->toArray();
+
+        // Add Faker instance
+        $faker = \Faker\Factory::create();
+
         // Seed example activity
         Activity::create([
             'represent' => 'Menghadiri',
@@ -59,13 +67,15 @@ class ActivitySeeder extends Seeder
             'achievement_id' => $achievementId,
             'club_id' => $clubId,
             'category' => 'Kelab & Persatuan',
-            'activity_place' => 'Padang Jawa',
+            'activity_place' => $faker->city(),
             'date_start' => '2025-01-01',
             'time_start' => '10:00',
             'date_end' => '2025-01-02',
-            'time_end' => '12:00',
+            'time_end' => '12:00',  
             'leader_id' => $leaderId,
             'created_by' => $createdBy,
+            'activity_teachers_id' => $randomTeacherIds,
+            'activity_students_id' => $randomStudentIds 
         ]);
 
         $this->command->info('Activity seeded successfully!');
