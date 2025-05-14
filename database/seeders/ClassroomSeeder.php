@@ -10,14 +10,15 @@ class ClassroomSeeder extends Seeder
 {
     public function run()
     {
-        $faker = Faker::create();
-        // Create 10 classrooms with random data
-        for ($i = 1; $i <= 10; $i++) {
-            Classroom::create([
-                'year' => $faker->numberBetween(1, 6),  // Random academic year
-                'class_name' => $faker->randomElement(['Taubat', 'Muhibbah', 'Zuhud', 'Ikhlas', 'Tawakkal', 'Sabar']),
-                'active_status' => $faker->boolean ? 1 : 0,
-            ]);
+        $classes = ['Taubat', 'Muhibbah', 'Zuhud', 'Ikhlas', 'Tawakkal', 'Sabar'];
+        foreach (range(1, 6) as $year) {
+            foreach ($classes as $class) {
+                Classroom::create([
+                    'year' => $year,
+                    'class_name' => $class,
+                    'active_status' => 1,
+                ]);
+            }
         }
     }
 }
