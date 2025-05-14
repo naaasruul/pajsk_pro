@@ -151,7 +151,7 @@
                                     </div>
                                     <div class="text-sm text-gray-600 dark:text-gray-300">
 										<div class="text-sm text-gray-500 dark:text-gray-400">
-											<p>{{ $student->current_position ? $student->current_position->position_name : 'No Position' }}</p>
+											<p>{{ $position ? $position : 'No Position' }}</p>
 										</div>
                                     </div>
                                 </div>
