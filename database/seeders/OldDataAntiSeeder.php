@@ -24,13 +24,13 @@ class OldDataAntiSeeder extends Seeder
             "- extra_cocuricullums (linked to classrooms)\n".
             "- pajsk_assessments (linked to classrooms)\n".
             "- students (all)\n".
-            "- clubs (all)\n".
+            // "- clubs (all)\n".
             "- club_student (pivot)\n".
             "- activities (all)\n".
             "This operation cannot be undone. Proceed?", false)) 
         {
             // Revert user records seeded by StudentSeeder (except for critical users)
-            User::whereNotIn('id', [1, 2, 3])->delete();
+            User::whereNotIn('id', [1, 2, 3, 4, 5])->delete();
 
             // Get IDs of classrooms for years 1 to 6 seeded by ClassroomSeeder
             $classroomIds = Classroom::whereBetween('year', [1, 6])->pluck('id')->toArray();
@@ -48,8 +48,8 @@ class OldDataAntiSeeder extends Seeder
             // Delete student records seeded by StudentSeeder
             Student::query()->delete(); // Reverts StudentSeeder without foreign key constraint issues
 
-            // Delete club records seeded by ClubSeeder
-            Club::query()->delete(); // Reverts ClubSeeder
+            // // Delete club records seeded by ClubSeeder
+            // Club::query()->delete(); // Reverts ClubSeeder
 
             // Clear pivot records seeded by ClubStudentSeeder
             DB::table('club_student')->delete(); // Reverts ClubStudentSeeder
