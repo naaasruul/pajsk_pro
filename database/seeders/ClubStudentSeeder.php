@@ -11,18 +11,30 @@ class ClubStudentSeeder extends Seeder
 {
 	public function run(): void
 	{
-		$clubs = Club::all();
+		// Retrieve all clubs and group them by category needed
+		$persatuanClubs = Club::where('category', 'Kelab & Persatuan')->get();
+		$sukanClubs = Club::where('category', 'Sukan & Permainan')->get();
+		$beruniformClubs = Club::where('category', 'Badan Beruniform')->get();
+
 		$students = Student::all();
 		$positions = ClubPosition::all();
 		$defaultPosition = $positions->where('position_name', 'Ahli Biasa')->first();
 
-		// Assign each student to 1-2 random clubs
 		foreach ($students as $student) {
-			$numClubs = 1;
-			$selectedClubs = $clubs->random($numClubs);
+			// For each category, pick one club randomly (if available)
+			$selectedClubs = [];
+			if ($persatuanClubs->isNotEmpty()) {
+				$selectedClubs[] = $persatuanClubs->random();
+			}
+			if ($sukanClubs->isNotEmpty()) {
+				$selectedClubs[] = $sukanClubs->random();
+			}
+			if ($beruniformClubs->isNotEmpty()) {
+				$selectedClubs[] = $beruniformClubs->random();
+			}
 
 			foreach ($selectedClubs as $club) {
-				// 20% chance to get a leadership position
+				// 20% chance to get a leadership position; otherwise, use default
 				$position = rand(1, 100) <= 20
 					? $positions->whereNotIn('position_name', ['Ahli Biasa', 'Ahli Berdaftar'])->random()
 					: $defaultPosition;
@@ -35,6 +47,6 @@ class ClubStudentSeeder extends Seeder
 			}
 		}
 
-		$this->command->info('Students assigned to clubs successfully');
+		$this->command->info('Each student has been assigned to three clubs (one per category) successfully');
 	}
 }
