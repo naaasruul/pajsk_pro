@@ -24,11 +24,8 @@ class OldDataSeeder extends Seeder
 {
     /**
      * Run the database seeds.
-     *
-     * This method seeds classrooms, students, clubs, club-student records,
-     * activities, PAJSK assessments and extra co-curricular data.
      * 
-     * IMPORTANT: REVERT BY USING OldDataAntiSeeder
+     * This seeder now creates multiple assessment rows per student following the new storage schema.
      */
     public function run(): void
     {
@@ -36,129 +33,213 @@ class OldDataSeeder extends Seeder
         $this->call([
             ClassroomSeeder::class,
             StudentSeeder::class,
-            ClubSeeder::class,
+            // ClubSeeder::class,
             ClubStudentSeeder::class,
             ActivitySeeder::class,
         ]);
 
-        // Retrieve all teacher records from the teacher table.
         $teachers = Teacher::all();
-        // Retrieve all club records from the club table.
         $clubs = Club::all();
-
-        // Retrieve all student records from the student table.
         $students = Student::all();
-
-        // Loop through each student to create assessment and extracurricular data.
-        foreach ($students as $student) {
-            // Retrieve the classroom record for the current student using the student's class_id.
-            $studentClass = Classroom::find($student->class_id);
-            // Set the maximum number of academic years based on the classroom's year.
-            $maxYear = $studentClass->year;
-
-            // Iterate over each academic year for the student.
-            for ($year = 1; $year <= $maxYear; $year++) {
-                // Select a random attendance record from the Attendance table.
-                $attendance = Attendance::inRandomOrder()->first();
-                // Read the attendance score; if not found, default to 0.
-                $attendanceScore = $attendance ? $attendance->score : 0;
-                
-                // Select four random commitment records from the Commitment table.
-                $commitments = Commitment::inRandomOrder()->take(4)->get();
-                // Collect the IDs of the selected commitment records.
-                $commitmentIds = $commitments->pluck('id')->toArray();
-                // Sum the score values of the selected commitment records.
-                $commitmentScore = $commitments->sum('score');
-                
-                // Query the ServiceContribution table for the record with the service name 'ATLET/PESERTA'.
-                $serviceContribution = ServiceContribution::where('service_name', 'ATLET/PESERTA')->first();
-                // Define the service score from the found record, or default to 0.
-                $serviceScore = $serviceContribution ? $serviceContribution->score : 0;
-                
-                // Retrieve the first available record from the Activity table.
-                $activity = Activity::first();
-                
-                // Determine the club position ID; if the activity does not define it,
-                // retrieve the ID for the position named 'Ahli Biasa'.
-                $clubPositionId = $activity->club_position_id ?: ClubPosition::where('position_name', 'Ahli Biasa')->value('id');
-                // Retrieve the point value associated with the determined club position.
-                $positionScore = ClubPosition::where('id', $clubPositionId)->value('point');
-                
-                // Retrieve the involvement score from the achievement_involvement table using the activity's achievement_id and involvement_id.
-                $involvementScore = DB::table('achievement_involvement')
-                    ->where('achievement_id', $activity->achievement_id)
-                    ->where('involvement_type_id', $activity->involvement_id)
-                    ->value('score') ?? 5;
-                    
-                // Retrieve the placement score using the achievement_placement table, based on the activity's achievement_id and placement_id.
-                $placementScore = DB::table('achievement_placement')
-                    ->where('achievement_id', $activity->achievement_id)
-                    ->where('placement_id', $activity->placement_id)
-                    ->value('score') ?? 0;
-                
-                // Compute the total score as the sum of attendance, position, involvement, commitment, service, and placement scores.
-                $totalScore = $attendanceScore + $positionScore + $involvementScore + $commitmentScore + $serviceScore + $placementScore;
-                // Compute the percentage based on the total score out of a base value of 110.
-                $percentage = ($totalScore / 110) * 100;
-
-                // Select a random teacher record to associate with the assessment.
-                $teacher = $teachers->random();
-                // Select a random club record to associate with the assessment.
-                $club    = $clubs->random();
-                
-                // Create a new PAJSK assessment record with all of the computed values and identifiers.
-                PajskAssessment::create([
-                    'student_id'        => $student->id,                       // Link the assessment to the student.
-                    'class_id'          => $student->class_id,                 // Link the assessment to the student's class.
-                    'teacher_id'        => $teacher->id,                       // Record the teacher's ID.
-                    'club_id'           => $club->id,                          // Record the club's ID.
-                    'club_position_id'  => $clubPositionId,                    // Record the club position ID.
-                    'attendance_score'  => $attendanceScore,                   // Set the attendance score.
-                    'position_score'    => $positionScore,                     // Set the score corresponding to the club position.
-                    'involvement_score' => $involvementScore,                  // Set the involvement score.
-                    'commitment_score'  => $commitmentScore,                   // Set the commitment score.
-                    'service_score'     => $serviceScore,                      // Set the service score for contributions.
-                    'placement_score'   => $placementScore,                    // Set the placement score.
-                    'total_score'       => $totalScore,                        // Set the computed total score.
-                    'percentage'        => $percentage,                        // Set the computed percentage.
-                    'commitment_ids'    => $commitmentIds,                     // Save the list of commitment IDs.
-                    'service_contribution_id' => $serviceContribution ? $serviceContribution->id : 0, // Save the service contribution record ID or 0 if none.
-                ]);
-
-                // Retrieve a random Services record for extra co-curricular data.
-                $service = Services::inRandomOrder()->first();
-                // Retrieve a random SpecialAward record.
-                $specialAward = SpecialAward::inRandomOrder()->first();
-                // Retrieve a random CommunityServices record.
-                $communityService = CommunityServices::inRandomOrder()->first();
-                // Retrieve a random Nilam record.
-                $nilam = Nilam::inRandomOrder()->first();
-                // Retrieve a random TimmsAndPisa record.
-                $timmsPisa = TimmsAndPisa::inRandomOrder()->first();
-                // Compute the overall total point from the points of the selected extra co-curricular records.
-                $totalPoint = $service->point + $specialAward->point + $communityService->point + $nilam->point + $timmsPisa->point;
-
-                // Create an ExtraCocuricullum record with the associated extra co-curricular data.
-                ExtraCocuricullum::create([
-                    'student_id'         => $student->id,                   // Link to the student.
-                    'class_id'           => $student->class_id,             // Link to the student's class.
-                    'service_id'         => $service ? $service->id : null,   // Save the service record ID if available.
-                    'special_award_id'   => $specialAward ? $specialAward->id : null, // Save the special award record ID if available.
-                    'community_service_id' => $communityService ? $communityService->id : null, // Save the community service record ID if available.
-                    'nilam_id'           => $nilam ? $nilam->id : null,       // Save the Nilam record ID if available.
-                    'timms_pisa_id'      => $timmsPisa ? $timmsPisa->id : null, // Save the Timms and PISA record ID if available.
-                    'total_point'        => $totalPoint,                    // Save the computed extra co-curricular total points.
-                ]);
+        // // Retrieve a seeded activity to use its involvement_id and placement_id
+        // $seededActivity = Activity::inRandomOrder()->first();
+        // $involvementIdFromActivity = $seededActivity ? $seededActivity->involvement_id : null;
+        // $placementIdFromActivity   = $seededActivity ? $seededActivity->placement_id : null;
+        // Get available service contribution ids (as string values)
+        $serviceContributions = ServiceContribution::all();
+        $serviceIdsAvailable = $serviceContributions->pluck('id')->map(fn($id) => (string)$id)->toArray();
+        // Get available attendance record ids
+        $attendanceIdsPool = Attendance::pluck('id')->toArray();
+        // Get available commitment ids (as strings)
+        $commitmentIdsPool = Commitment::pluck('id')->map(fn($id) => (string)$id)->toArray();
+        
+        // Helper function to ensure an array has exactly $n elements.
+        $ensureLength = function(array $arr, int $n) {
+            if(count($arr) < $n) {
+                // pad by repeating random elements
+                while(count($arr) < $n) {
+                    $arr[] = $arr[array_rand($arr)];
+                }
+            } elseif(count($arr) > $n) {
+                $arr = array_slice($arr, 0, $n);
             }
-            // Retrieve a dummy activity record to ensure the student has associated activity data.
-            $dummyActivity = Activity::first();
-            // If a dummy activity exists, attach it to the student's activity relationships without detaching existing ones.
-            if ($dummyActivity) {
-                $student->activities()->syncWithoutDetaching([$dummyActivity->id]);
+            return $arr;
+        };
+
+        // Also seed extra cocuricullum data for each student
+        foreach ($students as $student) {
+            $service = \App\Models\Services::inRandomOrder()->first();
+            $specialAward = \App\Models\SpecialAward::inRandomOrder()->first();
+            $communityService = \App\Models\CommunityServices::inRandomOrder()->first();
+            $nilam = \App\Models\Nilam::inRandomOrder()->first();
+            $timmsPisa = \App\Models\TimmsAndPisa::inRandomOrder()->first();
+            $totalPoint = ($service->point ?? 0)
+                        + ($specialAward->point ?? 0)
+                        + ($communityService->point ?? 0)
+                        + ($nilam->point ?? 0)
+                        + ($timmsPisa->point ?? 0);
+            \App\Models\ExtraCocuricullum::updateOrCreate(
+                ['student_id' => $student->id, 'class_id' => $student->class_id],
+                [
+                    'service_id'           => $service->id ?? null,
+                    'special_award_id'     => $specialAward->id ?? null,
+                    'community_service_id' => $communityService->id ?? null,
+                    'nilam_id'             => $nilam->id ?? null,
+                    'timms_pisa_id'        => $timmsPisa->id ?? null,
+                    'total_point'          => $totalPoint,
+                ]
+            );
+        }
+        // // Attach seeded activity to each student if not already attached
+        // if ($seededActivity) {
+        //     foreach ($students as $student) {
+        //         if (!$student->activities()->where('activity_id', $seededActivity->id)->exists()) {
+        //             $student->activities()->attach($seededActivity->id);
+        //         }
+        //     }
+        // }
+
+        // Loop through each student to create pajsk_assessments data.
+        foreach ($students as $student) {
+            $studentClass = Classroom::find($student->class_id);
+            $maxYear = $studentClass->year;
+            // If student is in grade 6, randomly decide if assessments are 5 or 6 rows.
+            if ($maxYear == 6) {
+                $assessmentsCount = rand(5, 6);
+            } else {
+                $assessmentsCount = $maxYear;
+            }
+            // For each assessment row, arrays must have 3 elements.
+            // Get student's clubs (as IDs)
+            $studentClubIds = $ensureLength($student->clubs->pluck('id')->toArray(), 3);
+            
+            // For each assessment year, create one pajsk_assessment row.
+            for ($i = 1; $i <= $assessmentsCount; $i++) {
+                // Replace previous random selection with distinct values:
+                // Select 3 distinct teacher IDs.
+                $teacherArr = $teachers->pluck('id')->toArray();
+                shuffle($teacherArr);
+                $teacherIds = array_slice($teacherArr, 0, 3);
+                
+                // Select 3 distinct service contribution IDs (as strings).
+                $serviceContribArr = $serviceContributions->pluck('id')->map(fn($id)=>(string)$id)->toArray();
+                shuffle($serviceContribArr);
+                $serviceContribIds = array_slice($serviceContribArr, 0, 3);
+                
+                // Select 3 distinct attendance IDs.
+                $attendanceArr = $attendanceIdsPool;
+                shuffle($attendanceArr);
+                $attendanceIds = array_slice($attendanceArr, 0, 3);
+                
+                // Select 3 distinct club position IDs.
+                $positionArr = \App\Models\ClubPosition::all()->pluck('id')->toArray();
+                shuffle($positionArr);
+                $studentClubPositions = array_slice($positionArr, 0, 3);
+                
+                // Use distinct service IDs same as service contribution IDs.
+                $serviceIds = $serviceContribIds;
+
+                // For commitments, build a 2D array with 3 nested arrays, each with 4 random commitment ids.
+                $commitmentIds = [];
+                for ($j = 0; $j < 3; $j++) {
+                    $commitmentIds[] = (array) array_rand(array_flip($commitmentIdsPool), 4);
+                }
+
+                // For scores, here we simulate per-organization (3 clubs)
+                $totals = [];
+                $percents = [];
+                for ($k = 0; $k < 3; $k++) {
+                    // Simulate individual score components (you can replace with more elaborate logic)
+                    $attScore = Attendance::find($attendanceIds[$k])?->score ?? rand(30, 40);
+                    $posScore = ClubPosition::find($studentClubPositions[$k])?->point ?? rand(1,10);
+                    // Use model relationships to determine true involvement and placement scores:
+                    $activities = $student->activities()->with(['achievement.involvements','achievement.placements'])->get();
+                    if($activities->isNotEmpty()){
+                        $activityForOrg = $activities->random();
+                        $involScore = optional($activityForOrg->achievement->involvements->first())->pivot->score ?? 0;
+                        $placeScore = optional($activityForOrg->achievement->placements->first())->pivot->score ?? 0;
+                    } else {
+                        $involScore = 0;
+                        $placeScore = 0;
+                    }
+                    // Sum commitment scores for 4 commitments in this organization.
+                    $commScore = 0;
+                    foreach ($commitmentIds[$k] as $cid) {
+                        $commScore += Commitment::find($cid)?->score ?? rand(1, 4);
+                    }
+                    $servScore = ServiceContribution::find($serviceIds[$k])?->score ?? rand(5,10);
+                    $total = $attScore + $posScore + $involScore + $commScore + $servScore + $placeScore;
+                    $totals[] = $total;
+                    $percents[] = round(($total/110)*100,2);
+                    \Illuminate\Support\Facades\Log::info('Pajsk Assessment Calculation', [
+                        'org_index' => $k,
+                        'attendanceScore' => $attScore,
+                        'positionScore' => $posScore,
+                        'involvementScore' => $involScore,
+                        'commitmentScore' => $commScore,
+                        'serviceScore' => $servScore,
+                        'placementScore' => $placeScore,
+                        'total' => $total,
+                        'percentage' => round(($total/110)*100,2)
+                    ]);
+                }
+                
+                // For class_id, use random value from classrooms for past years; current year remains.
+                $class_id = ($i < $assessmentsCount) ? Classroom::inRandomOrder()->first()->id : $student->classroom->id;
+                
+                // Select a random activity for this assessment.
+                $randomActivity = Activity::inRandomOrder()->first();
+                $involvementId = $randomActivity ? $randomActivity->involvement_id : null;
+                $placementId   = $randomActivity ? $randomActivity->placement_id : null;
+                
+                PajskAssessment::create([
+                    'student_id' => $student->id,
+                    'class_id'   => $class_id,
+                    'teacher_ids' => $teacherIds,
+                    'club_ids' => $studentClubIds,
+                    'club_position_ids' => $studentClubPositions,
+                    'service_contribution_ids' => $serviceContribIds,
+                    'attendance_ids' => $attendanceIds,
+                    'commitment_ids' => $commitmentIds,
+                    'involvement_id' => $involvementId,
+                    'placement_id' => $placementId,
+                    'service_ids' => $serviceIds,
+                    'total_scores' => $totals,
+                    'percentages' => $percents,
+                ]);
+                // Attach the randomly selected activity if not already attached
+                if ($randomActivity && !$student->activities()->where('activity_id', $randomActivity->id)->exists()) {
+                    $student->activities()->attach($randomActivity->id);
+                }
+
+                // // Retrieve a random Services record for extra co-curricular data.
+                // $service = Services::inRandomOrder()->first();
+                // // Retrieve a random SpecialAward record.
+                // $specialAward = SpecialAward::inRandomOrder()->first();
+                // // Retrieve a random CommunityServices record.
+                // $communityService = CommunityServices::inRandomOrder()->first();
+                // // Retrieve a random Nilam record.
+                // $nilam = Nilam::inRandomOrder()->first();
+                // // Retrieve a random TimmsAndPisa record.
+                // $timmsPisa = TimmsAndPisa::inRandomOrder()->first();
+                // // Compute the overall total point from the points of the selected extra co-curricular records.
+                // $totalPoint = $service->point + $specialAward->point + $communityService->point + $nilam->point + $timmsPisa->point;
+
+                // // Create an ExtraCocuricullum record with the associated extra co-curricular data.
+                // ExtraCocuricullum::create([
+                //     'student_id'            => $student->id,                   // Link to the student.
+                //     'class_id'              => $student->class_id,             // Link to the student's class.
+                //     'service_id'            => $service->id,   // Save the service record ID if available.
+                //     'special_award_id'      => $specialAward->id, // Save the special award record ID if available.
+                //     'community_service_id'  => $communityService->id, // Save the community service record ID if available.
+                //     'nilam_id'              => $nilam->id,       // Save the Nilam record ID if available.
+                //     'timms_pisa_id'         => $timmsPisa->id, // Save the Timms and PISA record ID if available.
+                //     'total_point'           => $totalPoint,                    // Save the computed extra co-curricular total points.
+                // ]);
             }
         }
 
         // Output a console message to indicate that the seeding process has completed successfully.
-        $this->command->info('Old data seeded successfully');
+        $this->command->info('Old data seeded successfully.');
     }
 }
