@@ -116,39 +116,42 @@ class OldDataSeeder extends Seeder
                     $class_id = $student->classroom->id;
                 }
                 
-                // Select 3 distinct teacher IDs.
+                // Determine random item quantity (0-3) for each evaluation array
+                $n = rand(0, 3);
+
+                // Select $n distinct teacher IDs.
                 $teacherArr = $teachers->pluck('id')->toArray();
                 shuffle($teacherArr);
-                $teacherIds = array_slice($teacherArr, 0, 3);
+                $teacherIds = array_slice($teacherArr, 0, $n);
                 
-                // Select 3 distinct service contribution IDs (as strings).
-                $serviceContribArr = $serviceContributions->pluck('id')->map(fn($id)=>(string)$id)->toArray();
+                // Select $n distinct service contribution IDs (as strings).
+                $serviceContribArr = $serviceContributions->pluck('id')->map(fn($id)=> (string)$id)->toArray();
                 shuffle($serviceContribArr);
-                $serviceContribIds = array_slice($serviceContribArr, 0, 3);
+                $serviceContribIds = array_slice($serviceContribArr, 0, $n);
                 
-                // Select 3 distinct attendance IDs.
+                // Select $n distinct attendance IDs.
                 $attendanceArr = $attendanceIdsPool;
                 shuffle($attendanceArr);
-                $attendanceIds = array_slice($attendanceArr, 0, 3);
+                $attendanceIds = array_slice($attendanceArr, 0, $n);
                 
-                // Select 3 distinct club position IDs.
+                // Select $n distinct club position IDs.
                 $positionArr = \App\Models\ClubPosition::all()->pluck('id')->toArray();
                 shuffle($positionArr);
-                $studentClubPositions = array_slice($positionArr, 0, 3);
+                $studentClubPositions = array_slice($positionArr, 0, $n);
                 
                 // Use distinct service IDs same as service contribution IDs.
                 $serviceIds = $serviceContribIds;
-
-                // For commitments, build a 2D array with 3 nested arrays, each with 4 random commitment ids.
+ 
+                // For commitments, build a 2D array with $n nested arrays, each with 4 random commitment ids.
                 $commitmentIds = [];
-                for ($j = 0; $j < 3; $j++) {
+                for ($j = 0; $j < $n; $j++) {
                     $commitmentIds[] = (array) array_rand(array_flip($commitmentIdsPool), 4);
                 }
 
-                // For scores, here we simulate per-organization (3 clubs)
+                // Simulate per-organization scores for $n clubs.
                 $totals = [];
                 $percents = [];
-                for ($k = 0; $k < 3; $k++) {
+                for ($k = 0; $k < $n; $k++) {
                     // Simulate individual score components (you can replace with more elaborate logic)
                     $attScore = Attendance::find($attendanceIds[$k])?->score ?? rand(30, 40);
                     $posScore = ClubPosition::find($studentClubPositions[$k])?->point ?? rand(1,10);
