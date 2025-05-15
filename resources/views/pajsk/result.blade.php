@@ -11,6 +11,32 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900 dark:text-gray-100">
+                    @if(empty($totalScores))
+                    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
+                        <strong class="font-bold">No Assessments!</strong>
+                        <span class="block sm:inline">One or more assessment categories have no data recorded yet.</span>
+                    </div>
+                    @endif
+
+                    @php
+                        $clubCount = count($assessment->club_ids ?? []);
+                        $dataCount = count($totalScores);
+                        $missingClubIds = array_slice($assessment->club_ids ?? [], $dataCount);
+                        $missingClubNames = collect($missingClubIds)
+                          ->map(fn($id) => \App\Models\Club::find($id)?->club_name)
+                          ->filter()
+                          ->implode(', ');
+                    @endphp
+                    @if($clubCount > $dataCount)
+                        <div class="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded relative mb-4" role="alert">
+                             <strong class="font-bold">Incomplete Evaluation!</strong>
+                             <span class="block sm:inline">
+                                 {{ $clubCount - $dataCount }} club{{ ($clubCount - $dataCount) > 1 ? 's' : '' }} missing evaluation data:
+                                 {{ $missingClubNames }}.
+                             </span>
+                        </div>
+                    @endif
+
                     <div class="mb-6">
                         <h3 class="text-lg font-semibold mb-4">Evaluation Results for {{ $student->user->name }}</h3>
                         
