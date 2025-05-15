@@ -26,12 +26,26 @@ class DatabaseSeeder extends Seeder
         ]);
         $userAdmin->assignRole('admin');
 
-        $userTeacher = User::create([
-            'name' => 'Teacher User',
+        $userTeacherKelab = User::create([
+            'name' => 'Teacher User (Kelab)',
             'email' => 'teacher@example.com',
             'password' => bcrypt('password'),
         ]);
-        $userTeacher->assignRole('teacher');
+        $userTeacherKelab->assignRole('teacher');
+
+        $userTeacherUniform = User::create([
+            'name' => 'Teacher User (Uniform)',
+            'email' => 'teacherU@example.com',
+            'password' => bcrypt('password'),
+        ]);
+        $userTeacherUniform->assignRole('teacher');
+
+        $userTeacherSukan = User::create([
+            'name' => 'Teacher User (Sukan)',
+            'email' => 'teacherS@example.com',
+            'password' => bcrypt('password'),
+        ]);
+        $userTeacherSukan->assignRole('teacher');
 
         $userStudent = User::create([
             'name' => 'Student User',
@@ -85,9 +99,25 @@ class DatabaseSeeder extends Seeder
             'class_id' => $class->id,
         ]);
 
-        $userTeacher = Teacher::create([
-            'user_id' => $userTeacher->id,
-            'club_id' => 1,
+        $userTeacherKelab = Teacher::create([
+            'user_id' => $userTeacherKelab->id,
+            'club_id' => 1, // Kelab Alam Sekitar
+            'address' => fake()->address(),
+            'phone_number' => fake()->phoneNumber(),
+            'home_number' => fake()->phoneNumber(),
+        ]);
+
+        $userTeacherUniform = Teacher::create([
+            'user_id' => $userTeacherUniform->id,
+            'club_id' => 9, // Kadet Bomba
+            'address' => fake()->address(),
+            'phone_number' => fake()->phoneNumber(),
+            'home_number' => fake()->phoneNumber(),
+        ]);
+
+        $userTeacherSukan = Teacher::create([
+            'user_id' => $userTeacherSukan->id,
+            'club_id' => 6, // Kelab Sukan
             'address' => fake()->address(),
             'phone_number' => fake()->phoneNumber(),
             'home_number' => fake()->phoneNumber(),
