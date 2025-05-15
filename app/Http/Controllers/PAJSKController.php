@@ -113,54 +113,69 @@ class PAJSKController extends Controller
             'commitments.*' => 'exists:commitments,id',
             'service_contribution_id' => 'required|exists:service_contributions,id',
         ]);
-
-        $attendance = Attendance::where('attendance_count', $validated['attendance'])->firstOrFail();
-        $commitments = Commitment::whereIn('id', $validated['commitments'])->get();
-        $serviceContribution = ServiceContribution::find($validated['service_contribution_id']);
         
-        $scores = [
-            'attendance_score' => $attendance->score,
-            'position_score' => $student->getCurrentPositionAttribute()?->point ?? 0,
-            'involvement_score' => $student->getInvolvementScore(),
-            'placement_score' => $student->getPlacementScore(),
-            'commitment_score' => $commitments->sum('score'),
-            'service_score' => $serviceContribution->score
-        ];
+        $attendanceRecord = Attendance::where('attendance_count', $validated['attendance'])->firstOrFail();
+        $serviceContribution = ServiceContribution::find($validated['service_contribution_id']);
 
-        $total = $scores['attendance_score'] + 
-                 $scores['position_score'] + 
-                 $scores['involvement_score'] + 
-                 $scores['placement_score'] + 
-                 $scores['commitment_score'] + 
-                 $scores['service_score'];
+        $clubPositionId = $student->clubPosition();
+        $firstActivity = $student->activities()->first();
+        $involvementId = $firstActivity ? $firstActivity->involvement_id : null;
+        $placementId = $firstActivity ? $firstActivity->placement_id : null;
+        $commitmentIds = $validated['commitments'];
+        $serviceIds = [$validated['service_contribution_id']];
 
-        $percentage = ($total / 110) * 100; // Updated total to 110
-
-        // Create new PAJSK assessment record
-        $assessment = PajskAssessment::create([
+        $attendancePoint    = $attendanceRecord->score;
+        $clubPositionPoint  = $clubPositionId ? (\App\Models\ClubPosition::find($clubPositionId)->point ?? 0) : 0;
+        $involvementScore   = $student->getInvolvementScore();
+        $commitmentScore    = Commitment::whereIn('id', $validated['commitments'])->sum('score');
+        $serviceScore       = $serviceContribution->score;
+        $achievementScore   = $this->calculateAchievementScore($student);
+        $totalScore         = $attendancePoint + $clubPositionPoint + $involvementScore + $commitmentScore + $serviceScore + $achievementScore;
+        $percentage         = round(($totalScore / 110) * 100, 2);
+        
+        // Retrieve existing assessment if available; otherwise, create new.
+        $assessment = PajskAssessment::firstOrNew([
             'student_id' => $student->id,
-            'class_id' => $student->classroom->id,
-            'club_id' => $student->current_club->id,
-            'club_position_id' => $student->clubPosition(),
-            'teacher_id' => auth()->user()->teacher->id,
-            'attendance_score' => $scores['attendance_score'],
-            'position_score' => $scores['position_score'],
-            'involvement_score' => $scores['involvement_score'],
-            'placement_score' => $scores['placement_score'],
-            'commitment_score' => $scores['commitment_score'],
-            'service_score' => $scores['service_score'],
-            'total_score' => $total,
-            'percentage' => $percentage,
-            'commitment_ids' => $validated['commitments'],
-            'service_contribution_id' => $validated['service_contribution_id']
+            'class_id'   => $student->classroom->id,
         ]);
 
+        // For array fields, merge new values with existing values.
+        $assessment->teacher_ids = array_merge($assessment->teacher_ids ?? [], [auth()->user()->teacher->id]);
+        
+        // Replace merging of club_ids with conditional assignment
+        if (empty($assessment->club_ids)) {
+            $assessment->club_ids = $student->clubs->pluck('id')->toArray();
+        }
+        
+        $assessment->club_position_ids = array_merge($assessment->club_position_ids ?? [], $clubPositionId ? [$clubPositionId] : []);
+        $assessment->service_contribution_ids = array_merge($assessment->service_contribution_ids ?? [], [$validated['service_contribution_id']]);
+        $assessment->attendance_ids = array_merge($assessment->attendance_ids ?? [], [$attendanceRecord->id]);
+        
+        // For singular fields, set if not already set.
+        if (!$assessment->involvement_id) {
+            $assessment->involvement_id = $involvementId;
+        }
+        if (!$assessment->placement_id) {
+            $assessment->placement_id = $placementId;
+        }
+        
+        // For commitment_ids, which must be a 2D array
+        if (!empty($assessment->commitment_ids)) {
+            $assessment->commitment_ids = array_merge($assessment->commitment_ids, [$commitmentIds]);
+        } else {
+            $assessment->commitment_ids = [$commitmentIds];
+        }
+        $assessment->service_ids = array_merge($assessment->service_ids ?? [], $serviceIds);
+        $assessment->total_scores = array_merge($assessment->total_scores ?? [], [$totalScore]);
+        $assessment->percentages  = array_merge($assessment->percentages ?? [], [$percentage]);
+        
+        $assessment->save();
+        
         return redirect()->route('pajsk.result', ['student' => $student, 'evaluation' => $assessment]);
     }
 
     public function result(Student $student, PajskAssessment $evaluation)
     {
-        // Authorization check to ensure evaluation belongs to student
         if ($evaluation->student_id !== $student->id) {
             Log::error('PAJSK assessment authorization failed', [
                 'student_id' => $student->id,
@@ -170,41 +185,88 @@ class PAJSKController extends Controller
             abort(404);
         }
 
-        // Get attendance record based on score
-        $attendance = Attendance::where('score', $evaluation->attendance_score)->first();
-
-        // Add extracurricular data selecting by student_id and class_id
         $extracocuricullum = ExtraCocuricullum::where('student_id', $student->id)
                                 ->where('class_id', $student->classroom->id)
                                 ->first();
+        
+        $attendance = Attendance::find(collect($evaluation->attendance_ids)->first());
+        // Keep the id arrays unchanged: total_scores & percentages still hold multiple breakdown values.
+        $totalScores  = $evaluation->total_scores ?? [];  
+        $percentages  = $evaluation->percentages ?? [];
+        
+        // Sort activities in descending order by placement pivot score from achievement_placement pivot
+        $sortedActivities = $student->activities->sortByDesc(function($activity) {
+            $placementScore = $activity->achievement->placements()
+                ->where('placement_id', $activity->placement_id)
+                ->first()?->pivot->score ?? 0;
+            return $placementScore;
+        });
 
         $scores = [
-            'attendance_score' => $evaluation->attendance_score,
-            'position_score' => $evaluation->position_score,
-            'involvement_score' => $evaluation->involvement_score,
-            'commitment_score' => $evaluation->commitment_score,
-            'service_score' => $evaluation->service_score,
-            'placement_score' => $evaluation->placement_score,
-            'achievement_score' => $evaluation->achievement_score,
+            'attendance' => [
+                'ids' => $evaluation->attendance_ids,
+                'scores' => array_map(function($id) {
+                    $att = Attendance::find($id);
+                    return $att ? $att->score : 0;
+                }, $evaluation->attendance_ids ?? []),
+            ],
+            'club_positions' => [
+                'ids' => $evaluation->club_position_ids,
+                'scores' => array_map(function($id) {
+                    $cp = \App\Models\ClubPosition::find($id);
+                    return $cp ? $cp->point : 0;
+                }, $evaluation->club_position_ids ?? []),
+            ],
+            'commitments' => [
+                'ids' => $evaluation->commitment_ids,
+                'scores' => array_map(function($idArray) {
+                    $scores = array_map(function($id) {
+                        $comm = \App\Models\Commitment::find($id);
+                        return $comm ? $comm->score : 0;
+                    }, $idArray);
+                    return [array_sum($scores)];
+                }, $evaluation->commitment_ids ?? []),
+            ],
+            'services' => [
+                'ids' => $evaluation->service_ids,
+                'scores' => array_map(function($id) {
+                    $serv = ServiceContribution::find($id);
+                    return $serv ? $serv->score : 0;
+                }, $evaluation->service_ids ?? []),
+            ],
+            'involvement' => [
+                'id' => $evaluation->involvement_id,
+                'score' => $evaluation->involvement_id ? $student->getInvolvementScore() : 0,
+            ],
+            'placement' => [
+                'id' => $evaluation->placement_id,
+                'score' => $evaluation->placement_id ? $student->getPlacementScore() : 0,
+            ],
+            'totalScores' => $totalScores,
+            'percentages' => $percentages,
         ];
 
+        // $commitments = $evaluation->commitments()->get();
+        $service = ServiceContribution::find(optional($evaluation->service_contribution_ids)[0]);
+
+        // Pass full id arrays along with breakdown arrays to the view.
         $result = [
             'scores' => $scores,
-            'total' => $evaluation->total_score,
-            'percentage' => $evaluation->percentage,
+            'totalScores' => $totalScores,
+            'percentages' => $percentages,
             'student' => $student,
-            'teacher' => $evaluation->teacher,
+            'teacher_ids' => $evaluation->teacher_ids,
             'year' => $evaluation->classroom->year,
             'class_name' => $evaluation->classroom->class_name,
-            'club' => $evaluation->club->club_name,
-            'position' => $evaluation->clubPosition->position_name,
+            'club_ids' => $evaluation->club_ids,
+            'position' => optional($evaluation->club_positions->first())->position_name,
             'attendance' => $attendance,
-            'commitments' => Commitment::whereIn('id', $evaluation->commitment_ids)->get(),
-            'service' => ServiceContribution::find($evaluation->service_contribution_id),
+            'service' => $service,
             'assessment' => $evaluation,
             'extracocuricullum' => $extracocuricullum,
+            'sortedActivities' => $sortedActivities, // pass sorted activities to the view
         ];
-
+        
         return view('pajsk.result', $result);
     }
 
@@ -219,17 +281,18 @@ class PAJSKController extends Controller
         $search = $request->get('search');
         $year_filter = $request->get('year_filter');
         $club_filter = $request->get('club_filter');
+        $club_category = $request->get('club_category'); // new filter variable
 
         // Retrieve all clubs to populate the filter dropdown
         $clubs = Club::orderBy('club_name')->get();
 
         if (auth()->user()->hasrole('admin')) {
-            $query = PajskAssessment::with(['student.user', 'serviceContribution', 'classroom', 'club']);
+            $query = PajskAssessment::with(['student.user', 'serviceContribution', 'classroom']);
         } else if (auth()->user()->hasrole('teacher')) {
-            $query = PajskAssessment::with(['student.user', 'serviceContribution', 'classroom', 'club'])
-                ->where('teacher_id', auth()->user()->teacher->id);
+            $query = PajskAssessment::with(['student.user', 'serviceContribution', 'classroom'])
+                ->whereJsonContains('teacher_ids', auth()->user()->teacher->id);
         } else if (auth()->user()->hasrole('student')) {
-            $query = PajskAssessment::with(['student.user', 'serviceContribution', 'classroom', 'club'])
+            $query = PajskAssessment::with(['student.user', 'serviceContribution', 'classroom'])
                 ->where('student_id', auth()->user()->student->id);
         } else {
             abort(403, 'Unauthorized action.');
@@ -247,6 +310,11 @@ class PAJSKController extends Controller
         }
         if ($club_filter) {
             $query->where('club_id', $club_filter);
+        }
+        if ($club_category) {
+            $query->whereHas('club', function ($q) use ($club_category) {
+                $q->where('category', $club_category);
+            });
         }
 
         $evaluations = $query->latest()->paginate(10);

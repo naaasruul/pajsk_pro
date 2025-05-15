@@ -7,27 +7,36 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class PajskAssessment extends Model
 {
+    // Updated fillable to reflect new fields and aggregated totals
     protected $fillable = [
         'student_id',
         'class_id',
-        'teacher_id',
-        'club_id',
-        'club_position_id',
-        'attendance_score',
-        'position_score',
-        'involvement_score',
-        'commitment_score',
-        'service_score',
-        'placement_score', // Add this line
-        'total_score',
-        'percentage',
+        'teacher_ids',
+        'club_ids',
+        'club_position_ids',
+        'service_contribution_ids',
+        'attendance_ids',
+        'involvement_id',
         'commitment_ids',
-        'service_contribution_id'
+        'service_ids',
+        'placement_id',
+        'total_scores',
+        'percentages',
     ];
 
+    // Updated casts for new fields
     protected $casts = [
+        'teacher_ids' => 'array',
+        'club_ids' => 'array',
+        'club_position_ids' => 'array',
+        'service_contribution_ids' => 'array',
+        'attendance_ids' => 'array',
         'commitment_ids' => 'array',
-        'percentage' => 'decimal:2'
+        'service_ids' => 'array',
+        'involvement_id' => 'integer',
+        'placement_id'   => 'integer',
+        'total_scores'    => 'array',
+        'percentages'     => 'array',
     ];
 
     public function student(): BelongsTo
@@ -35,28 +44,70 @@ class PajskAssessment extends Model
         return $this->belongsTo(Student::class);
     }
 
-    public function teacher(): BelongsTo
+    // Accessor for teacher models remains unchanged.
+    public function getTeachersAttribute()
     {
-        return $this->belongsTo(Teacher::class);
+        $ids = $this->teacher_ids ?? [];
+        return \App\Models\Teacher::whereIn('id', $ids)->get();
+    }
+
+    public function getTeacherAttribute()
+    {
+        return optional($this->teachers->first());
     }
 
     public function serviceContribution(): BelongsTo
     {
-        return $this->belongsTo(ServiceContribution::class);
+        return $this->belongsTo(\App\Models\ServiceContribution::class);
     }
 
-    public function classroom(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    public function classroom(): BelongsTo
     {
         return $this->belongsTo(\App\Models\Classroom::class, 'class_id');
     }
 
-    public function club(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    // Accessor for clubs using stored club_ids
+    public function getClubsAttribute()
     {
-        return $this->belongsTo(\App\Models\Club::class, 'club_id');
+        $ids = $this->club_ids ?? [];
+        return \App\Models\Club::whereIn('id', $ids)->get();
+    }
+    
+    // Accessor for club positions using club_position_ids
+    public function getClubPositionsAttribute()
+    {
+        $ids = $this->club_position_ids ?? [];
+        return \App\Models\ClubPosition::whereIn('id', $ids)->get();
     }
 
-    public function clubPosition(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    // New relationship: Attendances (stored as JSON array)
+    public function attendances()
     {
-        return $this->belongsTo(\App\Models\ClubPosition::class, 'club_position_id');
+        return \App\Models\Attendance::whereIn('id', $this->attendance_ids ?? []);
+    }
+    
+    // New relationship: Involvement (singular)
+    public function involvement()
+    {
+        return \App\Models\InvolvementType::find($this->involvement_id);
+    }
+    
+    // New relationship: Commitments
+    public function commitments()
+    {
+        $ids = is_array($this->commitment_ids) ? \Illuminate\Support\Arr::flatten($this->commitment_ids) : [];
+        return \App\Models\Commitment::whereIn('id', $ids);
+    }
+    
+    // New relationship: Services 
+    public function services()
+    {
+        return \App\Models\ServiceContribution::whereIn('id', $this->service_ids ?? []);
+    }
+    
+    // New relationship: Placement (singular)
+    public function placement()
+    {
+        return \App\Models\Placement::find($this->placement_id);
     }
 }
