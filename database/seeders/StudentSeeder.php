@@ -16,13 +16,14 @@ class StudentSeeder extends Seeder
     {
         // Retrieve all classrooms from the database
         $classrooms = Classroom::all();
+        $yearsix = Classroom::where('year', 6)->get();
 
         // Create 50 students with users
         $students = collect();
         for ($i = 1; $i <= 50; $i++) {
 
             $user = User::create([
-                'name' => fake()->name(),
+                'name' => fake()->unique()->name(),
                 'email' => fake()->unique()->safeEmail(),
                 'password' => Hash::make('password'),
             ]);
@@ -35,9 +36,11 @@ class StudentSeeder extends Seeder
                 'home_number' => fake()->phoneNumber(),
                 'address' => fake()->address(),
                 'class_id' => $classrooms->random()->id,
+                // 'class_id' => $yearsix->random()->id,
             ]);
 
             $students->push($student);
+            // $this->command->info($students);
         }
 
         $this->command->info('Created 50 students for testing');
