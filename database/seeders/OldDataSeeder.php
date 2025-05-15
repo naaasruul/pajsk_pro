@@ -103,19 +103,19 @@ class OldDataSeeder extends Seeder
         foreach ($students as $student) {
             $studentClass = Classroom::find($student->class_id);
             $maxYear = $studentClass->year;
-            // If student is in grade 6, randomly decide if assessments are 5 or 6 rows.
-            if ($maxYear == 6) {
-                $assessmentsCount = rand(5, 6);
-            } else {
-                $assessmentsCount = $maxYear;
-            }
-            // For each assessment row, arrays must have 3 elements.
             // Get student's clubs (as IDs)
             $studentClubIds = $ensureLength($student->clubs->pluck('id')->toArray(), 3);
             
-            // For each assessment year, create one pajsk_assessment row.
-            for ($i = 1; $i <= $assessmentsCount; $i++) {
-                // Replace previous random selection with distinct values:
+            // For each unique classroom year (1 .. current year), create one assessment.
+            // Loop over each unique classroom year so that a student has one assessment per year.
+            for ($year = 1; $year <= $maxYear; $year++) {
+                if ($year < $maxYear) {
+                    $classroom = Classroom::where('year', $year)->inRandomOrder()->first();
+                    $class_id = $classroom ? $classroom->id : $student->classroom->id;
+                } else {
+                    $class_id = $student->classroom->id;
+                }
+                
                 // Select 3 distinct teacher IDs.
                 $teacherArr = $teachers->pluck('id')->toArray();
                 shuffle($teacherArr);
@@ -184,9 +184,6 @@ class OldDataSeeder extends Seeder
                     ]);
                 }
                 
-                // For class_id, use random value from classrooms for past years; current year remains.
-                $class_id = ($i < $assessmentsCount) ? Classroom::inRandomOrder()->first()->id : $student->classroom->id;
-                
                 // Select a random activity for this assessment.
                 $randomActivity = Activity::inRandomOrder()->first();
                 $involvementId = $randomActivity ? $randomActivity->involvement_id : null;
@@ -211,31 +208,6 @@ class OldDataSeeder extends Seeder
                 if ($randomActivity && !$student->activities()->where('activity_id', $randomActivity->id)->exists()) {
                     $student->activities()->attach($randomActivity->id);
                 }
-
-                // // Retrieve a random Services record for extra co-curricular data.
-                // $service = Services::inRandomOrder()->first();
-                // // Retrieve a random SpecialAward record.
-                // $specialAward = SpecialAward::inRandomOrder()->first();
-                // // Retrieve a random CommunityServices record.
-                // $communityService = CommunityServices::inRandomOrder()->first();
-                // // Retrieve a random Nilam record.
-                // $nilam = Nilam::inRandomOrder()->first();
-                // // Retrieve a random TimmsAndPisa record.
-                // $timmsPisa = TimmsAndPisa::inRandomOrder()->first();
-                // // Compute the overall total point from the points of the selected extra co-curricular records.
-                // $totalPoint = $service->point + $specialAward->point + $communityService->point + $nilam->point + $timmsPisa->point;
-
-                // // Create an ExtraCocuricullum record with the associated extra co-curricular data.
-                // ExtraCocuricullum::create([
-                //     'student_id'            => $student->id,                   // Link to the student.
-                //     'class_id'              => $student->class_id,             // Link to the student's class.
-                //     'service_id'            => $service->id,   // Save the service record ID if available.
-                //     'special_award_id'      => $specialAward->id, // Save the special award record ID if available.
-                //     'community_service_id'  => $communityService->id, // Save the community service record ID if available.
-                //     'nilam_id'              => $nilam->id,       // Save the Nilam record ID if available.
-                //     'timms_pisa_id'         => $timmsPisa->id, // Save the Timms and PISA record ID if available.
-                //     'total_point'           => $totalPoint,                    // Save the computed extra co-curricular total points.
-                // ]);
             }
         }
 
