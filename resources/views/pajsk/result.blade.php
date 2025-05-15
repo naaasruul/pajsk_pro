@@ -46,22 +46,24 @@
 								<h4 class="font-medium text-sm text-gray-500 dark:text-gray-400 mb-2">Student Information</h4>
 								<div class="space-y-1">
 									<p class="text-gray-900 dark:text-gray-100">Class: {{ $year . ' ' . $class_name  }}</p>
+								    <p class="text-sm text-gray-500 dark:text-gray-400">{{ $student->user->name }}</p>
 								</div>
 							</div>
 							<div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
 								<h4 class="font-medium text-sm text-gray-500 dark:text-gray-400 mb-2">Assessment Date</h4>
-								<p class="text-gray-900 dark:text-gray-100">{{ $assessment->created_at->format('d/m/Y H:i') }}</p>
+								<p class="text-gray-900 dark:text-gray-100">Last Updated: {{ $assessment->updated_at->format('d/m/Y H:i') }}</p>
+								<p class="text-sm text-gray-500 dark:text-gray-400">Created: {{ $assessment->created_at->format('d/m/Y H:i') }}</p>
 							</div>
 						</div>
 						
 						<!-- Club and Position Info -->
-						<div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 mb-6">
+						{{-- <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 mb-6">
 							<h4 class="font-medium text-sm text-gray-500 dark:text-gray-400 mb-2">Club & Position Information</h4>
 							<div class="space-y-1">
 								<p class="text-gray-900 dark:text-gray-100">Club: {{ $club }}</p>
 								<p class="text-gray-900 dark:text-gray-100">Position: {{ $position ? $position : 'No Position' }}</p>
 							</div>
-						</div>
+						</div> --}}
 
                         @if($extracocuricullum)
                         <!-- Extra Cocu Breakdown -->
