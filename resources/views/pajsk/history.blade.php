@@ -10,7 +10,7 @@
 	<x-container>
 		{{-- <x-club-overview :clubName='$club->club_name' :clubCategory=' $club->category'></x-club-overview> --}}
 
-		<form method="GET" action="{{ route('pajsk.history') }}" class="mb-4 grid grid-cols-4 gap-4">
+		<form method="GET" action="{{ route('pajsk.history') }}" class="mb-4 grid grid-cols-5 gap-4">
 			{{-- Search input (2/4) --}}
 			{{-- <div class="col-span-4 sm:col-span-2">
 				<input type="text" name="search" value="{{ request('search') }}" placeholder="Search..."
@@ -46,12 +46,23 @@
 			<div class="col-span-4 sm:col-span-1">
 				<select name="club_filter" onchange="this.form.submit()"
 					class="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 bg-gray-50 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white">
-					<option value="">All Clubs</option>
+					<option value="">All Organizations</option>
 					@foreach($clubs as $clubItem)
 						<option value="{{ $clubItem->id }}" {{ request('club_filter') == $clubItem->id ? 'selected' : '' }}>
 							{{ $clubItem->club_name }}
 						</option>
 					@endforeach
+				</select>
+			</div>
+
+			{{-- Club Category filter (1/4) --}}
+			<div class="col-span-4 sm:col-span-1">
+				<select name="club_category" onchange="this.form.submit()"
+					class="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 bg-gray-50 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white">
+					<option value="">All Categories</option>
+					<option value="Kelab & Persatuan" {{ request('club_category') == 'Kelab & Persatuan' ? 'selected' : '' }}>Kelab & Persatuan</option>
+					<option value="Sukan & Permainan" {{ request('club_category') == 'Sukan & Permainan' ? 'selected' : '' }}>Sukan & Permainan</option>
+					<option value="Badan Beruniform" {{ request('club_category') == 'Badan Beruniform' ? 'selected' : '' }}>Badan Beruniform</option>
 				</select>
 			</div>
 		</form>
