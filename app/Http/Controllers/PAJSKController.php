@@ -8,6 +8,7 @@ use App\Models\Club;
 use App\Models\ClubPosition;
 use App\Models\Commitment;
 use App\Models\PajskAssessment;
+use App\Models\PajskReport;
 use App\Models\ServiceContribution;
 use App\Models\Teacher;
 use App\Models\ExtraCocuricullum;
@@ -320,5 +321,88 @@ class PAJSKController extends Controller
         $evaluations = $query->latest()->paginate(10);
 
         return view('pajsk.history', compact('evaluations', 'club', 'teacher', 'clubs'));
+    }
+
+    public function generateReport(Student $student, PajskAssessment $assessment)
+    {
+        // Retrieve the previous year from the current assessment's classroom year.
+        $previousYear = $assessment->classroom->year > 1 ? $assessment->classroom->year - 1 : $assessment->classroom->year;
+        // Find the older assessment for the same student in the previous year.
+        $oldAssessment = PajskAssessment::where('student_id', $student->id)
+                        ->whereHas('classroom', function($q) use ($previousYear) {
+                            $q->where('year', $previousYear);
+                        })->latest()->first();
+        $cgpaLast = $oldAssessment ? $oldAssessment->cgpa : null;
+
+        // Calculate GPA from the total_scores array
+        $scores = $assessment->total_scores ?? [];
+        rsort($scores);
+        if(count($scores) >= 2){
+            $gpa = ($scores[0] + $scores[1]) / 2;
+        } elseif(count($scores) == 1) {
+            $gpa = $scores[0];
+        } else {
+            $gpa = 0;
+        }
+        // For demonstration, we use cgpa equal to gpa; adjust as needed
+        $cgpa = $gpa;
+        $cgpa_pctg = round($cgpa * 0.1, 2);
+        $report_description = $cgpa >= 80 ? 'Excellent' : ($cgpa >= 60 ? 'Good' : 'Needs Improvement');
+        
+        // Create a new PajskReport record in the pajsk_reports table
+        $report = PajskReport::create([
+            'student_id' => $student->id,
+            'class_id'   => $assessment->class_id,
+            'extra_cocuricullum_id' => optional($student->extraCocuriculum)->id,
+            'pajsk_assessment_id' => $assessment->id,
+            'gpa' => $gpa,
+            'cgpa' => $cgpa,
+            'cgpa_pctg' => $cgpa_pctg,
+            'report_description' => $report_description,
+        ]);
+        
+        // Change the route name to match the registered route: 'pajsk.show-report'
+        return redirect()->route('pajsk.show-report', ['student' => $student->id, 'report' => $report->id]);
+    }
+
+    public function reportHistory(Request $request)
+    {
+        // Retrieve reports with related student and classroom data
+        $reports = PajskReport::with(['student.user', 'classroom'])
+                    ->latest()
+                    ->paginate(10);
+        return view('pajsk.report-history', ['reports' => $reports]);
+    }
+
+    public function showReport(Student $student, PajskReport $report)
+    {
+        if ($report->student_id !== $student->id) {
+            abort(404, 'Report not found for the given student.');
+        }
+        $assessment = PajskAssessment::find($report->pajsk_assessment_id);
+        $extracocuricullum = ExtraCocuricullum::find($report->extra_cocuricullum_id);
+        
+        // Collect clubs from assessment based on club_ids.
+        $clubsCollection = collect($assessment->club_ids ?? [])->map(function($id) {
+            return Club::find($id);
+        })->filter();
+        $sukan  = $clubsCollection->firstWhere('category', 'Sukan & Permainan');
+        $kelab  = $clubsCollection->firstWhere('category', 'Kelab & Persatuan');
+        $badan  = $clubsCollection->firstWhere('category', 'Badan Beruniform');
+        $clubs = collect([$sukan, $kelab, $badan]);
+
+        // Collect positions based on the stored club_position_ids.
+        $positions = collect($assessment->club_position_ids ?? [])->map(function($id) {
+            return ClubPosition::find($id);
+        })->filter();
+
+        return view('pajsk.report', [
+            'report'            => $report,
+            'student'           => $student,
+            'extracocuricullum' => $extracocuricullum,
+            'assessment'        => $assessment,
+            'clubs'             => $clubs,
+            'positions'         => $positions,
+        ]);
     }
 }

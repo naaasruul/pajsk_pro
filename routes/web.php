@@ -25,6 +25,10 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     Route::get('/evaluations', [PAJSKController::class, 'history'])->name('pajsk.history');
     Route::get('/result/student/{student}/evaluation/{evaluation}', [PAJSKController::class, 'result'])->name('pajsk.result');
+    Route::get('pajsk/report-history', [\App\Http\Controllers\PAJSKController::class, 'reportHistory'])
+         ->name('pajsk.report-history');
+    Route::get('/report/student/{student}/report/{report}', [\App\Http\Controllers\PAJSKController::class, 'showReport'])
+         ->name('pajsk.show-report');
 
 
     // Routes accessible by admin and teachers
@@ -101,6 +105,9 @@ Route::middleware('auth')->group(function () {
             Route::post('/extra-cocuriculum/{student}/store', [ExtraCocuriculumController::class, 'store'])->name('extra-cocuriculum.store');
         });
     });
+
+    // Replace the existing generateReport route:
+    Route::get('pajsk/report/{student}/{assessment}', [\App\Http\Controllers\PAJSKController::class, 'generateReport'])->name('pajsk.report');
 });
 
 require __DIR__.'/auth.php';
