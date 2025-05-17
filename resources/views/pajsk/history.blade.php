@@ -10,13 +10,13 @@
 	<x-container>
 		{{-- <x-club-overview :clubName='$club->club_name' :clubCategory=' $club->category'></x-club-overview> --}}
 
-		<form method="GET" action="{{ route('pajsk.history') }}" class="mb-4 grid grid-cols-5 gap-4">
-			{{-- Search input (2/4) --}}
+		<form method="GET" action="{{ route('pajsk.history') }}" class="mb-4 grid grid-cols-4 gap-4">
 			{{-- <div class="col-span-4 sm:col-span-2">
 				<input type="text" name="search" value="{{ request('search') }}" placeholder="Search..."
-					class="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 bg-gray-50 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white" />
+				class="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 bg-gray-50 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white" />
 			</div> --}}
-
+			
+			{{-- Search input (2/4) --}}
 			<div class="col-span-4 sm:col-span-2 relative">
 				<label for="default-search" class="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white">Search</label>
 				<div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
@@ -41,9 +41,22 @@
 					@endfor
 				</select>
 			</div>
+
+			{{-- Class filter (1/4) --}}
+			<div class="col-span-4 sm:col-span-1">
+				<select name="class_filter" onchange="this.form.submit()"
+					class="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 bg-gray-50 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white">
+					<option value="">All Classes</option>
+					@foreach($classNames as $className)
+						<option value="{{ $className }}" {{ request('class_filter') == $className ? 'selected' : '' }}>
+							{{ $className }}
+						</option>
+					@endforeach
+				</select>
+			</div>
 		
 			{{-- Club filter (1/4) --}}
-			<div class="col-span-4 sm:col-span-1">
+			{{-- <div class="col-span-4 sm:col-span-1">
 				<select name="club_filter" onchange="this.form.submit()"
 					class="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 bg-gray-50 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white">
 					<option value="">All Organizations</option>
@@ -53,10 +66,10 @@
 						</option>
 					@endforeach
 				</select>
-			</div>
+			</div> --}}
 
 			{{-- Club Category filter (1/4) --}}
-			<div class="col-span-4 sm:col-span-1">
+			{{-- <div class="col-span-4 sm:col-span-1">
 				<select name="club_category" onchange="this.form.submit()"
 					class="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 bg-gray-50 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white">
 					<option value="">All Categories</option>
@@ -64,7 +77,7 @@
 					<option value="Sukan & Permainan" {{ request('club_category') == 'Sukan & Permainan' ? 'selected' : '' }}>Sukan & Permainan</option>
 					<option value="Badan Beruniform" {{ request('club_category') == 'Badan Beruniform' ? 'selected' : '' }}>Badan Beruniform</option>
 				</select>
-			</div>
+			</div> --}}
 		</form>
 
 		<div class="relative overflow-x-auto">

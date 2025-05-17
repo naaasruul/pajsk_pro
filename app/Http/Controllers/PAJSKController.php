@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Student;
 use App\Models\Attendance;
+use App\Models\Classroom;
 use App\Models\Club;
 use App\Models\ClubPosition;
 use App\Models\Commitment;
@@ -281,8 +282,9 @@ class PAJSKController extends Controller
 
         $search = $request->get('search');
         $year_filter = $request->get('year_filter');
-        $club_filter = $request->get('club_filter');
-        $club_category = $request->get('club_category'); // new filter variable
+        $class_filter = $request->get('class_filter');
+        // $club_filter = $request->get('club_filter');
+        // $club_category = $request->get('club_category');
 
         // Retrieve all clubs to populate the filter dropdown
         $clubs = Club::orderBy('club_name')->get();
@@ -299,28 +301,48 @@ class PAJSKController extends Controller
             abort(403, 'Unauthorized action.');
         }
 
+        // Search by student name or class name
         if ($search) {
-            $query->whereHas('student.user', function ($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%");
+            $query->where(function($q) use ($search) {
+                $q->whereHas('student.user', function($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%");
+                })->orWhereHas('classroom', function($q) use ($search) {
+                    $q->where('class_name', 'like', "%{$search}%");
+                });
             });
         }
+
+        // Filter by year
         if ($year_filter) {
             $query->whereHas('classroom', function ($q) use ($year_filter) {
                 $q->where('year', $year_filter);
             });
         }
-        if ($club_filter) {
-            $query->where('club_id', $club_filter);
-        }
-        if ($club_category) {
-            $query->whereHas('club', function ($q) use ($club_category) {
-                $q->where('category', $club_category);
+
+        // Filter by class name
+        if ($class_filter) {
+            $query->whereHas('classroom', function($q) use ($class_filter) {
+                $q->where('class_name', $class_filter);
             });
         }
 
+        // Get unique class names for filter dropdown
+        $classNames = Classroom::select('class_name')
+                            ->distinct()
+                            ->orderBy('class_name')
+                            ->pluck('class_name');
+        // if ($club_filter) {
+        //     $query->where('club_id', $club_filter);
+        // }
+        // if ($club_category) {
+        //     $query->whereHas('club', function ($q) use ($club_category) {
+        //         $q->where('category', $club_category);
+        //     });
+        // }
+
         $evaluations = $query->latest()->paginate(10);
 
-        return view('pajsk.history', compact('evaluations', 'club', 'teacher', 'clubs'));
+        return view('pajsk.history', compact('evaluations', 'club', 'teacher', 'clubs', 'classNames'));
     }
 
     public function generateReport(Student $student, PajskAssessment $assessment)
