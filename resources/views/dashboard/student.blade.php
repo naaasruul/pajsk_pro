@@ -21,15 +21,17 @@
                         </div>
                         <div>
                             <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Class</p>
-                            <p class="mt-1 text-sm text-gray-900 dark:text-gray-100">{{ auth()->user()->student->class }}</p>
+                            <p class="mt-1 text-sm text-gray-900 dark:text-gray-100">
+                                {{ $student->classroom ? $student->classroom->year . ' ' . $student->classroom->class_name : 'Not Assigned' }}
+                            </p>
                         </div>
                         <div>
                             <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Phone Number</p>
-                            <p class="mt-1 text-sm text-gray-900 dark:text-gray-100">{{ auth()->user()->student->phone_number }}</p>
+                            <p class="mt-1 text-sm text-gray-900 dark:text-gray-100">{{ $student->phone_number }}</p>
                         </div>
                         <div>
                             <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Address</p>
-                            <p class="mt-1 text-sm text-gray-900 dark:text-gray-100">{{ auth()->user()->student->address }}</p>
+                            <p class="mt-1 text-sm text-gray-900 dark:text-gray-100">{{ $student    ->address }}</p>
                         </div>
                     </div>
                 </div>
