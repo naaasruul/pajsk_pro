@@ -32,11 +32,9 @@ class Student extends Model
                     ->withTimestamps();
     }
 
-    public function activities(): BelongsToMany
+    public function activities()
     {
-        return $this->belongsToMany(Activity::class, 'activity_student')
-                    ->with(['involvement', 'achievement', 'placement'])
-                    ->withTimestamps();
+        return $this->belongsToMany(Activity::class, 'activity_student');
     }
 
     public function mentor()
