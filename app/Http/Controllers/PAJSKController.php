@@ -347,27 +347,41 @@ class PAJSKController extends Controller
 
     public function generateReport(Student $student, PajskAssessment $assessment)
     {
-        // Retrieve the previous year from the current assessment's classroom year.
         $previousYear = $assessment->classroom->year > 1 ? $assessment->classroom->year - 1 : $assessment->classroom->year;
-        // Find the older assessment for the same student in the previous year.
-        $oldAssessment = PajskAssessment::where('student_id', $student->id)
-                        ->whereHas('classroom', function($q) use ($previousYear) {
-                            $q->where('year', $previousYear);
-                        })->latest()->first();
+        // Log::info('Generating report for student:', [
+        //     'student_id' => $student->id,
+        //     'previous_year' => $previousYear,
+        // ]);
+        $oldAssessment = PajskReport::where('student_id', $student->id)
+            ->whereHas('classroom', function ($q) use ($previousYear) {
+                $q->where('year', $previousYear);
+            })->latest()->first();
         $cgpaLast = $oldAssessment ? $oldAssessment->cgpa : null;
+
+        // Log::info('Previous Year Assessment:', [
+        //     'student_id' => $student->id,
+        //     'previous_year' => $previousYear,
+        //     'old_assessment' => $oldAssessment,
+        //     'cgpa_last' => $cgpaLast,
+        // ]);
 
         // Calculate GPA from the total_scores array
         $scores = $assessment->total_scores ?? [];
         rsort($scores);
-        if(count($scores) >= 2){
+        if (count($scores) >= 2) {
             $gpa = ($scores[0] + $scores[1]) / 2;
-        } elseif(count($scores) == 1) {
+        } elseif (count($scores) == 1) {
             $gpa = $scores[0];
         } else {
             $gpa = 0;
         }
-        // For demonstration, we use cgpa equal to gpa; adjust as needed
-        $cgpa = $gpa;
+
+        if ($assessment->classroom->year > 1) {
+            $cgpa = ($gpa + $cgpaLast) / 2;
+        } else {
+            $cgpa = $gpa;
+        }
+
         $cgpa_pctg = round($cgpa * 0.1, 2);
         $report_description = $cgpa >= 80 ? 'Excellent' : ($cgpa >= 60 ? 'Good' : 'Needs Improvement');
         
@@ -379,6 +393,7 @@ class PAJSKController extends Controller
             'pajsk_assessment_id' => $assessment->id,
             'gpa' => $gpa,
             'cgpa' => $cgpa,
+            'cgpa_last' => $cgpaLast,
             'cgpa_pctg' => $cgpa_pctg,
             'report_description' => $report_description,
         ]);
