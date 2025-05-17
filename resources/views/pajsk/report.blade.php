@@ -12,30 +12,30 @@
 			<!-- Main Content -->
 			<div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg print-container">
 				
-				<p class="text-sm text-gray-600 dark:text-gray-400">Student: {{ $student->user->name }}</p>
-				<p class="text-sm text-gray-600 dark:text-gray-400">Class: {{ $report->classroom->year . ' ' . $report->classroom->class_name }}</p>
+				<p class="text-sm text-gray-600 dark:text-gray-400">Student: {{ isset($student) && isset($student->user) ? $student->user->name : '--' }}</p>
+				<p class="text-sm text-gray-600 dark:text-gray-400">Class: {{ isset($report) && isset($report->classroom) ? $report->classroom->year . ' ' . $report->classroom->class_name : '--' }}</p>
 				<div class="p-2 sm:p-4 overflow-x-auto">
 					<table
-						class="w-full text-sm text-left text-gray-500 dark:text-gray-300 border-collapse border border-gray-200 dark:border-gray-700 table-auto">
+						class="w-full text-sm text-left text-gray-500 dark:text-gray-300 border-collapse border border-gray-500 dark:border-gray-700 table-auto">
 						<thead class="text-xs text-white uppercase bg-blue-600 dark:bg-blue-800">
 							<tr>
 								<th scope="col"
-									class="px-2 py-2 sm:px-4 sm:py-3 text-center font-medium border border-gray-300 dark:border-gray-600">
+									class="px-2 py-2 sm:px-4 sm:py-3 text-center font-medium border border-gray-500 dark:border-gray-500">
 									ELEMEN</th>
 								<th scope="col"
-									class="px-2 py-2 sm:px-4 sm:py-3 text-center font-medium border border-gray-300 dark:border-gray-600">
+									class="px-2 py-2 sm:px-4 sm:py-3 text-center font-medium border border-gray-500 dark:border-gray-500">
 									ASPEK</th>
 								<th scope="col"
-									class="px-2 py-2 sm:px-4 sm:py-3 text-center font-medium border border-gray-300 dark:border-gray-600">
+									class="px-2 py-2 sm:px-4 sm:py-3 text-center font-medium border border-gray-500 dark:border-gray-500">
 									SUKAN / PERMAINAN</th>
 								<th scope="col"
-									class="px-2 py-2 sm:px-4 sm:py-3 text-center font-medium border border-gray-300 dark:border-gray-600">
+									class="px-2 py-2 sm:px-4 sm:py-3 text-center font-medium border border-gray-500 dark:border-gray-500">
 									KELAB / PERSATUAN</th>
 								<th scope="col"
-									class="px-2 py-2 sm:px-4 sm:py-3 text-center font-medium border border-gray-300 dark:border-gray-600">
+									class="px-2 py-2 sm:px-4 sm:py-3 text-center font-medium border border-gray-500 dark:border-gray-500">
 									BADAN BERUNIFORM</th>
 								<th scope="col"
-									class="px-2 py-2 sm:px-4 sm:py-3 text-center font-medium border border-gray-300 dark:border-gray-600">
+									class="px-2 py-2 sm:px-4 sm:py-3 text-center font-medium border border-gray-500 dark:border-gray-500">
 									EKSTRA KURIKULUM</th>
 							</tr>
 						</thead>
@@ -43,185 +43,135 @@
 							<!-- PENGLIBATAN Section -->
 							<tr class="bg-white dark:bg-gray-700 border">
 								<td rowspan="7"
-									class="px-2 py-2 sm:px-4 sm:py-3 text-center font-bold border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-600">
+									class="px-2 py-2 sm:px-4 sm:py-3 text-center font-bold border border-gray-500 dark:border-gray-500 bg-gray-100 dark:bg-gray-600">
 									PENGLIBATAN</td>
 								<td
-									class="px-2 py-2 sm:px-4 sm:py-3 text-center font-bold border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-600">
+									class="px-2 py-2 sm:px-4 sm:py-3 text-center font-bold border border-gray-500 dark:border-gray-500 bg-gray-100 dark:bg-gray-600">
 									Jenis</td>
+								<td class="px-2 py-2 sm:px-4 sm:py-3 text-center border border-gray-500 dark:border-gray-500">
+									{{ isset($clubs) && $clubs->get(0) ? $clubs->get(0)->club_name : '--' }}</td>
+								<td class="px-2 py-2 sm:px-4 sm:py-3 text-center border border-gray-500 dark:border-gray-500">
+									{{ isset($clubs) && $clubs->get(1) ? $clubs->get(1)->club_name : '--' }}</td>
+								<td class="px-2 py-2 sm:px-4 sm:py-3 text-center border border-gray-500 dark:border-gray-500">
+									{{ isset($clubs) && $clubs->get(2) ? $clubs->get(2)->club_name : '--' }}</td>
 								<td
-									class="px-2 py-2 sm:px-4 sm:py-3 text-center border border-gray-300 dark:border-gray-600">
-									{{ $clubs->get(0) ?
-									$clubs->get(0)->club_name : '--' }}</td>
-								<td
-									class="px-2 py-2 sm:px-4 sm:py-3 text-center border border-gray-300 dark:border-gray-600">
-									{{ $clubs->get(1) ?
-									$clubs->get(1)->club_name : '--' }}</td>
-								<td
-									class="px-2 py-2 sm:px-4 sm:py-3 text-center border border-gray-300 dark:border-gray-600">
-									{{ $clubs->get(2) ?
-									$clubs->get(2)->club_name : '--' }}</td>
-								<td
-									class="px-2 py-2 sm:px-4 sm:py-3 text-center font-bold border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-600">
+									class="px-2 py-2 sm:px-4 sm:py-3 text-center font-bold border border-gray-500 dark:border-gray-500 bg-gray-100 dark:bg-gray-600">
 									Nama Jawatan</td>
 							</tr>
 							<tr class="bg-white dark:bg-gray-700 border">
 								<td
-									class="px-2 py-2 sm:px-4 sm:py-3 text-center font-bold border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-600">
+									class="px-2 py-2 sm:px-4 sm:py-3 text-center font-bold border border-gray-500 dark:border-gray-500 bg-gray-100 dark:bg-gray-600">
 									Jawatan</td>
+								<td class="px-2 py-2 sm:px-4 sm:py-3 text-center border border-gray-500 dark:border-gray-500">
+									{{ isset($positions) && $positions->get(0) ? $positions->get(0)->position_name : 'N/A' }}</td>
+								<td class="px-2 py-2 sm:px-4 sm:py-3 text-center border border-gray-500 dark:border-gray-500">
+									{{ isset($positions) && $positions->get(1) ? $positions->get(1)->position_name : 'N/A' }}</td>
+								<td class="px-2 py-2 sm:px-4 sm:py-3 text-center border border-gray-500 dark:border-gray-500">
+									{{ isset($positions) && $positions->get(2) ? $positions->get(2)->position_name : '--' }}</td>
 								<td
-									class="px-2 py-2 sm:px-4 sm:py-3 text-center border border-gray-300 dark:border-gray-600">
-									{{ $positions->get(0) ?
-									$positions->get(0)->position_name : 'N/A' }}</td>
-								<td
-									class="px-2 py-2 sm:px-4 sm:py-3 text-center border border-gray-300 dark:border-gray-600">
-									{{ $positions->get(1) ?
-									$positions->get(1)->position_name : 'N/A' }}</td>
-								<td
-									class="px-2 py-2 sm:px-4 sm:py-3 text-center border border-gray-300 dark:border-gray-600">
-									{{ $positions->get(2) ?
-									$positions->get(2)->position_name : '--' }}</td>
-								<td
-									class="px-2 py-2 sm:px-4 sm:py-3 text-center border border-gray-300 dark:border-gray-600">
+									class="px-2 py-2 sm:px-4 sm:py-3 text-center border border-gray-500 dark:border-gray-500">
 									-</td>
 							</tr>
 							<tr class="bg-white dark:bg-gray-700 border">
 								<td
-									class="px-2 py-2 sm:px-4 sm:py-3 text-center font-bold border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-600">
+									class="px-2 py-2 sm:px-4 sm:py-3 text-center font-bold border border-gray-500 dark:border-gray-500 bg-gray-100 dark:bg-gray-600">
 									Peringkat</td>
-								<td
-									class="px-2 py-2 sm:px-4 sm:py-3 text-center border border-gray-300 dark:border-gray-600">
-									{{ $assessment->total_scores[0] ?? '--' }}
+								<td class="px-2 py-2 sm:px-4 sm:py-3 text-center border border-gray-500 dark:border-gray-500">
+									{{ isset($assessment) && isset($assessment->total_scores[0]) ? $assessment->total_scores[0] : '--' }}
+								</td>
+								<td class="px-2 py-2 sm:px-4 sm:py-3 text-center border border-gray-500 dark:border-gray-500">
+									{{ isset($assessment) && isset($assessment->total_scores[1]) ? $assessment->total_scores[1] : '--' }}
+								</td>
+								<td class="px-2 py-2 sm:px-4 sm:py-3 text-center border border-gray-500 dark:border-gray-500">
+									{{ isset($assessment) && isset($assessment->total_scores[2]) ? $assessment->total_scores[2] : '--' }}
 								</td>
 								<td
-									class="px-2 py-2 sm:px-4 sm:py-3 text-center border border-gray-300 dark:border-gray-600">
-									{{ $assessment->total_scores[1] ?? '--' }}
-								</td>
-								<td
-									class="px-2 py-2 sm:px-4 sm:py-3 text-center border border-gray-300 dark:border-gray-600">
-									{{ $assessment->total_scores[2] ?? '--' }}
-								</td>
-								<td
-									class="px-2 py-2 sm:px-4 sm:py-3 text-center font-bold border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-600">
+									class="px-2 py-2 sm:px-4 sm:py-3 text-center font-bold border border-gray-500 dark:border-gray-500 bg-gray-100 dark:bg-gray-600">
 									Anugerah Khas</td>
 							</tr>
 							<tr class="bg-white dark:bg-gray-700 border">
 								<td rowspan="2"
-									class="px-2 py-2 sm:px-4 sm:py-3 text-center font-bold border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-600">
+									class="px-2 py-2 sm:px-4 sm:py-3 text-center font-bold border border-gray-500 dark:border-gray-500 bg-gray-100 dark:bg-gray-600">
 									Komitmen
 								</td>
 								<td rowspan="2"
-									class="px-2 py-2 sm:px-4 sm:py-3 text-center border border-gray-300 dark:border-gray-600">
-									{{ isset($assessment->commitment_ids[0])
-									? collect($assessment->commitment_ids[0])
-									->map(fn($id) => \App\Models\Commitment::find($id)?->commitment_name ?? $id)
-									->implode(', ')
-									: '--' }}
+									class="px-2 py-2 sm:px-4 sm:py-3 text-center border border-gray-500 dark:border-gray-500">
+									{{ isset($commitmentNames) && isset($commitmentNames[0]) ? $commitmentNames[0] : '--' }}
 								</td>
 								<td rowspan="2"
-									class="px-2 py-2 sm:px-4 sm:py-3 text-center border border-gray-300 dark:border-gray-600">
-									{{ isset($assessment->commitment_ids[1])
-									? collect($assessment->commitment_ids[1])
-									->map(fn($id) => \App\Models\Commitment::find($id)?->commitment_name ?? $id)
-									->implode(', ')
-									: '--' }}
+									class="px-2 py-2 sm:px-4 sm:py-3 text-center border border-gray-500 dark:border-gray-500">
+									{{ isset($commitmentNames) && isset($commitmentNames[1]) ? $commitmentNames[1] : '--' }}
 								</td>
 								<td rowspan="2"
-									class="px-2 py-2 sm:px-4 sm:py-3 text-center border border-gray-300 dark:border-gray-600">
-									{{ isset($assessment->commitment_ids[2])
-									? collect($assessment->commitment_ids[2])
-									->map(fn($id) => \App\Models\Commitment::find($id)?->commitment_name ?? $id)
-									->implode(', ')
-									: '--' }}
+									class="px-2 py-2 sm:px-4 sm:py-3 text-center border border-gray-500 dark:border-gray-500">
+									{{ isset($commitmentNames) && isset($commitmentNames[2]) ? $commitmentNames[2] : '--' }}
 								</td>
 								<td
-									class="px-2 py-2 sm:px-4 sm:py-3 text-center border border-gray-300 dark:border-gray-600">
-									{{ $extracocuricullum && $extracocuricullum->specialAward ?
+									class="px-2 py-2 sm:px-4 sm:py-3 text-center border border-gray-500 dark:border-gray-500">
+									{{ isset($extracocuricullum) && isset($extracocuricullum->specialAward) ? 
 									$extracocuricullum->specialAward->name : '--' }}
 								</td>
 							</tr>
 							<tr class="bg-white dark:bg-gray-700 border">
 								<td
-									class="px-2 py-2 sm:px-4 sm:py-3 text-center font-bold border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-600">
+									class="px-2 py-2 sm:px-4 sm:py-3 text-center font-bold border border-gray-500 dark:border-gray-500 bg-gray-100 dark:bg-gray-600">
 									Khidmat Sumbangan
 								</td>
 							</tr>
 							<tr class="bg-white dark:bg-gray-700 border">
 								<td rowspan="2"
-									class="px-2 py-2 sm:px-4 sm:py-3 text-center font-bold border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-600">
+									class="px-2 py-2 sm:px-4 sm:py-3 text-center font-bold border border-gray-500 dark:border-gray-500 bg-gray-100 dark:bg-gray-600">
 									Khidmat
 									Sumbangan</td>
 								<td rowspan="2"
-									class="px-2 py-2 sm:px-4 sm:py-3 text-center border border-gray-300 dark:border-gray-600">
-									{{ isset($assessment->service_contribution_ids[0])
-									?
-									(\App\Models\ServiceContribution::find($assessment->service_contribution_ids[0])?->service_name
-									??
-									'--')
-									: '--' }}
+									class="px-2 py-2 sm:px-4 sm:py-3 text-center border border-gray-500 dark:border-gray-500">
+									{{ isset($serviceNames) && $serviceNames->get(0) ? $serviceNames->get(0)->service_name : '--' }}
 								</td>
 								<td rowspan="2"
-									class="px-2 py-2 sm:px-4 sm:py-3 text-center border border-gray-300 dark:border-gray-600">
-									{{ isset($assessment->service_contribution_ids[1])
-									?
-									(\App\Models\ServiceContribution::find($assessment->service_contribution_ids[1])?->service_name
-									??
-									'--')
-									: '--' }}
+									class="px-2 py-2 sm:px-4 sm:py-3 text-center border border-gray-500 dark:border-gray-500">
+									{{ isset($serviceNames) && $serviceNames->get(1) ? $serviceNames->get(1)->service_name : '--' }}
+
 								</td>
 								<td rowspan="2"
-									class="px-2 py-2 sm:px-4 sm:py-3 text-center border border-gray-300 dark:border-gray-600">
-									{{ isset($assessment->service_contribution_ids[2])
-									?
-									(\App\Models\ServiceContribution::find($assessment->service_contribution_ids[2])?->service_name
-									??
-									'--')
-									: '--' }}
-								</td>
+									class="px-2 py-2 sm:px-4 sm:py-3 text-center border border-gray-500 dark:border-gray-500">
+									{{ isset($serviceNames) && $serviceNames->get(2) ? $serviceNames->get(2)->service_name : '--' }}
+
 								<td
-									class="px-2 py-2 sm:px-4 sm:py-3 text-center border border-gray-300 dark:border-gray-600">
+									class="px-2 py-2 sm:px-4 sm:py-3 text-center border border-gray-500 dark:border-gray-500">
 									check service id</td>
 							</tr>
 							<tr class="bg-white dark:bg-gray-700 border">
 								<td
-									class="px-2 py-2 sm:px-4 sm:py-3 text-center font-bold border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-600">
+									class="px-2 py-2 sm:px-4 sm:py-3 text-center font-bold border border-gray-500 dark:border-gray-500 bg-gray-100 dark:bg-gray-600">
 									Program NILAM</td>
 							</tr>
 
 							<!-- PENYERTAAN Section -->
 							<tr class="bg-white dark:bg-gray-700 border">
 								<td
-									class="px-2 py-2 sm:px-4 sm:py-3 text-center font-bold border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-600">
+									class="px-2 py-2 sm:px-4 sm:py-3 text-center font-bold border border-gray-500 dark:border-gray-500 bg-gray-100 dark:bg-gray-600">
 									PENYERTAAN</td>
 								<td
-									class="px-2 py-2 sm:px-4 sm:py-3 text-center font-bold border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-600">
+									class="px-2 py-2 sm:px-4 sm:py-3 text-center font-bold border border-gray-500 dark:border-gray-500 bg-gray-100 dark:bg-gray-600">
 									Kehadiran</td>
 								<td
-									class="px-2 py-2 sm:px-4 sm:py-3 text-center border border-gray-300 dark:border-gray-600">
-									{{ isset($assessment->attendance_ids[0]) ?
-									(\App\Models\Attendance::find($assessment->attendance_ids[0])->attendance_count ??
-									'--') . '
-									days' :
-									'--' }}
+									class="px-2 py-2 sm:px-4 sm:py-3 text-center border border-gray-500 dark:border-gray-500">
+									{{ isset($attendanceCounts) && $attendanceCounts->get(0) ? 
+									$attendanceCounts->get(0)->attendance_count . ' days' : '--' }}
 								</td>
 								<td
-									class="px-2 py-2 sm:px-4 sm:py-3 text-center border border-gray-300 dark:border-gray-600">
-									{{ isset($assessment->attendance_ids[1]) ?
-									(\App\Models\Attendance::find($assessment->attendance_ids[1])->attendance_count ??
-									'--') . '
-									days' :
-									'--' }}
+									class="px-2 py-2 sm:px-4 sm:py-3 text-center border border-gray-500 dark:border-gray-500">
+									{{ isset($attendanceCounts) && $attendanceCounts->get(1) ? 
+									$attendanceCounts->get(1)->attendance_count . ' days' : '--' }}
 								</td>
 								<td
-									class="px-2 py-2 sm:px-4 sm:py-3 text-center border border-gray-300 dark:border-gray-600">
-									{{ isset($assessment->attendance_ids[2]) ?
-									(\App\Models\Attendance::find($assessment->attendance_ids[2])->attendance_count ??
-									'--') . '
-									days' :
-									'--' }}
+									class="px-2 py-2 sm:px-4 sm:py-3 text-center border border-gray-500 dark:border-gray-500">
+									{{ isset($attendanceCounts) && $attendanceCounts->get(2) ? 
+									$attendanceCounts->get(2)->attendance_count . ' days' : '--' }}
 								</td>
-								<td
-									class="px-2 py-2 sm:px-4 sm:py-3 text-center border border-gray-300 dark:border-gray-600">
-									{{ $extracocuricullum->nilam ? $extracocuricullum->nilam->tier->name . ' ' .
+								<td class="px-2 py-2 sm:px-4 sm:py-3 text-center border border-gray-500 dark:border-gray-500">
+									{{ isset($extracocuricullum) && isset($extracocuricullum->nilam) ? 
+									$extracocuricullum->nilam->tier->name . ' ' .
 									$extracocuricullum->nilam->achievement->achievement_name : 'N/A' }}
 								</td>
 							</tr>
@@ -229,33 +179,33 @@
 							<!-- PRESTASI Section -->
 							<tr class="bg-white dark:bg-gray-700 border">
 								<td rowspan="2"
-									class="px-2 py-2 sm:px-4 sm:py-3 text-center font-bold border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-600">
+									class="px-2 py-2 sm:px-4 sm:py-3 text-center font-bold border border-gray-500 dark:border-gray-500 bg-gray-100 dark:bg-gray-600">
 									PRESTASI
 								</td>
 								<td rowspan="2"
-									class="px-2 py-2 sm:px-4 sm:py-3 text-center font-bold border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-600">
+									class="px-2 py-2 sm:px-4 sm:py-3 text-center font-bold border border-gray-500 dark:border-gray-500 bg-gray-100 dark:bg-gray-600">
 									Tahap
 									Pencapaian</td>
 								<td rowspan="2"
-									class="px-2 py-2 sm:px-4 sm:py-3 text-center border border-gray-300 dark:border-gray-600">
+									class="px-2 py-2 sm:px-4 sm:py-3 text-center border border-gray-500 dark:border-gray-500">
 									{{ isset($assessment->percentages[0]) ? $assessment->percentages[0].'%' : '--' }}
 								</td>
 								<td rowspan="2"
-									class="px-2 py-2 sm:px-4 sm:py-3 text-center border border-gray-300 dark:border-gray-600">
+									class="px-2 py-2 sm:px-4 sm:py-3 text-center border border-gray-500 dark:border-gray-500">
 									{{ isset($assessment->percentages[1]) ? $assessment->percentages[1].'%' : '--' }}
 								</td>
 								<td rowspan="2"
-									class="px-2 py-2 sm:px-4 sm:py-3 text-center border border-gray-300 dark:border-gray-600">
+									class="px-2 py-2 sm:px-4 sm:py-3 text-center border border-gray-500 dark:border-gray-500">
 									{{ isset($assessment->percentages[2]) ? $assessment->percentages[2].'%' : '--' }}
 								</td>
 								<td
-									class="px-2 py-2 sm:px-4 sm:py-3 text-center font-bold border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-600">
+									class="px-2 py-2 sm:px-4 sm:py-3 text-center font-bold border border-gray-500 dark:border-gray-500 bg-gray-100 dark:bg-gray-600">
 									TIMMS DAN PISA</td>
 							</tr>
 							<tr class="bg-white dark:bg-gray-700 border">
 								<td
-									class="px-2 py-2 sm:px-4 sm:py-3 text-center border border-gray-300 dark:border-gray-600">
-									{{ $extracocuricullum && $extracocuricullum->timmsAndPisa ?
+									class="px-2 py-2 sm:px-4 sm:py-3 text-center border border-gray-500 dark:border-gray-500">
+									{{ isset($extracocuricullum) && isset($extracocuricullum->timmsAndPisa) ? 
 									$extracocuricullum->timmsAndPisa->name : '--' }}
 								</td>
 							</tr>
@@ -263,102 +213,102 @@
 							<!-- PELAPORAN MARKAH Section -->
 							<tr class="bg-white dark:bg-gray-700 border">
 								<td colspan="6"
-									class="px-2 py-2 sm:px-4 sm:py-3 text-center font-bold border border-gray-300 dark:border-gray-600 bg-blue-600 dark:bg-blue-800 text-white">
+									class="px-2 py-2 sm:px-4 sm:py-3 text-center font-bold border border-gray-500 dark:border-gray-500 bg-blue-600 dark:bg-blue-800 text-white">
 									PELAPORAN
 									MARKAH</td>
 							</tr>
 							<tr class="bg-white dark:bg-gray-700 border">
 								<td colspan="2"
-									class="px-2 py-2 sm:px-4 sm:py-3 text-center font-bold border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-600">
+									class="px-2 py-2 sm:px-4 sm:py-3 text-center font-bold border border-gray-500 dark:border-gray-500 bg-gray-100 dark:bg-gray-600">
 									SKOR
 									ELEMEN</td>
 								<td
-									class="px-2 py-2 sm:px-4 sm:py-3 text-center border border-gray-300 dark:border-gray-600">
+									class="px-2 py-2 sm:px-4 sm:py-3 text-center border border-gray-500 dark:border-gray-500">
 									{{ isset($assessment->total_scores[0]) ?
 									$assessment->total_scores[0] : '--' }}</td>
 								<td
-									class="px-2 py-2 sm:px-4 sm:py-3 text-center border border-gray-300 dark:border-gray-600">
+									class="px-2 py-2 sm:px-4 sm:py-3 text-center border border-gray-500 dark:border-gray-500">
 									{{ isset($assessment->total_scores[1]) ?
 									$assessment->total_scores[1] : '--' }}</td>
 								<td
-									class="px-2 py-2 sm:px-4 sm:py-3 text-center border border-gray-300 dark:border-gray-600">
+									class="px-2 py-2 sm:px-4 sm:py-3 text-center border border-gray-500 dark:border-gray-500">
 									{{ isset($assessment->total_scores[2]) ?
 									$assessment->total_scores[2] : '--' }}</td>
 								<td
-									class="px-2 py-2 sm:px-4 sm:py-3 text-center border border-gray-300 dark:border-gray-600">
+									class="px-2 py-2 sm:px-4 sm:py-3 text-center border border-gray-500 dark:border-gray-500">
 									{{ $extracocuricullum ?
 									$extracocuricullum->total_point : '--' }}</td>
 							</tr>
 							<tr class="bg-white dark:bg-gray-700 border">
 								<td colspan="2"
-									class="px-2 py-2 sm:px-4 sm:py-3 text-center font-bold border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-600">
+									class="px-2 py-2 sm:px-4 sm:py-3 text-center font-bold border border-gray-500 dark:border-gray-500 bg-gray-100 dark:bg-gray-600">
 									JUMLAH
 									SKOR (%)</td>
 								<td
-									class="px-2 py-2 sm:px-4 sm:py-3 text-center border border-gray-300 dark:border-gray-600">
+									class="px-2 py-2 sm:px-4 sm:py-3 text-center border border-gray-500 dark:border-gray-500">
 									{{ isset($assessment->percentages[0]) ?
 									$assessment->percentages[0].'%' : '--' }}</td>
 								<td
-									class="px-2 py-2 sm:px-4 sm:py-3 text-center border border-gray-300 dark:border-gray-600">
+									class="px-2 py-2 sm:px-4 sm:py-3 text-center border border-gray-500 dark:border-gray-500">
 									{{ isset($assessment->percentages[1]) ?
 									$assessment->percentages[1].'%' : '--' }}</td>
 								<td
-									class="px-2 py-2 sm:px-4 sm:py-3 text-center border border-gray-300 dark:border-gray-600">
+									class="px-2 py-2 sm:px-4 sm:py-3 text-center border border-gray-500 dark:border-gray-500">
 									{{ isset($assessment->percentages[2]) ?
 									$assessment->percentages[2].'%' : '--' }}</td>
 								<td
-									class="px-2 py-2 sm:px-4 sm:py-3 text-center border border-gray-300 dark:border-gray-600">
+									class="px-2 py-2 sm:px-4 sm:py-3 text-center border border-gray-500 dark:border-gray-500">
 									{{ $extracocuricullum ? $extracocuricullum->total_point : '--' }}
 								</td>
 							</tr>
 							<tr class="bg-white dark:bg-gray-700 border">
 								<td colspan="2"
-									class="px-2 py-2 sm:px-4 sm:py-3 text-center font-bold border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-600">
+									class="px-2 py-2 sm:px-4 sm:py-3 text-center font-bold border border-gray-500 dark:border-gray-500 bg-gray-100 dark:bg-gray-600">
 									GPA /
 									GRED</td>
 								<td colspan="4"
-									class="px-2 py-2 sm:px-4 sm:py-3 text-center border border-gray-300 dark:border-gray-600">
-									{{ isset($assessment->gpa) ? $assessment->gpa : '--' }}
+									class="px-2 py-2 sm:px-4 sm:py-3 text-center border border-gray-500 dark:border-gray-500">
+									{{ $report->gpa }}
 								</td>
 							</tr>
 							<tr class="bg-white dark:bg-gray-700 border">
 								<td colspan="2"
-									class="px-2 py-2 sm:px-4 sm:py-3 text-center font-bold border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-600">
+									class="px-2 py-2 sm:px-4 sm:py-3 text-center font-bold border border-gray-500 dark:border-gray-500 bg-gray-100 dark:bg-gray-600">
 									CGPA /
 									GRED</td>
 								<td
-									class="px-2 py-2 sm:px-4 sm:py-3 text-center border border-gray-300 dark:border-gray-600">
+									class="px-2 py-2 sm:px-4 sm:py-3 text-center border border-gray-500 dark:border-gray-500">
 								</td>
 								<td
-									class="px-2 py-2 sm:px-4 sm:py-3 text-center border border-gray-300 dark:border-gray-600">
-									{{ 'Year' . ' ' . $report->classroom->year
-									- 1 . ': ' . ($cgpaLast ?? '--') }}</td>
+									class="px-2 py-2 sm:px-4 sm:py-3 text-center border border-gray-500 dark:border-gray-500">
+									{{ ($report->classroom->year - 1) == 0 ? '--' : 'Year ' . ($report->classroom->year - 1) . ': ' . $cgpaLast }}
+								</td>
 								<td
-									class="px-2 py-2 sm:px-4 sm:py-3 text-center border border-gray-300 dark:border-gray-600">
+									class="px-2 py-2 sm:px-4 sm:py-3 text-center border border-gray-500 dark:border-gray-500">
 									{{ 'Year' . ' ' . $report->classroom->year
 									. ': ' . $report->cgpa }}</td>
 								<td
-									class="px-2 py-2 sm:px-4 sm:py-3 text-center border border-gray-300 dark:border-gray-600">
+									class="px-2 py-2 sm:px-4 sm:py-3 text-center border border-gray-500 dark:border-gray-500">
 								</td>
 							</tr>
 							<tr class="bg-white dark:bg-gray-700 border">
 								<td colspan="2"
-									class="px-2 py-2 sm:px-4 sm:py-3 text-center font-bold border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-600">
+									class="px-2 py-2 sm:px-4 sm:py-3 text-center font-bold border border-gray-500 dark:border-gray-500 bg-gray-100 dark:bg-gray-600">
 									CGPA /
 									(%)</td>
 								<td colspan="4"
-									class="px-2 py-2 sm:px-4 sm:py-3 text-center border border-gray-300 dark:border-gray-600">
+									class="px-2 py-2 sm:px-4 sm:py-3 text-center border border-gray-500 dark:border-gray-500">
 									{{ $report->cgpa_pctg }}</td>
 							</tr>
 							<tr class="bg-white dark:bg-gray-700 border">
 								<td colspan="2"
-									class="px-2 py-2 sm:px-4 sm:py-3 text-center font-bold border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-600">
+									class="px-2 py-2 sm:px-4 sm:py-3 text-center font-bold border border-gray-500 dark:border-gray-500 bg-gray-100 dark:bg-gray-600">
 									PENYATAAN
 									LAPORAN</td>
 								<td colspan="4"
-									class="px-2 py-2 sm:px-4 sm:py-3 text-center border border-gray-300 dark:border-gray-600">
-									{{ $report->report_description
-									}}</td>
+									class="px-2 py-2 sm:px-4 sm:py-3 text-center border border-gray-500 dark:border-gray-500">
+									{{ isset($report) && isset($report->report_description) ? $report->report_description : '--' }}
+								</td>
 							</tr>
 						</tbody>
 					</table>

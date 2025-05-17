@@ -456,9 +456,17 @@ class PAJSKController extends Controller
         }
         $assessment = PajskAssessment::find($report->pajsk_assessment_id);
         $extracocuricullum = ExtraCocuricullum::find($report->extra_cocuricullum_id);
-        
+
+        // Get the previous year's CGPA
+        $previousYear = $report->classroom->year > 1 ? $report->classroom->year - 1 : $report->classroom->year;
+        $oldAssessment = PajskReport::where('student_id', $student->id)
+            ->whereHas('classroom', function ($q) use ($previousYear) {
+                $q->where('year', $previousYear);
+            })->latest()->first();
+        $cgpaLast = $oldAssessment ? $oldAssessment->cgpa : null;
+
         // Collect clubs from assessment based on club_ids.
-        $clubsCollection = collect($assessment->club_ids ?? [])->map(function($id) {
+        $clubsCollection = collect($assessment->club_ids ?? [])->map(function ($id) {
             return Club::find($id);
         })->filter();
         $sukan  = $clubsCollection->firstWhere('category', 'Sukan & Permainan');
@@ -466,10 +474,30 @@ class PAJSKController extends Controller
         $badan  = $clubsCollection->firstWhere('category', 'Badan Beruniform');
         $clubs = collect([$sukan, $kelab, $badan]);
 
+        // Collect commitment names based on the stored commitment_ids.
+        $commitmentNames = collect($assessment->commitment_ids)->map(function ($ids) {
+            return collect($ids)->map(function ($id) {
+                return Commitment::find($id)?->commitment_name ?? $id;
+            })->implode(', ') ?: '--';
+        });
+
+        Log::info('Commitment Names:', $commitmentNames->toArray());
+
         // Collect positions based on the stored club_position_ids.
-        $positions = collect($assessment->club_position_ids ?? [])->map(function($id) {
-            return ClubPosition::find($id);
+        $positions = collect($assessment->club_position_ids ?? [])->map(function ($ids) {
+            return ClubPosition::find($ids);
         })->filter();
+
+        Log::info('Positions:', $positions->toArray());
+
+        // Collect service names based on the stored service_contribution_ids.
+        $serviceNames = collect($assessment->service_contribution_ids ?? [])->map(function ($ids) {
+            return ServiceContribution::find($ids);
+        });
+
+        $attendanceCounts = collect($assessment->attendance_ids ?? [])->map(function ($ids) {
+            return Attendance::find($ids);
+        });
 
         return view('pajsk.report', [
             'report'            => $report,
@@ -477,7 +505,17 @@ class PAJSKController extends Controller
             'extracocuricullum' => $extracocuricullum,
             'assessment'        => $assessment,
             'clubs'             => $clubs,
+            'commitmentNames'   => $commitmentNames,
+            'serviceNames'      => $serviceNames,
+            'attendanceCounts'  => $attendanceCounts,
             'positions'         => $positions,
+            'cgpaLast'         => $cgpaLast, // Add this line
         ]);
+    }
+
+    public function destroyReport(PajskReport $report)
+    {
+        $report->delete();
+        return redirect()->route('pajsk.report-history')->with('success', 'Report deleted successfully.');
     }
 }
