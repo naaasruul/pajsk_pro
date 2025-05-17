@@ -68,17 +68,17 @@ class OldDataSeeder extends Seeder
 
         // Also seed extra cocuricullum data for each student
         foreach ($students as $student) {
-            $service = \App\Models\Services::inRandomOrder()->first();
-            $specialAward = \App\Models\SpecialAward::inRandomOrder()->first();
-            $communityService = \App\Models\CommunityServices::inRandomOrder()->first();
-            $nilam = \App\Models\Nilam::inRandomOrder()->first();
-            $timmsPisa = \App\Models\TimmsAndPisa::inRandomOrder()->first();
+            $service = Services::inRandomOrder()->first();
+            $specialAward = SpecialAward::inRandomOrder()->first();
+            $communityService = CommunityServices::inRandomOrder()->first();
+            $nilam = Nilam::inRandomOrder()->first();
+            $timmsPisa = TimmsAndPisa::inRandomOrder()->first();
             $totalPoint = ($service->point ?? 0)
-                        + ($specialAward->point ?? 0)
-                        + ($communityService->point ?? 0)
-                        + ($nilam->point ?? 0)
-                        + ($timmsPisa->point ?? 0);
-            \App\Models\ExtraCocuricullum::updateOrCreate(
+                + ($specialAward->point ?? 0)
+                + ($communityService->point ?? 0)
+                + ($nilam->point ?? 0)
+                + ($timmsPisa->point ?? 0);
+            ExtraCocuricullum::updateOrCreate(
                 ['student_id' => $student->id, 'class_id' => $student->class_id],
                 [
                     'service_id'           => $service->id ?? null,
@@ -118,6 +118,8 @@ class OldDataSeeder extends Seeder
                 
                 // Determine random item quantity (0-3) for each evaluation array
                 $n = rand(0, 3);
+                // DEBUG: Force n to always be 3 for testing
+                // $n = 3;
 
                 // Select $n distinct teacher IDs.
                 $teacherArr = $teachers->pluck('id')->toArray();
@@ -125,7 +127,7 @@ class OldDataSeeder extends Seeder
                 $teacherIds = array_slice($teacherArr, 0, $n);
                 
                 // Select $n distinct service contribution IDs (as strings).
-                $serviceContribArr = $serviceContributions->pluck('id')->map(fn($id)=> (string)$id)->toArray();
+                $serviceContribArr = $serviceContributions->pluck('id')->map(fn($id) => (string)$id)->toArray();
                 shuffle($serviceContribArr);
                 $serviceContribIds = array_slice($serviceContribArr, 0, $n);
                 
@@ -135,13 +137,13 @@ class OldDataSeeder extends Seeder
                 $attendanceIds = array_slice($attendanceArr, 0, $n);
                 
                 // Select $n distinct club position IDs.
-                $positionArr = \App\Models\ClubPosition::all()->pluck('id')->toArray();
+                $positionArr = ClubPosition::all()->pluck('id')->toArray();
                 shuffle($positionArr);
                 $studentClubPositions = array_slice($positionArr, 0, $n);
                 
                 // Use distinct service IDs same as service contribution IDs.
                 $serviceIds = $serviceContribIds;
- 
+
                 // For commitments, build a 2D array with $n nested arrays, each with 4 random commitment ids.
                 $commitmentIds = [];
                 for ($j = 0; $j < $n; $j++) {
@@ -173,7 +175,7 @@ class OldDataSeeder extends Seeder
                     $servScore = ServiceContribution::find($serviceIds[$k])?->score ?? rand(5,10);
                     $total = $attScore + $posScore + $involScore + $commScore + $servScore + $placeScore;
                     $totals[] = $total;
-                    $percents[] = round(($total/110)*100,2);
+                    $percents[] = round(($total / 110) * 100, 2);
                     \Illuminate\Support\Facades\Log::info('Pajsk Assessment Calculation', [
                         'org_index' => $k,
                         'attendanceScore' => $attScore,
@@ -183,7 +185,7 @@ class OldDataSeeder extends Seeder
                         'serviceScore' => $servScore,
                         'placementScore' => $placeScore,
                         'total' => $total,
-                        'percentage' => round(($total/110)*100,2)
+                        'percentage' => round(($total / 110) * 100, 2)
                     ]);
                 }
                 
