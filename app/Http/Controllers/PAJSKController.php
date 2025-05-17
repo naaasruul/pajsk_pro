@@ -404,11 +404,49 @@ class PAJSKController extends Controller
 
     public function reportHistory(Request $request)
     {
-        // Retrieve reports with related student and classroom data
-        $reports = PajskReport::with(['student.user', 'classroom'])
-                    ->latest()
-                    ->paginate(10);
-        return view('pajsk.report-history', ['reports' => $reports]);
+        $search = $request->get('search');
+        $year_filter = $request->get('year_filter');
+        $class_filter = $request->get('class_filter');
+
+        $query = PajskReport::with(['student.user', 'classroom']);
+
+        // Search by student name or class name
+        if ($search) {
+            $query->where(function($q) use ($search) {
+                $q->whereHas('student.user', function($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%");
+                })->orWhereHas('classroom', function($q) use ($search) {
+                    $q->where('class_name', 'like', "%{$search}%");
+                });
+            });
+        }
+
+        // Filter by year
+        if ($year_filter) {
+            $query->whereHas('classroom', function($q) use ($year_filter) {
+                $q->where('year', $year_filter);
+            });
+        }
+
+        // Filter by class name
+        if ($class_filter) {
+            $query->whereHas('classroom', function($q) use ($class_filter) {
+                $q->where('class_name', $class_filter);
+            });
+        }
+
+        // Get unique class names for filter dropdown
+        $classNames = Classroom::select('class_name')
+                            ->distinct()
+                            ->orderBy('class_name')
+                            ->pluck('class_name');
+
+        $reports = $query->latest()->paginate(10);
+        
+        return view('pajsk.report-history', [
+            'reports' => $reports,
+            'classNames' => $classNames
+        ]);
     }
 
     public function showReport(Student $student, PajskReport $report)

@@ -7,6 +7,48 @@
 		</div>
 	</x-slot>
 
+	<x-container>
+		<form action="{{ route('pajsk.report-history') }}" method="GET" class="mb-4 grid grid-cols-4 gap-4">
+		{{-- Search input (2/4) --}}
+			<div class="col-span-4 sm:col-span-2 relative">
+				<label for="default-search" class="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white">Search</label>
+				<div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+					<svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+						fill="none" viewBox="0 0 20 20">
+						<path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+							d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" />
+					</svg>
+				</div>
+				<input type="text" name="search" id="default-search" value="{{ request('search') }}"
+					class="w-full p-2 ps-10 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 bg-gray-50 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+					placeholder="Search..." />
+			</div>
+			
+			{{-- Year filter (1/4) --}}
+			<div class="col-span-4 sm:col-span-1">
+				<select name="year_filter" onchange="this.form.submit()"
+					class="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 bg-gray-50 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white">
+					<option value="">All Years</option>
+					@for ($i = 1; $i <= 6; $i++)
+						<option value="{{ $i }}" {{ request('year_filter') == "$i" ? 'selected' : '' }}>{{ $i }}</option>
+					@endfor
+				</select>
+			</div>
+
+			{{-- Class filter (1/4) --}}
+			<div class="col-span-4 sm:col-span-1">
+				<select name="class_filter" onchange="this.form.submit()"
+					class="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 bg-gray-50 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white">
+					<option value="">All Classes</option>
+					@foreach($classNames as $className)
+						<option value="{{ $className }}" {{ request('class_filter') == $className ? 'selected' : '' }}>
+							{{ $className }}
+						</option>
+					@endforeach
+				</select>
+			</div>
+		</form>
+
 	<div class="relative overflow-x-auto">
 			<div class="rounded-lg dark:border-gray-700">
 				<div class="relative overflow-x-auto shadow-md sm:rounded-lg">
