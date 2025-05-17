@@ -60,13 +60,18 @@
 									Report ID</th>
 								<th
 									class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+									Year</th>
+								<th
+									class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
 									Student</th>
 								<th
 									class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
 									Class</th>
-								<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+								<th
+									class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
 									GPA</th>
-									<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+								<th
+									class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
 									CGPA</th>
 								<th
 									class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
@@ -82,10 +87,13 @@
 								<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
 									{{ $report->id }}
 								</td>
+								<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+									{{ $report->classroom->year }}
+								</td>
 								<td class="px-6 py-4 whitespace-nowrap">
-								    <div class="text-sm font-medium text-gray-900 dark:text-gray-100">
-								        {{ $report->student->user->name }}
-								    </div>
+									<div class="text-sm font-medium text-gray-900 dark:text-gray-100">
+										{{ $report->student->user->name }}
+									</div>
 								</td>
 								<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
 									{{ $report->classroom->year . ' ' . $report->classroom->class_name }}
@@ -97,21 +105,35 @@
 									{{ $report->cgpa }}
 								</td>
 								<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-									{{ $report->updated_at->format('d/m/Y H:i') ?? $report->created_at->format('d/m/Y H:i') }}
+									{{ $report->updated_at->format('d/m/Y H:i') ?? $report->created_at->format('d/m/Y
+									H:i') }}
 								</td>
 								<td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
 									<a href="{{ route('pajsk.show-report', ['student' => $report->student->id, 'report' => $report]) }}"
 										class="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300">
 										View Details
 									</a>
+
+									@hasrole('admin')
+									<form action="{{ route('pajsk.delete-report', ['report' => $report]) }}"
+										method="POST" class="inline">
+										@csrf
+										@method('DELETE')
+										<button type="submit"
+											class="font-medium text-red-600 dark:text-red-500 hover:underline ml-2"
+											onclick="return confirm('Are you sure you want to delete this report? this action cannot be undone.')">
+											Delete
+										</button>
+									</form>
+									@endhasrole
 								</td>
 							</tr>
 							@empty
-								<tr>
-									<td colspan="10" class="px-6 py-4 text-center text-sm text-gray-500 dark:text-gray-400">
-										No reports found.
-									</td>
-								</tr>
+							<tr>
+								<td colspan="10" class="px-6 py-4 text-center text-sm text-gray-500 dark:text-gray-400">
+									No reports found.
+								</td>
+							</tr>
 							@endforelse
 						</tbody>
 					</table>
@@ -121,4 +143,5 @@
 				</div>
 			</div>
 		</div>
+	</x-container>
 </x-app-layout>
