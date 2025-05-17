@@ -55,7 +55,7 @@
                     PAJSK Assessment
                 </x-sidebar-item> --}}
                 <x-sidebar-item class="pl-11" :route="route('pajsk.history')" :role="request()->routeIs('pajsk.history')">
-                    {{ __('Evaluations History') }}
+                    {{ __('Assessment History') }}
                 </x-sidebar-item>
                 <x-sidebar-item class="pl-11" :route="route('pajsk.extra-cocuriculum')" :role="request()->routeIs('pajsk.extra-cocuriculum')">
                     {{ __('Extra-Cocuriculum') }}
@@ -87,7 +87,7 @@
                     PAJSK Assessment
                 </x-sidebar-item>
                 <x-sidebar-item class="pl-11" :route="route('pajsk.history')" :role="request()->routeIs('pajsk.history')">
-                    {{ __('Evaluations History') }}
+                    {{ __('Assessment History') }}
                 </x-sidebar-item>
                 <x-sidebar-item class="pl-11" :route="route('pajsk.extra-cocuriculum')" :role="request()->routeIs('pajsk.extra-cocuriculum')">
                     {{ __('Extra-Cocuriculum') }}
@@ -128,7 +128,10 @@
 
             @hasrole('student')
                 <x-sidebar-item :route="route('pajsk.history')" :role="request()->routeIs('pajsk.history')">
-                    Evaluations History
+                    {{ __('Evaluations History') }}
+                </x-sidebar-item>
+                <x-sidebar-item :route="route('pajsk.report-history')" :role="request()->routeIs('pajsk.report-history')">
+                    {{ __('Reports History') }}
                 </x-sidebar-item>
             @endhasanyrole
 
