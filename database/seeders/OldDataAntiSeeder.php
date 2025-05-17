@@ -11,6 +11,7 @@ use App\Models\User;
 use App\Models\Student;
 use App\Models\Club;
 use App\Models\Activity;
+use App\Models\PajskReport;
 
 class OldDataAntiSeeder extends Seeder
 {
@@ -23,6 +24,7 @@ class OldDataAntiSeeder extends Seeder
             "- classrooms (years 1 to 6)\n".
             "- extra_cocuricullums (linked to classrooms)\n".
             "- pajsk_assessments (linked to classrooms)\n".
+            "- pajsk_reports (linked to classrooms)\n".
             "- students (all)\n".
             // "- clubs (all)\n".
             "- club_student (pivot)\n".
@@ -40,6 +42,7 @@ class OldDataAntiSeeder extends Seeder
 
             // Delete PajskAssessment records created by OldDataSeeder
             PajskAssessment::whereIn('class_id', $classroomIds)->delete();
+            PajskReport::whereIn('class_id', $classroomIds)->delete();
 
             // --- Revert data seeded by additional seeders called in OldDataSeeder ---
             // Delete classroom records seeded by ClassroomSeeder
