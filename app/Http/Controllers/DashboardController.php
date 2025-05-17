@@ -51,8 +51,7 @@ class DashboardController extends Controller
             ));
         } elseif ($user->hasRole('student')) {
             $student = $user->student; // Get the student associated with the user
-            $activities = $student->activities()->count(); // Activities assigned to the student
-
+            $activities = $student ? $student->activities()->count() : 0; // Default to 0 if no student profile
             return view('dashboard.student', compact('student', 'activities'));
         }
 
