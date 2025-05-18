@@ -14,6 +14,7 @@ use App\Models\ServiceContribution;
 use App\Models\Teacher;
 use App\Models\ExtraCocuricullum;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
 class PAJSKController extends Controller
@@ -61,18 +62,43 @@ class PAJSKController extends Controller
     public function evaluateStudent(Student $student)
     {
         $student->load(['activities.involvement', 'activities.achievement', 'activities.placement', 'clubs']);
-        $position = $student->current_position;
-        $club = $student->current_club;
-        
+
+
+        $teacher = Auth::user()->teacher;
+        $teacherClub = $teacher->club;
+
+        // Check if the student is a member of the teacher's club
+        if (!$student->clubs->contains('id', $teacherClub->id)) {
+            abort(403, 'This student does not belong to your club.');
+        }
+
+        // Filter activities by club and category
+        $clubActivities = $student->activities->filter(function ($activity) use ($teacherClub) {
+            return $activity->club_id === $teacherClub->id && $activity->category === $teacherClub->category;
+        });
+
+        $positionId = $student->clubs
+            ->where('id', $teacherClub->id)
+            ->first()
+            ?->pivot
+            ?->club_position_id;
+
+        $position = $positionId ? ClubPosition::find($positionId) : null;  
+
+        $teacher = Auth::user()->teacher;
+
         return view('pajsk.evaluate', [
             'student' => $student,
-            'club' => $club,
+            'club' => $teacherClub,
             'position' => $position,
             'attendanceScores' => Attendance::all(),
             'commitments' => Commitment::all(),
             'serviceContributions' => ServiceContribution::all(),
             'involvementScore' => $student->getInvolvementScore(),
-            'placementScore' => $student->getPlacementScore()
+            'placementScore' => $student->getPlacementScore(),
+            'teacher' => $teacher,
+            'clubActivities' => $clubActivities, // Pass only relevant activities
+
         ]);
     }
 

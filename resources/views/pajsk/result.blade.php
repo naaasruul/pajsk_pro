@@ -179,7 +179,7 @@
 								<div class="py-2 border-b dark:border-gray-600">
                                     <div class="flex justify-between items-center">
                                         <span class="font-medium">Club Score</span>
-                                        <span class="text-lg">{{ $scores['club_positions']['scores'][$i] ?? 'N/A' }}/10</span>
+                                        {{-- <span class="text-lg">{{ $scores['club_positions']['scores'][$i] ?? 'N/A' }}/10</span> --}}
                                     </div>
                                     <div class="text-sm text-gray-600 dark:text-gray-300">
 										<div class="text-sm text-gray-500 dark:text-gray-400">
