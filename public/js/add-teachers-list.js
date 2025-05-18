@@ -1,5 +1,7 @@
 $(() => {
     let selectedLeaderId = null; // Store the selected leader's ID
+    window.selectedLeaderId = selectedLeaderId; // Expose globally
+
     let selectedTeacherIds = []; // Array to store selected teacher IDs
     let selectedTeacherNames = []; // Array to store selected teacher Names
     const rowsPerPage = 10; // Number of rows per page
@@ -10,11 +12,11 @@ $(() => {
         const teacherId = $(this).data("teacher-id");
         const row = $(this).closest("tr");
 
-        if (selectedLeaderId === teacherId) {
+        if (window.selectedLeaderId === teacherId) {
             // Deassign the leader
             row.removeClass("bg-green-100 dark:bg-green-800");
             row.find('input[type="checkbox"]').prop("disabled", false);
-            selectedLeaderId = null;
+            window.selectedLeaderId = null;
             alert(`Teacher with ID ${teacherId} is no longer the leader.`);
         } else {
             // Assign the leader
@@ -23,7 +25,7 @@ $(() => {
 
             row.addClass("bg-green-100 dark:bg-green-800");
             row.find('input[type="checkbox"]').prop("disabled", true);
-            selectedLeaderId = teacherId;
+            window.selectedLeaderId = teacherId;
             alert(`Teacher with ID ${teacherId} is now the leader.`);
         }
     });

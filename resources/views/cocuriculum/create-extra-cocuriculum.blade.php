@@ -23,7 +23,7 @@
                 </label>
                 <select id="service_point" name="service_point" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
                     @foreach ($services as $service)
-                        <option value="{{ $service->id }}">{{ $service->name }}</option>
+                        <option value="{{ $service->id }}">{{ $service->name }} [{{ $service->point }}]</option>
                     @endforeach
                 </select>
             </div>
@@ -35,7 +35,7 @@
                 </label>
                 <select id="special_award_point" name="special_award_point" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
                     @foreach ($special_awards as $special_award)
-                        <option value="{{ $special_award->id }}">{{ $special_award->name }}</option>
+                        <option value="{{ $special_award->id }}">{{ $special_award->name }} [{{ $special_award->point }}]</option>
                     @endforeach
                 </select>
             </div>
@@ -47,7 +47,7 @@
                 </label>
                 <select id="community_service_point" name="community_service_point" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
                     @foreach ($community_services as $community_service)
-                        <option value="{{ $community_service->id }}">{{ $community_service->name }}</option>
+                        <option value="{{ $community_service->id }}">{{ $community_service->name }} [{{ $community_service->point }}]</option>
                         
                     @endforeach
                 </select>
@@ -79,7 +79,7 @@
                 </label>
                 <select id="timms_and_pisa_point" name="timms_and_pisa_point" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
                     @foreach ($timms_pisa as $item)
-                        <option value="{{ $item->id }}">{{ $item->name }}</option>
+                        <option value="{{ $item->id }}">{{ $item->name }} [{{ $item->point }}]</option>
                     @endforeach
                 </select>
             </div>

@@ -4,7 +4,9 @@
             {{ __('Extra Co-Curriculum') }}
         </h2>
     </x-slot>
-
+    @if (session('success'))
+        <x-alert type='success' :title="session('success')" message=''></x-alert>
+    @endif
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
