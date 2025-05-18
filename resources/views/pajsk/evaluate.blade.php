@@ -125,24 +125,11 @@
                         <div class="space-y-2 mb-6">
                             <h4 class="text-lg font-medium mb-4 border-b pb-2">Involvement Stage [{{ $involvementScore }} Marks]</h4>
                             <div class="space-y-2">
-                                {{-- <h5 class="font-medium">Activities:</h5> --}}
-                                @forelse($student->activities as $activity)
+                                @forelse($clubActivities as $activity)
                                 <div class="flex justify-between p-2 bg-gray-100 rounded dark:bg-gray-600">
                                     <span>
-                                        {{ $activity->represent }} {{ $activity->involvement->description }} Dalam {{ $activity->club->club_name ?? 'NULL' }}, Peringkat {{ $activity->achievement->achievement_name}}
-                                        {{-- @php
-                                            $debug = DB::table('achievement_involvement')
-                                                ->where([
-                                                    'involvement_type_id' => $activity->involvement->type,
-                                                    'achievement_id' => $activity->achievement_id,
-                                                ])
-                                                ->first();
-                                            if ($debug) {
-                                                echo " - Score: {$debug->score} (Type: {$activity->involvement->type})";
-                                            } else {
-                                                echo " - No score found [Achievement: {$activity->achievement_id}, Type: {$activity->involvement->type}]";
-                                            }
-                                        @endphp --}}
+                                        {{ $activity->represent }} {{ $activity->involvement->description }} Dalam {{ $activity->club->club_name ??
+                                        'NULL' }}, Peringkat {{ $activity->achievement->achievement_name }}
                                     </span>
                                 </div>
                                 @empty
@@ -155,27 +142,24 @@
                         <div class="space-y-2 mb-6">
                             <h4 class="text-lg font-medium mb-4 border-b pb-2">Placement Stage [{{ $placementScore }} Marks]</h4>
                             <div class="space-y-2">
-                                {{-- <h5 class="font-medium">Placement:</h5> --}}
-                                @forelse($student->activities as $activity)
+                                @forelse($clubActivities as $activity)
                                 <div class="flex justify-between p-2 bg-gray-100 rounded dark:bg-gray-600">
                                     <span>
                                         {{ $activity->represent }} {{ $activity->involvement->description }} Dalam {{ $activity->club->club_name ?? 'NULL' }},
-                                        @if($activity->placement)
-                                            {{ $activity->placement->name }} Peringkat {{ $activity->achievement->achievement_name }}
-                                            @php
-                                                $placementScore = DB::table('achievement_placement')
+                                        
+                                            @if($activity->placement)
+                                                {{ $activity->placement->name }} Peringkat {{ $activity->achievement->achievement_name }}
+                                                 @php
+                                                    $placementScore = DB::table('achievement_placement')
                                                     ->where([
-                                                        'placement_id' => $activity->placement_id,
-                                                        'achievement_id' => $activity->achievement_id,
+                                                    'placement_id' => $activity->placement_id,
+                                                    'achievement_id' => $activity->achievement_id,
                                                     ])
                                                     ->value('score');
-                                            @endphp
-                                            {{-- @if($placementScore)
-                                                <span class="text-green-500 dark:text-green-400">[Score: {{ $placementScore }}]</span>
-                                            @endif --}}
-                                        @else
-                                            Peringkat {{ $activity->achievement->achievement_name }}
-                                        @endif
+                                                 @endphp
+                                            @else
+                                                Peringkat {{ $activity->achievement->achievement_name }}
+                                            @endif
                                     </span>
                                 </div>
                                 @empty

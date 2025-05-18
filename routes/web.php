@@ -57,7 +57,6 @@ Route::middleware('auth')->group(function () {
             Route::get('/{cocuriculum}/edit', [CocuriculumController::class, 'edit'])->name('edit');
             Route::put('/{cocuriculum}', [CocuriculumController::class, 'update'])->name('update');
             Route::delete('/{cocuriculum}', [CocuriculumController::class, 'destroy'])->name('destroy');
-            
             Route::get('/extra-cocuriculum', [ExtraCocuriculumController::class, 'index'])->name('extra-cocuriculum');
         });
         Route::prefix('activity')->name('activity.')->group(function () {

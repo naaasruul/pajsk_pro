@@ -99,17 +99,12 @@ class ExtraCocuriculumController extends Controller
         $specialAwardPoint = SpecialAward::find($validated['special_award_point'])->point ?? 0;
         $communityServicePoint = CommunityServices::find($validated['community_service_point'])->point ?? 0;
         $timmsAndPisaPoint = TimmsAndPisa::find($validated['timms_and_pisa_point'])->point ?? 0;
-        
         Log::info('servicePoint = '.$servicePoint);
         Log::info('specialAwardPoint = '.$specialAwardPoint);
         Log::info('communityServicePoint = '.$communityServicePoint);
         Log::info('nilamPoint = '.$nilamPoint);
         Log::info('timmsAndPisaPoint = '.$timmsAndPisaPoint);
-        
         $totalPoint = $servicePoint + $specialAwardPoint + $communityServicePoint + $nilamPoint + $timmsAndPisaPoint;
-        if($totalPoint > 10){
-            $totalPoint = 10;
-        }    
 
         $student = Student::find($studentId);
         // Create the ExtraCocuricullum record
@@ -124,7 +119,7 @@ class ExtraCocuriculumController extends Controller
             'total_point' => $totalPoint,
         ]);
 
-        return redirect()->route('pajsk.extra-cocuriculum')->with('success', 'Extra Cocuricculum data added successfully!');
+        return redirect()->back()->with('success', 'Extra Cocuricculum data added successfully!');
     }
 
     /**
