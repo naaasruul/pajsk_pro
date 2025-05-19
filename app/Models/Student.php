@@ -32,9 +32,16 @@ class Student extends Model
                     ->withTimestamps();
     }
 
-    public function activities()
+    // Remove or comment out the old relationship:
+//     public function activities()
+//     {
+//         return $this->belongsToMany(Activity::class, 'activity_student');
+//     }
+
+    // New accessor that returns activities using the JSON field in the activities table
+    public function getActivitiesAttribute()
     {
-        return $this->belongsToMany(Activity::class, 'activity_student');
+        return \App\Models\Activity::whereJsonContains('activity_students_id', (string)$this->id)->get();
     }
 
     public function mentor()
@@ -52,77 +59,42 @@ class Student extends Model
         return $this->belongsTo(Classroom::class, 'class_id');
     }
 
-    // Involvement scoring methods
+    // Replace existing getInvolvementScore() with:
     public function getInvolvementScore(): int
     {
-        $maxScore = 0;
-        $activities = $this->activities()
-            ->with(['involvement', 'achievement'])
-            ->get();
-
-        foreach ($activities as $activity) {
-            if (!$activity->involvement || !$activity->achievement) {
-                \Log::debug('Missing relationship', [
-                    'activity_id' => $activity->id,
-                    'has_involvement' => (bool)$activity->involvement,
-                    'has_achievement' => (bool)$activity->achievement
-                ]);
-                continue;
-            }
-
-            // Use involvement type instead of ID
-            $score = \DB::table('achievement_involvement')
-                ->where([
-                    'achievement_id' => $activity->achievement_id,
-                    'involvement_type_id' => $activity->involvement->type // Use type here
-                ])
-                ->value('score');
-
-            \Log::debug('Score calculation', [
-                'activity_id' => $activity->id,
-                'achievement_id' => $activity->achievement_id,
-                'involvement_type' => $activity->involvement->type,
-                'score' => $score
-            ]);
-
-            $maxScore = max($maxScore, (int)$score);
+        $teacherClub = $this->getCurrentClubAttribute();
+        if (!$teacherClub) return 0;
+        $teacherClubActivities = $this->activities->filter(function ($activity) use ($teacherClub) {
+            return (int)$activity->club_id === (int)$teacherClub->id;
+        });
+        $teacherActivity = $teacherClubActivities->first();
+        $involvementScoreForTeacher = 0;
+        if ($teacherActivity && $teacherActivity->achievement) {
+            $involvementScoreForTeacher = $teacherActivity->achievement->involvements()
+                ->where('involvement_type_id', $teacherActivity->involvement_id)
+                ->first()?->pivot->score ?? 0;
         }
-
-        return min($maxScore, 20);
+        return $involvementScoreForTeacher;
     }
-
-    // Placement scoring methods
+    
+    // Replace existing getPlacementScore() with:
     public function getPlacementScore(): int
     {
-        $maxScore = 0;
-        $activities = $this->activities()
-            ->with(['achievement', 'placement'])
-            ->whereNotNull('placement_id')
-            ->get();
-
-        foreach ($activities as $activity) {
-            if (!$activity->achievement || !$activity->placement) {
-                continue;
+        $teacherClub = $this->getCurrentClubAttribute();
+        if (!$teacherClub) return 0;
+        $teacherClubActivities = $this->activities->filter(function ($activity) use ($teacherClub) {
+            return (int)$activity->club_id === (int)$teacherClub->id;
+        });
+        $teacherActivity = $teacherClubActivities->first();
+        $placementScoreForTeacher = 0;
+        if ($teacherActivity && $teacherActivity->achievement) {
+            if ($teacherActivity->placement_id) {
+                $placementScoreForTeacher = $teacherActivity->achievement->placements()
+                    ->where('placement_id', $teacherActivity->placement_id)
+                    ->first()?->pivot->score ?? 0;
             }
-
-            $score = \DB::table('achievement_placement')
-                ->where([
-                    'achievement_id' => $activity->achievement_id,
-                    'placement_id' => $activity->placement_id
-                ])
-                ->value('score');
-
-            \Log::debug('Placement Score', [
-                'activity_id' => $activity->id,
-                'achievement_id' => $activity->achievement_id,
-                'placement_id' => $activity->placement_id,
-                'score' => $score
-            ]);
-
-            $maxScore = max($maxScore, (int)$score);
         }
-
-        return min($maxScore, 20);
+        return $placementScoreForTeacher;
     }
 
     public function getCurrentClubAttribute()
