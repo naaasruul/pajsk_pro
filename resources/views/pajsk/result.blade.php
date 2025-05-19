@@ -156,143 +156,113 @@
                         <!-- Score Breakdown -->
                         <h4 class="text-lg font-medium mb-4">PAJSK Score Breakdown</h4>
 
-                        @for($i = 0; $i < count($totalScores); $i++)
-                        <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 mb-6 page-break">
-                            <div class="space-y-3">
+                        @foreach($assessment->club_ids as $index => $clubId)
+                            @if(isset($totalScores[$index]) && $totalScores[$index] !== null)
+                                <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 mb-6 page-break">
+                                    <div class="space-y-3">
 
-                                {{-- <!-- Club Section -->
-								<div class="py-2 border-b dark:border-gray-600">
-                                    <div class="flex justify-between items-center">
-                                        <span class="font-medium">Club Information</span>
-                                    </div>
-                                    <div class="text-sm text-gray-600 dark:text-gray-300">
-										<div class="text-sm text-gray-500 dark:text-gray-400">
-											<p>
-                                                <?php $club = \App\Models\Club::find($club_ids[$i]); ?>
-                                                {{ $club->club_name }}
-                                            </p>
-										</div>
-                                    </div>
-                                </div> --}}
-
-                                <!-- Club Information Section -->
-								<div class="py-2 border-b dark:border-gray-600">
-                                    <div class="flex justify-between items-center">
-                                        <span class="font-medium">Club Score</span>
-                                        {{-- <span class="text-lg">{{ $scores['club_positions']['scores'][$i] ?? 'N/A' }}/10</span> --}}
-                                    </div>
-                                    <div class="text-sm text-gray-600 dark:text-gray-300">
-										<div class="text-sm text-gray-500 dark:text-gray-400">
-											<p>
-                                                <?php 
-                                                    $clubPos = \App\Models\ClubPosition::find($scores['club_positions']['ids'][$i]);
-                                                    $club = \App\Models\Club::find($club_ids[$i]);
-                                                ?>
-                                                {{ $club->club_name }} &bull; {{ $clubPos->position_name }}
-                                            </p>
-										</div>
-                                    </div>
-                                </div>
-
-                                <div class="py-2 border-b dark:border-gray-600">
-                                    <div class="flex justify-between items-center">
-                                        <div>
-                                            <span class="font-medium">Attendance Score</span>
-                                            <div class="text-sm text-gray-500 dark:text-gray-400">
-                                                <p>
-                                                    Days Present: 
-                                                    <?php $daysPresent = \App\Models\Attendance::find($scores['attendance']['ids'][$i]); ?>
-                                                    {{ $daysPresent->attendance_count }}
-                                                    days</p>
+                                        <!-- Club Information Section -->
+										<div class="py-2 border-b dark:border-gray-600">
+                                            <div class="flex justify-between items-center">
+                                                <span class="font-medium">Club Score</span>
+                                                <span class="text-lg">{{ $scores['club_positions']['scores'][$index] ?? 'N/A' }}/10</span>
+                                            </div>
+                                            <div class="text-sm text-gray-600 dark:text-gray-300">
+												<div class="text-sm text-gray-500 dark:text-gray-400">
+													<p>
+                                                        {{ $scores['clubs']['names'][$index] ?? 'N/A' }} &bull; {{ $scores['club_positions']['names'][$index] ?? 'N/A' }}
+                                                    </p>
+												</div>
                                             </div>
                                         </div>
-                                        <div class="text-right">
-                                            <span class="text-lg">{{ $scores['attendance']['scores'][$i] ?? 'N/A' }}/40</span>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Involvement Section -->
-                                <div class="py-2 border-b dark:border-gray-600">
-                                    <div class="flex justify-between items-center">
-                                        <span class="font-medium">Involvement Score</span>
-                                        <span class="text-lg">{{ $scores['involvement']['score'] }}/20</span>
-                                    </div>
-                                    <div class="text-sm text-gray-600 dark:text-gray-300">
-                                        @forelse($sortedActivities as $activity)  <!-- replaced iteration variable -->
-											<div class="text-sm text-gray-500 dark:text-gray-400">
-                                                <p>{{ $activity->represent }} {{ $activity->involvement->description }} In {{ $activity->club->club_name ?? 'Unknown Club' }} Peringkat {{ $activity->achievement->achievement_name }}</p>
-                                            </div>
-                                        @empty
-                                            <p class="text-gray-500 italic">No activities recorded</p>
-                                        @endforelse
-                                    </div>
-                                </div>
-                                <!-- Placement Section -->
-								<div class="py-2 border-b dark:border-gray-600">
-                                    <div class="flex justify-between items-center">
-                                        <span class="font-medium">Placement Score</span>
-                                        <span class="text-lg">{{ $scores['placement']['score'] }}/20</span>
-                                    </div>
-                                    <div class="text-sm text-gray-600 dark:text-gray-300">
-                                        @forelse($sortedActivities as $activity)  <!-- replaced iteration variable -->
-                                            @if($activity->placement)
-                                                <div class="text-sm text-gray-500 dark:text-gray-400">
-                                                    <p>{{ $activity->placement->name }} {{ $activity->represent }} {{ $activity->involvement->description }} Peringkat {{ $activity->achievement->achievement_name }}</p>
+                                        <!-- Attendance Section -->
+                                        <div class="py-2 border-b dark:border-gray-600">
+                                            <div class="flex justify-between items-center">
+                                                <div>
+                                                    <span class="font-medium">Attendance Score</span>
+                                                    <div class="text-sm text-gray-500 dark:text-gray-400">
+                                                        <p>Days Present: {{ $scores['attendance']['counts'][$index] ?? '0' }} days</p>
+                                                    </div>
                                                 </div>
-                                            @endif
-                                        @empty
-                                            <p class="text-gray-500 italic">No placement achievements recorded</p>
-                                        @endforelse
+                                                <div class="text-right">
+                                                    <span class="text-lg">{{ $scores['attendance']['scores'][$index] ?? 'N/A' }}/40</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- Achievement Section -->
+                                        <div class="py-2 border-b dark:border-gray-600">
+                                            <div class="flex justify-between items-center">
+                                                <span class="font-medium">Achievement Score</span>
+                                                <span class="text-lg">{{ $scores['achievement']['scores'][$index] ?? 'N/A' }}/20</span>
+                                            </div>
+                                            <div class="text-sm text-gray-600 dark:text-gray-300">
+                                                @foreach(range(0, count($assessment->club_ids) - 1) as $i)
+                                                    @if(!is_null($achievement_ids[$i]))
+                                                            <div class="text-sm text-gray-500 dark:text-gray-400">
+                                                                <p>{{ $scores['achievement_strings'][$i] }}</p>
+                                                            </div>
+                                                    @endif
+                                                @endforeach
+                                            </div>
+                                        </div>
+                                        <!-- Placement Section -->
+                                        <div class="py-2 border-b dark:border-gray-600">
+                                            <div class="flex justify-between items-center">
+                                                <span class="font-medium">Placement Score</span>
+                                                <span class="text-lg">{{ $scores['placement']['scores'][$index] ?? 'N/A' }}/20</span>
+                                            </div>
+                                            <div class="text-sm text-gray-600 dark:text-gray-300">
+                                                @foreach(range(0, count($assessment->club_ids) - 1) as $p)
+                                                    @if(!is_null($placement_ids[$p]))
+                                                        <div class="text-sm text-gray-500 dark:text-gray-400">
+                                                            <div class="text-sm text-gray-500 dark:text-gray-400">
+                                                                <p>{{ $scores['placement_strings'][$p] }}</p>
+                                                            </div>
+                                                        </div>
+                                                    @endif
+                                                @endforeach
+                                            </div>
+                                        </div>
+                                        <!-- Commitments Section -->
+                                        <div class="py-2 border-b dark:border-gray-600">
+                                            <div class="flex justify-between items-center">
+                                                <span class="font-medium">Commitment Score</span>
+                                                <span class="text-lg">{{ $scores['commitments']['scores'][$index][0] ?? 'N/A' }}/10</span>
+                                            </div>
+                                            <div class="pl-4 text-sm text-gray-500 dark:text-gray-400">
+                                                @foreach($scores['commitments']['names'][$index] ?? [] as $name)
+                                                    <p>&bull; {{ $name }}</p>
+                                                @endforeach
+                                            </div>
+                                        </div>
+                                        <!-- Service Contribution Section -->
+                                        <div class="py-2 dark:border-gray-600">
+                                            <div class="flex justify-between items-center">
+                                                <span class="font-medium">Service Contribution Score</span>
+                                                <span class="text-lg">{{ $scores['service_contributions']['scores'][$index] ?? 'N/A' }}/10</span>
+                                            </div>
+                                            <div class="text-sm text-gray-500 dark:text-gray-400">
+                                                <p>{{ $scores['service_contributions']['names'][$index] ?? 'N/A' }}</p>
+                                            </div>
+                                        </div>
+                                        <!-- Total Score Section -->
+                                        <div class="flex justify-between items-center pt-4 mt-4 border-t border-gray-300 dark:border-gray-500">
+                                            <div>
+                                                <span class="text-xl font-bold">Total Score</span>
+                                                <p class="text-sm text-gray-500 dark:text-gray-400">Overall Performance (%)</p>
+                                            </div>
+                                            <div class="text-right">
+                                                <span class="text-2xl font-bold">{{ $totalScores[$index] ?? '0' }}/110</span>
+                                                <p class="text-sm font-medium {{ (isset($percentages[$index]) && $percentages[$index] >= 80) ? 'text-green-500' : 'text-yellow-500' }}">
+                                                    {{ isset($percentages[$index]) ? number_format($percentages[$index], 2) : '0.00' }}%
+                                                </p>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
+                            @endif
+                        @endforeach
 
-                                <!-- Commitments Section -->
-                                <div class="py-2 border-b dark:border-gray-600">
-                                    <div class="flex justify-between items-center">
-                                        <span class="font-medium">Commitment Score</span>
-                                        <span class="text-lg">{{ $scores['commitments']['scores'][$i][0] ?? 'N/A' }}/10</span>
-                                    </div>
-                                    <div class="pl-4 text-sm text-gray-500 dark:text-gray-400">
-                                        @foreach($scores['commitments']['ids'][$i] as $commitmentId)
-                                            <?php $commitment = \App\Models\Commitment::find($commitmentId); ?>
-                                            @if($commitment)
-                                            <p>&bull; {{ $commitment->commitment_name }} ({{ $commitment->score }} points)</p>
-                                            @endif
-                                        @endforeach
-                                    </div>
-                                </div>
-                                
-								<!-- Service Contribution Section -->
-                                <div class="py-2 dark:border-gray-600">
-                                    <div class="flex justify-between items-center">
-                                        <span class="font-medium">Service Score</span>
-                                        <span class="text-lg">{{ $scores['services']['scores'][$i] }}/10</span>
-                                    </div>
-									<div class="text-sm text-gray-500 dark:text-gray-400">
-										<p>
-                                            <?php $service = \App\Models\ServiceContribution::find($scores['services']['ids'][$i]); ?>
-                                            {{ $service->service_name }}
-                                        </p>
-									</div>
-                                </div>
-
-                                <!-- Total Score -->
-                                <div class="flex justify-between items-center pt-4 mt-4 border-t border-gray-300 dark:border-gray-500">
-                                    <div>
-                                        <span class="text-xl font-bold">Total Score</span>
-                                        <p class="text-sm text-gray-500 dark:text-gray-400">Overall {{ $club->club_name }} Performance (%)</p>
-                                    </div>
-                                    <div class="text-right">
-                                        <span class="text-2xl font-bold">{{ $totalScores[$i] }}/110</span>
-                                        <p class="text-sm font-medium {{ $percentages[$i] >= 80 ? 'text-green-500' : 'text-yellow-500' }}">
-                                            {{ number_format($percentages[$i], 2) }}%
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        @endfor
 
                         <!-- Action Buttons -->
                         <div class="flex justify-end space-x-2 no-print">
