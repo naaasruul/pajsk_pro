@@ -125,22 +125,22 @@
                         @csrf
 
                         <!-- Hidden Inputs for IDs -->
-                        attendance id
-                        <input type="text" class="flex justify-between p-2 bg-gray-100 rounded dark:bg-gray-600" name="attendance_id" x-ref="attendanceIdInput">
-                        club position id
-                        <input type="text" class="flex justify-between p-2 bg-gray-100 rounded dark:bg-gray-600" name="position_id" x-ref="positionIdInput">
-                        achievement id
-                        <input type="text" class="flex justify-between p-2 bg-gray-100 rounded dark:bg-gray-600" name="achievement_id" x-ref="achievementIdInput">
-                        achievement activity id
-                        <input type="text" class="flex justify-between p-2 bg-gray-100 rounded dark:bg-gray-600" name="achievement_activity_id" x-ref="achievementActivityIdInput">
-                        placement id
-                        <input type="text" class="flex justify-between p-2 bg-gray-100 rounded dark:bg-gray-600" name="placement_id" x-ref="placementIdInput">
-                        placement activity id
-                        <input type="text" class="flex justify-between p-2 bg-gray-100 rounded dark:bg-gray-600" name="placement_activity_id" x-ref="placementActivityIdInput">
-                        commitments id
-                        <input type="text" class="flex justify-between p-2 bg-gray-100 rounded dark:bg-gray-600" name="commitment_ids" x-ref="commitmentIdsInput">
-                        service contributions id
-                        <input type="text" class="flex justify-between p-2 bg-gray-100 rounded dark:bg-gray-600" name="service_id" x-ref="serviceIdInput">
+                        <p class="hidden">attendance id</p>
+                        <input type="hidden" class="flex justify-between p-2 bg-gray-100 rounded dark:bg-gray-600" name="attendance_id" x-ref="attendanceIdInput">
+                        <p class="hidden">club position id</p>
+                        <input type="hidden" class="flex justify-between p-2 bg-gray-100 rounded dark:bg-gray-600" name="position_id" x-ref="positionIdInput">
+                        <p class="hidden">achievement id</p>
+                        <input type="hidden" class="flex justify-between p-2 bg-gray-100 rounded dark:bg-gray-600" name="achievement_id" x-ref="achievementIdInput">
+                        <p class="hidden">achievement activity id</p>
+                        <input type="hidden" class="flex justify-between p-2 bg-gray-100 rounded dark:bg-gray-600" name="achievement_activity_id" x-ref="achievementActivityIdInput">
+                        <p class="hidden">placement id</p>
+                        <input type="hidden" class="flex justify-between p-2 bg-gray-100 rounded dark:bg-gray-600" name="placement_id" x-ref="placementIdInput">
+                        <p class="hidden">placement activity id</p>
+                        <input type="hidden" class="flex justify-between p-2 bg-gray-100 rounded dark:bg-gray-600" name="placement_activity_id" x-ref="placementActivityIdInput">
+                        <p class="hidden">commitments id</p>
+                        <input type="hidden" class="flex justify-between p-2 bg-gray-100 rounded dark:bg-gray-600" name="commitment_ids" x-ref="commitmentIdsInput">
+                        <p class="hidden">service contributions id</p>
+                        <input type="hidden" class="flex justify-between p-2 bg-gray-100 rounded dark:bg-gray-600" name="service_id" x-ref="serviceIdInput">
 
                         <!-- Attendance Section -->
                         <div class="mb-6">
