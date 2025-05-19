@@ -64,44 +64,68 @@ class PAJSKController extends Controller
 
     public function evaluateStudent(Student $student)
     {
-        $student->load(['activities.involvement', 'activities.achievement', 'activities.placement', 'clubs']);
-
-
+        // Removed eager loading of activities relationships since "activities" is an accessor
+        $student->load(['clubs']);
         $teacher = Auth::user()->teacher;
         $teacherClub = $teacher->club;
-
-        // Check if the student is a member of the teacher's club
-        if (!$student->clubs->contains('id', $teacherClub->id)) {
-            abort(403, 'This student does not belong to your club.');
-        }
-
-        // Filter activities by club and category
+        \Log::info('Teacher Club:', [
+            'teacher_id' => $teacher->id,
+            'club_id' => $teacherClub->id,
+        ]);
         $clubActivities = $student->activities->filter(function ($activity) use ($teacherClub) {
-            return $activity->club_id === $teacherClub->id && $activity->category === $teacherClub->category;
+            return (int)$activity->club_id === (int)$teacherClub->id; // cast to int for proper comparison
         });
 
+        Log::info('Student Activities:', [
+            'student_id' => $student->id,
+            'activities' => $clubActivities->toArray(), // changed to log proper array
+        ]);
+
+        
         $positionId = $student->clubs
             ->where('id', $teacherClub->id)
             ->first()
             ?->pivot
             ?->club_position_id;
-
         $position = $positionId ? ClubPosition::find($positionId) : null;  
 
-        $teacher = Auth::user()->teacher;
+        // Compute teacher-club specific scores:
+        $teacherClubActivities = $student->activities->filter(function ($activity) use ($teacherClub) {
+            return $activity->club_id === $teacherClub->id;
+        });
+        $teacherActivity = $teacherClubActivities->first();
+        $involvementScoreForTeacher = 0;
+        $placementScoreForTeacher = 0;
+        if ($teacherActivity && $teacherActivity->achievement) {
+            if ($teacherActivity->placement_id) {
+                $placementScoreForTeacher = $teacherActivity->achievement->placements()
+                    ->where('placement_id', $teacherActivity->placement_id)
+                    ->first()?->pivot->score ?? 0;
+            }
+            $involvementScoreForTeacher = $teacherActivity->achievement->involvements()
+                    ->where('involvement_type_id', $teacherActivity->involvement_id)
+                    ->first()?->pivot->score ?? 0;
+        }
+        // Call the new function to get highest scores
+        $highestScores = $this->getHighestScores($teacherClubActivities);
 
         return view('pajsk.evaluate', [
-            'student' => $student,
-            'club' => $teacherClub,
-            'position' => $position,
-            'attendanceScores' => Attendance::all(),
-            'commitments' => Commitment::all(),
-            'serviceContributions' => ServiceContribution::all(),
-            'involvementScore' => $student->getInvolvementScore(),
-            'placementScore' => $student->getPlacementScore(),
-            'teacher' => $teacher,
-            'clubActivities' => $clubActivities, // Pass only relevant activities
-
+            'student'                       => $student,
+            'club'                          => $teacherClub,
+            'position'                      => $position,
+            'attendanceScores'              => Attendance::all(),
+            'commitments'                   => Commitment::all(),
+            'serviceContributions'          => ServiceContribution::all(),
+            'involvementScore'              => $involvementScoreForTeacher,
+            'placementScore'                => $placementScoreForTeacher,
+            'teacher'                       => $teacher,
+            'clubActivities'                => $clubActivities,
+            'highestPlacementScore'         => $highestScores['highestPlacementScore'],
+            'highestAchievementScore'       => $highestScores['highestAchievementScore'],
+            'highestPlacementId'            => $highestScores['highestPlacementId'],
+            'highestPlacementActivityId'    => $highestScores['highestPlacementActivityId'],
+            'highestAchievementId'          => $highestScores['highestAchievementId'],
+            'highestAchievementActivityId'  => $highestScores['highestAchievementActivityId'],
         ]);
     }
 
