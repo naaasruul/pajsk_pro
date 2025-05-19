@@ -37,13 +37,22 @@
                         positionScore: {{ $position ? $position->point : 0 }},
                         commitmentScore: parseFloat(localStorage.getItem('commitmentScore')) || 0,
                         serviceScore: parseFloat(localStorage.getItem('serviceScore')) || 0,
-                        involvementScore: {{ $involvementScore }},
-                        placementScore: {{ $placementScore }},
+                        achievementScore: {{ $highestAchievementScore }},
+                        placementScore: {{ $highestPlacementScore }},
                         attendanceScores: {
                             @foreach($attendanceScores as $attendance)
                                 {{ $attendance->attendance_count }}: {{ $attendance->score }},
                             @endforeach
                         },
+                        selectedAttendanceId: localStorage.getItem('selectedAttendanceId') || null,
+                        selectedPositionId: localStorage.getItem('selectedPositionId') || {{ $position ? $position->id : 'null' }},
+                        selectedAchievementId: localStorage.getItem('selectedAchievementId') || {{ $highestAchievementId }},  
+                        selectedAchievementActivityId: localStorage.getItem('selectedAchievementActivityId') || {{ $highestAchievementActivityId }},  
+                        selectedPlacementId: localStorage.getItem('selectedPlacementId') || {{ $highestPlacementId }},
+                        selectedPlacementActivityId: localStorage.getItem('selectedPlacementActivityId') || {{ $highestPlacementActivityId }},
+                        selectedCommitmentIds: JSON.parse(localStorage.getItem('selectedCommitmentIds') || '[]'),
+                        selectedServiceId: localStorage.getItem('selectedServiceId') || null,
+                        
                         calculateAttendanceScore(days) {
                             this.attendanceDays = days;
                             this.attendanceScore = this.attendanceScores[days] || 0;
@@ -59,10 +68,50 @@
                            localStorage.setItem('serviceScore', score);
                         },
                         calculateTotal() {
-                           return this.attendanceScore + this.positionScore + this.involvementScore + this.placementScore + this.commitmentScore + this.serviceScore;
+                           return this.attendanceScore + this.positionScore + this.achievementScore + this.placementScore + this.commitmentScore + this.serviceScore;
                         },
                         calculatePercentage() {
                            return ((this.calculateTotal() / 110) * 100).toFixed(2);
+                        },
+                        initializeForm() {
+                            // Initialize hidden inputs with current selection values
+                            this.$refs.attendanceIdInput.value = this.selectedAttendanceId ?? 1;
+                            this.$refs.positionIdInput.value = this.selectedPositionId;
+                            this.$refs.achievementIdInput.value = this.selectedAchievementId;
+                            this.$refs.achievementActivityIdInput.value = this.selectedAchievementActivityId;
+                            this.$refs.placementIdInput.value = this.selectedPlacementId;
+                            this.$refs.placementActivityIdInput.value = this.selectedPlacementActivityId;
+                            this.$refs.commitmentIdsInput.value = JSON.stringify(this.selectedCommitmentIds);
+                            this.$refs.serviceIdInput.value = this.selectedServiceId;
+                        },
+                        updateAttendanceId(days) {
+                            // Get attendance record ID based on days
+                            this.selectedAttendanceId = this.attendanceScores[days] ? days : null;
+                            this.$refs.attendanceIdInput.value = this.selectedAttendanceId;
+                            localStorage.setItem('selectedAttendanceId', this.selectedAttendanceId);
+                        },
+                        updateCommitmentIds() {
+                            this.$refs.commitmentIdsInput.value = JSON.stringify(this.selectedCommitments);
+                            localStorage.setItem('selectedCommitmentIds', JSON.stringify(this.selectedCommitments));
+                        },
+                        updateServiceId(serviceId) {
+                            this.selectedServiceId = serviceId;
+                            this.$refs.serviceIdInput.value = serviceId;
+                            localStorage.setItem('selectedServiceId', serviceId);
+                        },
+                        resetStorage() {
+                            localStorage.removeItem('attendanceDays');
+                            localStorage.removeItem('selectedCommitments');
+                            localStorage.removeItem('commitmentScore');
+                            localStorage.removeItem('serviceScore');
+                            localStorage.removeItem('selectedAttendanceId');
+                            localStorage.removeItem('selectedPositionId');
+                            localStorage.removeItem('selectedAchievementId');
+                            localStorage.removeItem('selectedAchievementActivityId');
+                            localStorage.removeItem('selectedPlacementId');
+                            localStorage.removeItem('selectedPlacementActivityId');
+                            localStorage.removeItem('selectedCommitmentIds');
+                            localStorage.removeItem('selectedServiceId');
                         }
                     }" 
                     x-init="$nextTick(() => {
@@ -71,8 +120,27 @@
                              $refs.attendanceInput.value = attendanceDays;
                              attendanceScore = calculateAttendanceScore(attendanceDays);
                         }
+                        initializeForm();
                     })">
                         @csrf
+
+                        <!-- Hidden Inputs for IDs -->
+                        attendance id
+                        <input type="text" class="flex justify-between p-2 bg-gray-100 rounded dark:bg-gray-600" name="attendance_id" x-ref="attendanceIdInput">
+                        club position id
+                        <input type="text" class="flex justify-between p-2 bg-gray-100 rounded dark:bg-gray-600" name="position_id" x-ref="positionIdInput">
+                        achievement id
+                        <input type="text" class="flex justify-between p-2 bg-gray-100 rounded dark:bg-gray-600" name="achievement_id" x-ref="achievementIdInput">
+                        achievement activity id
+                        <input type="text" class="flex justify-between p-2 bg-gray-100 rounded dark:bg-gray-600" name="achievement_activity_id" x-ref="achievementActivityIdInput">
+                        placement id
+                        <input type="text" class="flex justify-between p-2 bg-gray-100 rounded dark:bg-gray-600" name="placement_id" x-ref="placementIdInput">
+                        placement activity id
+                        <input type="text" class="flex justify-between p-2 bg-gray-100 rounded dark:bg-gray-600" name="placement_activity_id" x-ref="placementActivityIdInput">
+                        commitments id
+                        <input type="text" class="flex justify-between p-2 bg-gray-100 rounded dark:bg-gray-600" name="commitment_ids" x-ref="commitmentIdsInput">
+                        service contributions id
+                        <input type="text" class="flex justify-between p-2 bg-gray-100 rounded dark:bg-gray-600" name="service_id" x-ref="serviceIdInput">
 
                         <!-- Attendance Section -->
                         <div class="mb-6">
@@ -86,9 +154,10 @@
                                     <div class="flex-1">
                                         <input type="range" id="attendance_slider" x-ref="attendanceSlider"
                                             name="attendance" min="1" max="12" step="1" value="1" x-on:input="
-												$refs.attendanceInput.value = $event.target.value;
-												calculateAttendanceScore($event.target.value);
-											" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700">
+                                    $refs.attendanceInput.value = $event.target.value;
+                                    calculateAttendanceScore($event.target.value);
+                                    updateAttendanceId($event.target.value);
+                                " class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700">
 
                                         <!-- Slider Labels -->
                                         <div class="flex justify-between text-xs text-gray-500 dark:text-gray-400 mt-1">
@@ -122,48 +191,48 @@
                         </div>
 
                         <!-- Involvement section -->
+                        @php
+                            // Force filter by authenticated teacher club only for involvement stage
+                            $involvementActivities = $clubActivities;
+                        @endphp
                         <div class="space-y-2 mb-6">
-                            <h4 class="text-lg font-medium mb-4 border-b pb-2">Involvement Stage [{{ $involvementScore }} Marks]</h4>
+                            <h4 class="text-lg font-medium mb-4 border-b pb-2">Involvement Stage [{{ $highestAchievementScore }} Marks]</h4>
                             <div class="space-y-2">
-                                @forelse($clubActivities as $activity)
-                                <div class="flex justify-between p-2 bg-gray-100 rounded dark:bg-gray-600">
-                                    <span>
-                                        {{ $activity->represent }} {{ $activity->involvement->description }} Dalam {{ $activity->club->club_name ??
-                                        'NULL' }}, Peringkat {{ $activity->achievement->achievement_name }}
-                                    </span>
-                                </div>
+                                @forelse($involvementActivities as $activity)
+                                    @if(isset($activity->involvement))
+                                        <div class="flex justify-between p-2 bg-gray-100 rounded dark:bg-gray-600">
+                                            <span>
+                                                {{ $activity->represent }} {{ $activity->involvement->description }} in {{ $activity->club->club_name ?? 'N/A' }}, Peringkat {{ $activity->achievement->achievement_name ?? 'N/A' }}
+                                            </span>
+                                        </div>
+                                    @endif
                                 @empty
-                                <p class="text-gray-500">No activities recorded</p>
+                                    <p class="text-gray-500">No activities recorded</p>
                                 @endforelse
                             </div>
                         </div>
 
                         <!-- Placement section -->
+                        @php
+                            // Force filter by authenticated teacher club only for placement stage
+                            $placementActivities = $clubActivities->filter(fn($a) => isset($a->placement));
+                        @endphp
                         <div class="space-y-2 mb-6">
-                            <h4 class="text-lg font-medium mb-4 border-b pb-2">Placement Stage [{{ $placementScore }} Marks]</h4>
+                            <h4 class="text-lg font-medium mb-4 border-b pb-2">Placement Stage [{{ $highestPlacementScore }} Marks]</h4>
                             <div class="space-y-2">
-                                @forelse($clubActivities as $activity)
-                                <div class="flex justify-between p-2 bg-gray-100 rounded dark:bg-gray-600">
-                                    <span>
-                                        {{ $activity->represent }} {{ $activity->involvement->description }} Dalam {{ $activity->club->club_name ?? 'NULL' }},
-                                        
-                                            @if($activity->placement)
-                                                {{ $activity->placement->name }} Peringkat {{ $activity->achievement->achievement_name }}
-                                                 @php
-                                                    $placementScore = DB::table('achievement_placement')
-                                                    ->where([
-                                                    'placement_id' => $activity->placement_id,
-                                                    'achievement_id' => $activity->achievement_id,
-                                                    ])
-                                                    ->value('score');
-                                                 @endphp
+                                @forelse($placementActivities as $activity)
+                                    <div class="flex justify-between p-2 bg-gray-100 rounded dark:bg-gray-600">
+                                        <span>
+                                            {{ $activity->represent }} {{ $activity->involvement->description ?? '' }} in {{ $activity->club->club_name ?? 'N/A' }},
+                                            @if(isset($activity->placement))
+                                                {{ $activity->placement->name }} Peringkat {{ $activity->achievement->achievement_name ?? 'N/A' }}
                                             @else
-                                                Peringkat {{ $activity->achievement->achievement_name }}
+                                                No Placement
                                             @endif
-                                    </span>
-                                </div>
+                                        </span>
+                                    </div>
                                 @empty
-                                <p class="text-gray-500">No activities recorded</p>
+                                    <p class="text-gray-500">No activities recorded</p>
                                 @endforelse
                             </div>
                         </div>
@@ -177,21 +246,24 @@
                                 @foreach($commitments as $commitment)
                                 <div class="flex items-start">
                                     <div class="flex items-center h-6">
-                                        <input type="checkbox" id="commitment-{{ $commitment->id }}" name="commitments[]" value="{{ $commitment->id }}"
-                                            x-on:change="
-                                                    if ($event.target.checked) {
-                                                        if (selectedCommitments.length < maxCommitments) {
-                                                            selectedCommitments.push($event.target.value);
-                                                            commitmentScore += {{ $commitment->score }};
-                                                        } else {
-                                                            $event.target.checked = false;
-                                                        }
-                                                    } else {
-                                                        selectedCommitments = selectedCommitments.filter(id => id !== $event.target.value);
-                                                        commitmentScore -= {{ $commitment->score }};
-                                                    }
-                                                    updateCommitments();
-                                                "
+                                        <input type="checkbox" id="commitment-{{ $commitment->id }}" 
+                                name="commitments[]" 
+                                value="{{ $commitment->id }}"
+                                x-on:change="
+                                    if ($event.target.checked) {
+                                        if (selectedCommitments.length < maxCommitments) {
+                                            selectedCommitments.push('{{ $commitment->id }}');
+                                            commitmentScore += {{ $commitment->score }};
+                                        } else {
+                                            $event.target.checked = false;
+                                        }
+                                    } else {
+                                        selectedCommitments = selectedCommitments.filter(id => id !== '{{ $commitment->id }}');
+                                        commitmentScore -= {{ $commitment->score }};
+                                    }
+                                    updateCommitments();
+                                    updateCommitmentIds();
+                                "
                                             :checked="selectedCommitments.includes('{{ $commitment->id }}')"
                                             :disabled="!selectedCommitments.includes('{{ $commitment->id }}') && selectedCommitments.length >= maxCommitments"
                                             class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500 dark:border-gray-700 dark:bg-gray-900">
@@ -212,7 +284,7 @@
                             @enderror
                         </div>
 
-                        <!-- Service Contribution Section -->
+                        <!-- Service Contribution Section --> 
                         <div class="mb-6">
                             <h4 class="text-lg font-medium mb-4 border-b pb-2">Service Contribution [<span x-text="serviceScore + ' Marks'"></span>]</h4>
                             <div class="space-y-3">
@@ -220,7 +292,10 @@
                                     <div class="flex items-start">
                                         <div class="flex items-center h-6">
                                             <input type="radio" id="service_contribution_id-{{ $service->id }}" name="service_contribution_id" value="{{ $service->id }}"
-                                                x-on:change="updateServiceScore({{ $service->score }})"
+                                                x-on:change="
+                                                    updateServiceScore({{ $service->score }});
+                                                    updateServiceId($event.target.value);
+                                                "
                                                 class="border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500 dark:border-gray-700 dark:bg-gray-900">
                                         </div>
                                         <div class="ml-3">
@@ -252,12 +327,12 @@
                                     <span x-text="positionScore + '/10'"></span>
                                 </p>
                                 <p class="flex justify-between">
-                                    <span>Involvement Score:</span>
-                                    <span>{{ $involvementScore }}/20</span>
+                                    <span>Achievement Score:</span>
+                                    <span>{{ $highestAchievementScore }}/20</span>
                                 </p>
                                 <p class="flex justify-between">
                                     <span>Placement Score:</span>
-                                    <span>{{ $placementScore }}/20</span>
+                                    <span>{{ $highestPlacementScore }}/20</span>
                                 </p>
                                 <p class="flex justify-between">
                                     <span>Commitment Score:</span>
@@ -290,10 +365,7 @@
                                 $refs.attendanceInput.value = 1;
                                 $refs.form.querySelectorAll('input[type=checkbox]').forEach(cb => cb.checked = false);
                                 $refs.form.querySelectorAll('input[type=radio]').forEach(rb => rb.checked = false);
-                                localStorage.removeItem('attendanceDays');
-                                localStorage.removeItem('selectedCommitments');
-                                localStorage.removeItem('commitmentScore');
-                                localStorage.removeItem('serviceScore');
+                                resetStorage();
                             " class="inline-flex items-center px-4 py-2 bg-gray-200 dark:bg-gray-600 rounded-md font-semibold text-xs text-gray-800 dark:text-gray-200 uppercase tracking-widest hover:bg-gray-300 dark:hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition ease-in-out duration-150">
                                 Reset Form
                             </button>
@@ -318,12 +390,9 @@
                                         return;
                                     }
                                     if (confirm('Are you sure you want to save this evaluation?')) {
+                                        resetStorage();
                                         $refs.form.submit();
                                     }
-                                    localStorage.removeItem('attendanceDays');
-                                    localStorage.removeItem('selectedCommitments');
-                                    localStorage.removeItem('commitmentScore');
-                                    localStorage.removeItem('serviceScore');
                                 "
                                 class="inline-flex items-center px-4 py-2 bg-gray-800 dark:bg-gray-200 border border-transparent rounded-md font-semibold text-xs text-white dark:text-gray-800 uppercase tracking-widest hover:bg-gray-700 dark:hover:bg-white focus:bg-gray-700 dark:focus:bg-white active:bg-gray-900 dark:active:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
                                 Save Evaluation
