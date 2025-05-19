@@ -16,27 +16,37 @@ class PajskAssessment extends Model
         'club_position_ids',
         'service_contribution_ids',
         'attendance_ids',
-        'involvement_id',
         'commitment_ids',
-        'service_ids',
-        'placement_id',
+        // 'involvement_ids',
+        // 'activity_ids',
+        'achievement_ids',
+        'achievements_activity_ids',
+        'placement_ids',
+        'placements_activity_ids',
+        // 'service_ids',
         'total_scores',
         'percentages',
     ];
 
     // Updated casts for new fields
     protected $casts = [
-        'teacher_ids' => 'array',
-        'club_ids' => 'array',
-        'club_position_ids' => 'array',
-        'service_contribution_ids' => 'array',
-        'attendance_ids' => 'array',
-        'commitment_ids' => 'array',
-        'service_ids' => 'array',
-        'involvement_id' => 'integer',
-        'placement_id'   => 'integer',
-        'total_scores'    => 'array',
-        'percentages'     => 'array',
+        'student_id'                =>'integer',
+        'class_id'                  =>'integer',
+        'teacher_ids'               =>'array',
+        'club_ids'                  =>'array',
+        'club_position_ids'         =>'array',
+        'service_contribution_ids'  =>'array',
+        'attendance_ids'            =>'array',
+        'commitment_ids'            =>'array',
+        // 'involvement_ids'           =>'array',
+        // 'activity_ids'              =>'array',
+        'achievement_ids'           =>'array',
+        'achievements_activity_ids' =>'array',
+        'placement_ids'             =>'array',
+        'placements_activity_ids'   =>'array',
+        // 'service_ids'               =>'array',
+        'total_scores'              =>'array',
+        'percentages'               =>'array',
     ];
 
     public function student(): BelongsTo
@@ -89,7 +99,7 @@ class PajskAssessment extends Model
     // New relationship: Involvement (singular)
     public function involvement()
     {
-        return \App\Models\InvolvementType::find($this->involvement_id);
+        return \App\Models\InvolvementType::find('id', $this->involvement_ids ?? []);
     }
     
     // New relationship: Commitments
@@ -108,6 +118,6 @@ class PajskAssessment extends Model
     // New relationship: Placement (singular)
     public function placement()
     {
-        return \App\Models\Placement::find($this->placement_id);
+        return \App\Models\Placement::find('id', $this->placement_ids ?? []);
     }
 }

@@ -18,9 +18,12 @@ return new class extends Migration
             $table->json('service_contribution_ids')->nullable();
             $table->json('attendance_ids')->nullable();
             $table->json('commitment_ids')->nullable();
-            $table->foreignId('involvement_id')->constrained('involvement_types')->onDelete('cascade'); 
-            $table->foreignId('placement_id')->constrained('placements')->onDelete('cascade');
-            $table->json('service_ids')->nullable();
+            // $table->json('involvement_ids'); 
+            $table->json('achievement_ids');
+            $table->json('achievements_activity_ids'); 
+            $table->json('placement_ids');
+            $table->json('placements_activity_ids'); 
+            // $table->json('service_ids')->nullable();
             $table->json('total_scores')->nullable();
             $table->json('percentages')->nullable();
             $table->timestamps();
