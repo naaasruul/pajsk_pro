@@ -341,17 +341,9 @@ class PAJSKController extends Controller
                                 ->first();
         
         $attendance = Attendance::find(collect($evaluation->attendance_ids)->first());
-        // Keep the id arrays unchanged: total_scores & percentages still hold multiple breakdown values.
         $totalScores  = $evaluation->total_scores ?? [];  
         $percentages  = $evaluation->percentages ?? [];
-        
-        // Sort activities in descending order by placement pivot score from achievement_placement pivot
-        $sortedActivities = $student->activities->sortByDesc(function($activity) {
-            $placementScore = $activity->achievement->placements()
-                ->where('placement_id', $activity->placement_id)
-                ->first()?->pivot->score ?? 0;
-            return $placementScore;
-        });
+        $commitmentIds = $evaluation->commitment_ids ?? [];
 
         $scores = [
             'attendance' => [
@@ -360,62 +352,123 @@ class PAJSKController extends Controller
                     $att = Attendance::find($id);
                     return $att ? $att->score : 0;
                 }, $evaluation->attendance_ids ?? []),
+                'counts' => array_map(function($id) {
+                    $att = Attendance::find($id);
+                    return $att ? $att->attendance_count : 0;
+                }, $evaluation->attendance_ids ?? []),
+            ],
+            'clubs' => [
+                'ids' => $evaluation->club_ids,
+                'names' => array_map(function($id) {
+                    $club = Club::find($id);
+                    return $club ? $club->club_name : '';
+                }, $evaluation->club_ids ?? []),
             ],
             'club_positions' => [
                 'ids' => $evaluation->club_position_ids,
                 'scores' => array_map(function($id) {
-                    $cp = \App\Models\ClubPosition::find($id);
+                    $cp = ClubPosition::find($id);
                     return $cp ? $cp->point : 0;
                 }, $evaluation->club_position_ids ?? []),
+                'names' => array_map(function($id) {
+                    $cp = ClubPosition::find($id);
+                    return $cp ? $cp->position_name : '';
+                }, $evaluation->club_position_ids ?? []),
+            ],
+            'service_contributions' => [
+                'ids' => $evaluation->service_contribution_ids,
+                'scores' => array_map(function($id) {
+                    $serv = ServiceContribution::find($id);
+                    return $serv ? $serv->score : 0;
+                }, $evaluation->service_contribution_ids ?? []),
+                'names' => array_map(function($id) {
+                    $serv = ServiceContribution::find($id);
+                    return $serv ? $serv->service_name : '';
+                }, $evaluation->service_contribution_ids ?? []),
             ],
             'commitments' => [
                 'ids' => $evaluation->commitment_ids,
                 'scores' => array_map(function($idArray) {
                     $scores = array_map(function($id) {
-                        $comm = \App\Models\Commitment::find($id);
+                        $comm = Commitment::find($id);
                         return $comm ? $comm->score : 0;
                     }, $idArray);
                     return [array_sum($scores)];
                 }, $evaluation->commitment_ids ?? []),
+                'names' => array_map(function ($idArray) {
+                    return array_map(function ($id) {
+                        $commitment = Commitment::find($id);
+                        return $commitment ? $commitment->commitment_name : null;
+                    }, $idArray);
+                }, $commitmentIds),
             ],
-            'services' => [
-                'ids' => $evaluation->service_ids,
-                'scores' => array_map(function($id) {
-                    $serv = ServiceContribution::find($id);
-                    return $serv ? $serv->score : 0;
-                }, $evaluation->service_ids ?? []),
-            ],
-            'involvement' => [
-                'id' => $evaluation->involvement_id,
-                'score' => $evaluation->involvement_id ? $student->getInvolvementScore() : 0,
-            ],
+            // Added placement scores
             'placement' => [
-                'id' => $evaluation->placement_id,
-                'score' => $evaluation->placement_id ? $student->getPlacementScore() : 0,
+                'ids' => $evaluation->placement_ids,
+                'scores' => array_map(function($id) {
+                    $placement = Placement::find($id);
+                    return $placement ? ($placement->achievements()->first()->pivot->score ?? 0) : 0;
+                }, $evaluation->placement_ids ?? []),
             ],
-            'totalScores' => $totalScores,
-            'percentages' => $percentages,
+            // Added achievement scores
+            'achievement' => [
+                'ids' => $evaluation->achievement_ids,
+                'scores' => array_map(function($id) {
+                    $achievement = Achievement::find($id);
+                    return $achievement ? ($achievement->involvements()->first()->pivot->score ?? 0) : 0;;
+                }, $evaluation->achievement_ids ?? []),
+            ],
+            'achievement_strings' => array_map(function($i) use ($evaluation) {
+                $activityData = Activity::where('id', $evaluation->achievements_activity_ids[$i] ?? null)->first();
+                $represent = $activityData ? $activityData->represent : 'N/A';
+                $involvementName = ($activityData && $activityData->involvement) ? ($activityData->involvement->description ?? 'N/A') : 'N/A';
+                $club = Club::find($evaluation->club_ids[$i] ?? null);
+                $clubName = $club ? $club->club_name : 'N/A';
+                $achievement = Achievement::find($evaluation->achievement_ids[$i] ?? null);
+                $placement = Placement::find($evaluation->placement_ids[$i] ?? null);
+                $achievementName = $achievement ? $achievement->achievement_name : 'N/A';
+                $placementName = $placement ? $placement->placement_name : 'N/A';
+                return "{$represent} {$involvementName} {$clubName} Peringkat {$achievementName}";
+            }, range(0, count($evaluation->club_ids) - 1)),
+            'placement_strings' => array_map(function($p) use ($evaluation) {
+                $activityData = Activity::where('id', $evaluation->placements_activity_ids[$p] ?? null)->first();
+                $represent = $activityData ? $activityData->represent : 'N/A';
+                $involvementName = ($activityData && $activityData->involvement) ? ($activityData->involvement->description ?? 'N/A') : 'N/A';
+                $club = Club::find($evaluation->club_ids[$p] ?? null);
+                $clubName = $club ? $club->club_name : 'N/A';
+                $achievement = Achievement::find($evaluation->achievement_ids[$p] ?? null);
+                $achievementName = $achievement ? $achievement->achievement_name : 'N/A';
+                $placement = Placement::find($evaluation->placement_ids[$p] ?? null);
+                $placementName = $placement ? $placement->name : 'N/A';
+                return "{$represent} {$involvementName} {$clubName}, {$placementName} Peringkat {$achievementName}";
+            }, range(0, count($evaluation->club_ids) - 1)),
         ];
 
-        // $commitments = $evaluation->commitments()->get();
+        Log::info('Scores:', [
+            'student_id' => $student->id,
+            'scores' => $scores,
+        ]);
+
         $service = ServiceContribution::find(optional($evaluation->service_contribution_ids)[0]);
 
-        // Pass full id arrays along with breakdown arrays to the view.
         $result = [
-            'scores' => $scores,
-            'totalScores' => $totalScores,
-            'percentages' => $percentages,
-            'student' => $student,
-            'teacher_ids' => $evaluation->teacher_ids,
-            'year' => $evaluation->classroom->year,
-            'class_name' => $evaluation->classroom->class_name,
-            'club_ids' => $evaluation->club_ids,
-            'position' => optional($evaluation->club_positions->first())->position_name,
-            'attendance' => $attendance,
-            'service' => $service,
-            'assessment' => $evaluation,
-            'extracocuricullum' => $extracocuricullum,
-            'sortedActivities' => $sortedActivities, // pass sorted activities to the view
+            'scores'                => $scores,
+            'totalScores'           => $totalScores,
+            'percentages'           => $percentages,
+            'student'               => $student,
+            'teacher_ids'           => $evaluation->teacher_ids,
+            'year'                  => $evaluation->classroom->year,
+            'class_name'            => $evaluation->classroom->class_name,
+            'club_ids'              => $evaluation->club_ids,
+            'position'              => optional($evaluation->club_positions->first())->position_name,
+            'attendance'            => $attendance,
+            'service'               => $service,
+            'assessment'            => $evaluation,
+            'extracocuricullum'     => $extracocuricullum,
+            'involvement_ids'       => $evaluation->involvement_ids,
+            'placement_ids'         => $evaluation->placement_ids,
+            'achievement_ids'       => $evaluation->achievement_ids,
+            'activity_ids'          => $evaluation->activity_ids,
         ];
         
         return view('pajsk.result', $result);
