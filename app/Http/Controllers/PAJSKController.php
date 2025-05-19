@@ -164,68 +164,164 @@ class PAJSKController extends Controller
     {
         $validated = $request->validate([
             'attendance' => 'required|numeric|min:1|max:12',
-            'commitments' => 'required|array|size:4',
-            'commitments.*' => 'exists:commitments,id',
-            'service_contribution_id' => 'required|exists:service_contributions,id',
+            'attendance_id' => 'required|exists:attendances,id',
+            'position_id' => 'nullable|exists:club_positions,id',
+            'achievement_id' => 'nullable|exists:achievements,id',
+            'achievement_activity_id' => 'nullable|exists:activities,id',
+            'placement_id' => 'nullable|exists:placements,id',
+            'placement_activity_id' => 'nullable|exists:activities,id',
+            'commitment_ids' => 'required|json',
+            'service_id' => 'required|exists:service_contributions,id',
         ]);
-        
-        $attendanceRecord = Attendance::where('attendance_count', $validated['attendance'])->firstOrFail();
-        $serviceContribution = ServiceContribution::find($validated['service_contribution_id']);
 
-        $clubPositionId = $student->clubPosition();
-        $firstActivity = $student->activities()->first();
-        $involvementId = $firstActivity ? $firstActivity->involvement_id : null;
-        $placementId = $firstActivity ? $firstActivity->placement_id : null;
-        $commitmentIds = $validated['commitments'];
-        $serviceIds = [$validated['service_contribution_id']];
+        // Parse JSON for commitments
+        $commitmentIds = json_decode($validated['commitment_ids'], true);
 
-        $attendancePoint    = $attendanceRecord->score;
-        $clubPositionPoint  = $clubPositionId ? (\App\Models\ClubPosition::find($clubPositionId)->point ?? 0) : 0;
-        $involvementScore   = $student->getInvolvementScore();
-        $commitmentScore    = Commitment::whereIn('id', $validated['commitments'])->sum('score');
-        $serviceScore       = $serviceContribution->score;
-        $achievementScore   = $this->calculateAchievementScore($student);
-        $totalScore         = $attendancePoint + $clubPositionPoint + $involvementScore + $commitmentScore + $serviceScore + $achievementScore;
-        $percentage         = round(($totalScore / 110) * 100, 2);
+        // Get records for score calculation
+        $attendanceRecord = Attendance::findOrFail($validated['attendance_id']);
+        $serviceContribution = ServiceContribution::findOrFail($validated['service_id']);
+        $clubPosition = $validated['position_id'] ? ClubPosition::find($validated['position_id']) : null;
         
-        // Retrieve existing assessment if available; otherwise, create new.
+        // Calculate scores
+        $attendancePoint = $attendanceRecord->score;
+        $clubPositionPoint = $clubPosition ? $clubPosition->point : 0;
+        $commitmentScore = Commitment::whereIn('id', $commitmentIds)->sum('score');
+        $serviceScore = $serviceContribution->score;
+
+        // Get achievement/placement scores
+        $achievementScore = 0;
+        $placementScore = 0;
+        if ($validated['achievement_id']) {
+            $achievement = Achievement::find($validated['achievement_id']);
+            if ($achievement) {
+                $achievementScore = $achievement->involvements()
+                    ->where('involvement_type_id', Activity::find($validated['achievement_activity_id'])?->involvement_id)
+                    ->first()?->pivot->score ?? 0;
+            }
+        }
+        if ($validated['placement_id']) {
+            $placement = Placement::find($validated['placement_id']);
+            if ($placement) {
+                $placementScore = $placement->achievements()
+                    ->where('achievement_id', Activity::find($validated['placement_activity_id'])?->achievement_id)
+                    ->first()?->pivot->score ?? 0;
+            }
+        }
+
+        $totalScore = $attendancePoint + $clubPositionPoint + $achievementScore + $placementScore + $commitmentScore + $serviceScore;
+        $percentage = round(($totalScore / 110) * 100, 2);
+
+        // Determine teacher's club category index
+        $sukan = ['Sukan & Permainan', 'Sukan'];
+        $kelab = ['Kelab & Persatuan', 'Kelab & Persatuan', 'Kelab & Permainan']; // note: duplicate not harmful
+        $badan = ['Badan Beruniform'];
+        $teacher = Auth::user()->teacher;
+        $teacherClub = $teacher->club;
+        if (!$teacherClub) {
+            abort(403, 'Teacher has no registered club.');
+        }
+        if (in_array($teacherClub->category, $sukan)) {
+            $index = 0;
+        } elseif (in_array($teacherClub->category, $kelab)) {
+            $index = 1;
+        } elseif (in_array($teacherClub->category, $badan)) {
+            $index = 2;
+        } else {
+            $index = null;
+        }
+        if ($index === null) {
+            abort(500, 'Teacher club category is undefined.');
+        }
+        
+        // Initialize arrays with 3 items each.
+        $defaultNull = [null, null, null];
+        $defaultEmptyArray = [[], [], []];
+        
+        // For club_ids, collect student's clubs by category.
+        // For each category index, find the student's club in that category.
+        $clubsByCategory = [$defaultNull[0], $defaultNull[1], $defaultNull[2]];
+        foreach ($student->clubs as $club) {
+            if (in_array($club->category, $sukan)) {
+                $clubsByCategory[0] = $club->id;
+            } elseif (in_array($club->category, $kelab)) {
+                $clubsByCategory[1] = $club->id;
+            } elseif (in_array($club->category, $badan)) {
+                $clubsByCategory[2] = $club->id;
+            }
+        }
+        
+        // Get or create assessment
         $assessment = PajskAssessment::firstOrNew([
             'student_id' => $student->id,
-            'class_id'   => $student->classroom->id,
+            'class_id' => $student->classroom->id,
         ]);
 
-        // For array fields, merge new values with existing values.
-        $assessment->teacher_ids = array_merge($assessment->teacher_ids ?? [], [auth()->user()->teacher->id]);
-        
-        // Replace merging of club_ids with conditional assignment
-        if (empty($assessment->club_ids)) {
-            $assessment->club_ids = $student->clubs->pluck('id')->toArray();
-        }
-        
-        $assessment->club_position_ids = array_merge($assessment->club_position_ids ?? [], $clubPositionId ? [$clubPositionId] : []);
-        $assessment->service_contribution_ids = array_merge($assessment->service_contribution_ids ?? [], [$validated['service_contribution_id']]);
-        $assessment->attendance_ids = array_merge($assessment->attendance_ids ?? [], [$attendanceRecord->id]);
-        
-        // For singular fields, set if not already set.
-        if (!$assessment->involvement_id) {
-            $assessment->involvement_id = $involvementId;
-        }
-        if (!$assessment->placement_id) {
-            $assessment->placement_id = $placementId;
-        }
-        
-        // For commitment_ids, which must be a 2D array
-        if (!empty($assessment->commitment_ids)) {
-            $assessment->commitment_ids = array_merge($assessment->commitment_ids, [$commitmentIds]);
-        } else {
-            $assessment->commitment_ids = [$commitmentIds];
-        }
-        $assessment->service_ids = array_merge($assessment->service_ids ?? [], $serviceIds);
-        $assessment->total_scores = array_merge($assessment->total_scores ?? [], [$totalScore]);
-        $assessment->percentages  = array_merge($assessment->percentages ?? [], [$percentage]);
-        
+        // Initialize arrays
+        $defaultNull = [null, null, null];
+        $defaultEmptyArray = [[], [], []];
+
+        // Set all assessment fields
+        $assessment->teacher_ids = $assessment->teacher_ids ?? $defaultNull;
+        $assessment->club_ids = $clubsByCategory;
+        $assessment->club_position_ids = $assessment->club_position_ids ?? $defaultNull;
+        $assessment->service_contribution_ids = $assessment->service_contribution_ids ?? $defaultNull;
+        $assessment->attendance_ids = $assessment->attendance_ids ?? $defaultNull;
+        $assessment->commitment_ids = $assessment->commitment_ids ?? $defaultEmptyArray;
+        $assessment->service_contribution_ids = $assessment->service_contribution_ids ?? $defaultNull;
+        $assessment->achievement_ids = $assessment->achievement_ids ?? $defaultNull;
+        $assessment->achievements_activity_ids = $assessment->achievements_activity_ids ?? $defaultNull;
+        $assessment->placement_ids = $assessment->placement_ids ?? $defaultNull;
+        $assessment->placements_activity_ids = $assessment->placements_activity_ids ?? $defaultNull;
+        $assessment->total_scores = $assessment->total_scores ?? $defaultNull;
+        $assessment->percentages = $assessment->percentages ?? $defaultNull;
+
+        // Update arrays with new values
+        $temp = $assessment->teacher_ids;
+        $temp[$index] = $teacher->id;
+        $assessment->teacher_ids = $temp;
+
+        $temp = $assessment->attendance_ids;
+        $temp[$index] = $validated['attendance_id'];
+        $assessment->attendance_ids = $temp;
+
+        $temp = $assessment->club_position_ids;
+        $temp[$index] = $validated['position_id'];
+        $assessment->club_position_ids = $temp;
+
+        $temp = $assessment->achievement_ids;
+        $temp[$index] = $validated['achievement_id'];
+        $assessment->achievement_ids = $temp;
+
+        $temp = $assessment->achievements_activity_ids;
+        $temp[$index] = $validated['achievement_activity_id'];
+        $assessment->achievements_activity_ids = $temp;
+
+        $temp = $assessment->placement_ids;
+        $temp[$index] = $validated['placement_id'];
+        $assessment->placement_ids = $temp;
+
+        $temp = $assessment->placements_activity_ids;
+        $temp[$index] = $validated['placement_activity_id'];
+        $assessment->placements_activity_ids = $temp;
+
+        $temp = $assessment->commitment_ids;
+        $temp[$index] = $commitmentIds;
+        $assessment->commitment_ids = $temp;
+
+        $temp = $assessment->service_contribution_ids;
+        $temp[$index] = $validated['service_id'];
+        $assessment->service_contribution_ids = $temp;
+
+        $temp = $assessment->total_scores;
+        $temp[$index] = $totalScore;
+        $assessment->total_scores = $temp;
+
+        $temp = $assessment->percentages;
+        $temp[$index] = $percentage;
+        $assessment->percentages = $temp;
+
         $assessment->save();
-        
+
         return redirect()->route('pajsk.result', ['student' => $student, 'evaluation' => $assessment]);
     }
 
