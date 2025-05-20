@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('student_id')->constrained()->onDelete('cascade');
             $table->foreignId('class_id')->constrained('classrooms')->onDelete('cascade'); // determine the year of the report and classroom
-            $table->foreignId('extra_cocuricullum_id')->constrained('extra_cocuricculum')->onDelete('cascade'); // take extra cocu report for the current year and points
+            $table->foreignId('extra_cocuricullum_id')->nullable()->constrained('extra_cocuricculum')->onDelete('cascade');
             $table->foreignId('pajsk_assessment_id')->constrained()->onDelete('cascade'); // take club ids and marks
             $table->decimal('gpa', 5, 2)->nullable(); // GPA calculation: (highest total marks + second highest total marks for each organization) / 2 [automatically set to cgpa if first year]    
             $table->decimal('cgpa', 5, 2)->nullable(); // CGPA calculation: (past year + current year cgpa)
