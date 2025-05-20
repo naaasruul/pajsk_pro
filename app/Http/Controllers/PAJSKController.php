@@ -666,53 +666,146 @@ class PAJSKController extends Controller
                 $q->where('year', $previousYear);
             })->latest()->first();
         $cgpaLast = $oldAssessment ? $oldAssessment->cgpa : null;
+        
+        // Group clubs and related scores by club category
+        $groupedClubs = [
+            'Sukan / Permainan' => '--',
+            'Kelab / Persatuan' => '--',
+            'Badan Beruniform'  => '--',
+        ];
+        $groupedPositions = [
+            'Sukan / Permainan' => '--',
+            'Kelab / Persatuan' => '--',
+            'Badan Beruniform'  => '--',
+        ];
+        $groupedCommitmentNames = [
+            'Sukan / Permainan' => '--',
+            'Kelab / Persatuan' => '--',
+            'Badan Beruniform'  => '--',
+        ];
+        $groupedServiceNames = [
+            'Sukan / Permainan' => '--',
+            'Kelab / Persatuan' => '--',
+            'Badan Beruniform'  => '--',
+        ];
+        $groupedAttendanceCounts = [
+            'Sukan / Permainan' => '--',
+            'Kelab / Persatuan' => '--',
+            'Badan Beruniform'  => '--',
+        ];
+        
+        // Add new grouped arrays
+        $groupedAchievementNames = [
+            'Sukan / Permainan' => '--',
+            'Kelab / Persatuan' => '--',
+            'Badan Beruniform'  => '--',
+        ];
 
-        // Collect clubs from assessment based on club_ids.
-        $clubsCollection = collect($assessment->club_ids ?? [])->map(function ($id) {
-            return Club::find($id);
-        })->filter();
-        $sukan  = $clubsCollection->firstWhere('category', 'Sukan & Permainan');
-        $kelab  = $clubsCollection->firstWhere('category', 'Kelab & Persatuan');
-        $badan  = $clubsCollection->firstWhere('category', 'Badan Beruniform');
-        $clubs = collect([$sukan, $kelab, $badan]);
+        $groupedPlacementNames = [
+            'Sukan / Permainan' => '--',
+            'Kelab / Persatuan' => '--',
+            'Badan Beruniform'  => '--',
+        ];
 
-        // Collect commitment names based on the stored commitment_ids.
-        $commitmentNames = collect($assessment->commitment_ids)->map(function ($ids) {
-            return collect($ids)->map(function ($id) {
-                return Commitment::find($id)?->commitment_name ?? $id;
-            })->implode(', ') ?: '--';
-        });
+        // Initialize score arrays separately
+        $groupedPositionScores = $groupedCommitmentScores = $groupedServiceScores = 
+        $groupedAttendanceScores = $groupedPlacementScores = $groupedAchievementScores = [
+            'Sukan / Permainan' => 0,
+            'Kelab / Persatuan' => 0,
+            'Badan Beruniform'  => 0,
+        ];
 
-        Log::info('Commitment Names:', $commitmentNames->toArray());
+        if (!empty($assessment->club_ids)) {
+            foreach($assessment->club_ids as $i => $clubId) {
+                $club = Club::find($clubId);
+                if(!$club) continue;
+                if (in_array($club->category, ['Sukan & Permainan','Sukan'])) {
+                    $group = 'Sukan / Permainan';
+                } elseif (in_array($club->category, ['Kelab & Persatuan','Kelab & Permainan'])) {
+                    $group = 'Kelab / Persatuan';
+                } elseif ($club->category == 'Badan Beruniform') {
+                    $group = 'Badan Beruniform';
+                } else {
+                    $group = null;
+                }
+                if ($group) {
+                    $groupedClubs[$group] = $club->club_name;
 
-        // Collect positions based on the stored club_position_ids.
-        $positions = collect($assessment->club_position_ids ?? [])->map(function ($ids) {
-            return ClubPosition::find($ids);
-        })->filter();
+                    if (isset($assessment->club_position_ids[$i])) {
+                        $position = ClubPosition::find($assessment->club_position_ids[$i]);
+                        $groupedPositions[$group] = $position?->position_name ?? '--';
+                        $groupedPositionScores[$group] = $position?->point ?? 0;
+                    }
 
-        Log::info('Positions:', $positions->toArray());
+                    // Add commitment scores
+                    if (isset($assessment->commitment_ids[$i]) && !empty($assessment->commitment_ids[$i])) {
+                        $commitments = collect($assessment->commitment_ids[$i])->filter();
+                        $groupedCommitmentNames[$group] = $commitments->map(function($id) {
+                            return Commitment::find($id)?->commitment_name ?? '--';
+                        })->implode(', ');
+                        $groupedCommitmentScores[$group] = $commitments->sum(function($id) {
+                            return Commitment::find($id)?->score ?? 0;
+                        });
+                    }
 
-        // Collect service names based on the stored service_contribution_ids.
-        $serviceNames = collect($assessment->service_contribution_ids ?? [])->map(function ($ids) {
-            return ServiceContribution::find($ids);
-        });
+                    // Add service scores
+                    if (isset($assessment->service_contribution_ids[$i])) {
+                        $service = ServiceContribution::find($assessment->service_contribution_ids[$i]);
+                        $groupedServiceNames[$group] = $service?->service_name ?? '--';
+                        $groupedServiceScores[$group] = $service?->score ?? 0;
+                    }
 
-        $attendanceCounts = collect($assessment->attendance_ids ?? [])->map(function ($ids) {
-            return Attendance::find($ids);
-        });
+                    // Add attendance scores 
+                    if (isset($assessment->attendance_ids[$i])) {
+                        $attendance = Attendance::find($assessment->attendance_ids[$i]);
+                        $groupedAttendanceCounts[$group] = $attendance?->attendance_count . ' days' ?? '--';
+                        $groupedAttendanceScores[$group] = $attendance?->score ?? 0;
+                    }
 
-        return view('pajsk.report', [
-            'report'            => $report,
-            'student'           => $student,
-            'extracocuricullum' => $extracocuricullum,
-            'assessment'        => $assessment,
-            'clubs'             => $clubs,
-            'commitmentNames'   => $commitmentNames,
-            'serviceNames'      => $serviceNames,
-            'attendanceCounts'  => $attendanceCounts,
-            'positions'         => $positions,
-            'cgpaLast'         => $cgpaLast, // Add this line
-        ]);
+                    // Add placement scores
+                    if (isset($assessment->placement_ids[$i])) {
+                        $placement = Placement::find($assessment->placement_ids[$i]);
+                        $groupedPlacementNames[$group] = $placement?->name ?? '--';
+                        $groupedPlacementScores[$group] = $placement?->achievements()->first()?->pivot->score ?? 0;
+                    }
+
+                    // Add achievement scores
+                    if (isset($assessment->achievement_ids[$i])) {
+                        $achievement = Achievement::find($assessment->achievement_ids[$i]);
+                        $groupedAchievementNames[$group] = $achievement?->achievement_name ?? '--';
+                        $groupedAchievementScores[$group] = $achievement?->involvements()->first()?->pivot->score ?? 0;
+                    }
+
+                }
+            }
+        }
+
+        $result = [
+            // 'year'                      => $assessment->classroom->year,
+            // 'class_name'                => $assessment->classroom->class_name,
+            'student'                   => $student,
+            'report'                    => $report,
+            'totalScores'               => $assessment->total_scores ?? [],
+            'percentages'               => $assessment->percentages ?? [],
+            'teacher_ids'               => $assessment->teacher_ids,
+            'club_ids'                  => $assessment->club_ids,
+            'groupedClubs'              => $groupedClubs,
+            'groupedPositions'          => $groupedPositions,
+            'groupedPositionScores'     => $groupedPositionScores,
+            'groupedCommitmentNames'    => $groupedCommitmentNames,
+            'groupedCommitmentScores'   => $groupedCommitmentScores,
+            'groupedServiceNames'       => $groupedServiceNames,
+            'groupedServiceScores'      => $groupedServiceScores,
+            'groupedAttendanceCounts'   => $groupedAttendanceCounts,
+            'groupedAttendanceScores'   => $groupedAttendanceScores,
+            'groupedAchievementNames'   => $groupedAchievementNames,
+            'groupedAchievementScores'  => $groupedAchievementScores,
+            'groupedPlacementNames'     => $groupedPlacementNames,
+            'groupedPlacementScores'    => $groupedPlacementScores,
+            'extracocuricullum'         => $extracocuricullum,
+        ];
+        
+        return view('pajsk.report', $result);
     }
 
     public function destroyReport(PajskReport $report)
