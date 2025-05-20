@@ -72,7 +72,7 @@ class DatabaseSeeder extends Seeder
             ExtraCocuCommunityServices::class,
             ExtraCocuTIMMS_PISA::class,
             NilamSeeder::class,
-            ExtraCocuSeeder::class,
+            // ExtraCocuSeeder::class,
             // ClassroomSeeder::class,
             // ActivitySeeder::class,
             // StudentSeeder::class,
@@ -101,7 +101,7 @@ class DatabaseSeeder extends Seeder
 
         $userTeacherKelab = Teacher::create([
             'user_id' => $userTeacherKelab->id,
-            'club_id' => 1, // Kelab Alam Sekitar
+            'club_id' => 1, // Kelab Muzik
             'address' => fake()->address(),
             'phone_number' => fake()->phoneNumber(),
             'home_number' => fake()->phoneNumber(),
@@ -109,7 +109,7 @@ class DatabaseSeeder extends Seeder
 
         $userTeacherUniform = Teacher::create([
             'user_id' => $userTeacherUniform->id,
-            'club_id' => 9, // Kadet Bomba
+            'club_id' => 3, // Kadet Polis
             'address' => fake()->address(),
             'phone_number' => fake()->phoneNumber(),
             'home_number' => fake()->phoneNumber(),
@@ -117,7 +117,7 @@ class DatabaseSeeder extends Seeder
 
         $userTeacherSukan = Teacher::create([
             'user_id' => $userTeacherSukan->id,
-            'club_id' => 6, // Kelab Sukan
+            'club_id' => 2, // Kelab Sukan
             'address' => fake()->address(),
             'phone_number' => fake()->phoneNumber(),
             'home_number' => fake()->phoneNumber(),
