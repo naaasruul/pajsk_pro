@@ -720,4 +720,81 @@ class PAJSKController extends Controller
         $report->delete();
         return redirect()->route('pajsk.report-history')->with('success', 'Report deleted successfully.');
     }
+
+    // Add this new private function near the bottom of the class
+    private function getHighestScores($activities): array
+    {
+        \Log::debug('Starting getHighestScores function with ' . count($activities) . ' activities');
+        
+        $highestPlacementScore = 0;
+        $highestAchievementScore = 0;
+        $highestPlacementId = null;
+        $highestPlacementActivityId = null;
+        $highestAchievementId = null;
+        $highestAchievementActivityId = null;
+        
+        \Log::debug('Initial values set: placement score = 0, achievement score = 0');
+        
+        foreach ($activities as $activity) {
+            \Log::debug('Processing activity ID: ' . $activity->id);
+            
+            if (!$activity->achievement) {
+                \Log::debug('Activity ' . $activity->id . ' has no achievement, skipping');
+                continue;
+            }
+            
+            $currentPlacementId = null;
+            $currentAchievementId = null;
+            $currentPlacementActivityId = null;
+            $currentAchievementActivityId = null;
+            $currentPlacementScore = 0;
+            $currentAchievementScore = 0;
+            
+            if ($activity->placement_id) {
+                \Log::debug('Activity ' . $activity->id . ' has placement_id: ' . $activity->placement_id);
+                $currentPlacementScore = $activity->achievement->placements()
+                    ->where('placement_id', $activity->placement_id)
+                    ->first()?->pivot->score ?? 0;
+                $currentPlacementId = $activity->placement_id;
+                $currentPlacementActivityId = $activity->id;
+                \Log::debug('Placement score: ' . $currentPlacementScore);
+            }
+            
+            if ($activity->achievement_id) {
+                \Log::debug('Activity ' . $activity->id . ' has achievement_id: ' . $activity->achievement_id);
+                $currentAchievementScore = $activity->achievement->involvements()
+                ->where('achievement_id', $activity->achievement_id)
+                ->first()?->pivot->score ?? 0;
+                $currentAchievementId = $activity->achievement_id;
+                $currentAchievementActivityId = $activity->id;
+                \Log::debug('Achievement score: ' . $currentAchievementScore);
+            }
+            
+            if ($currentPlacementScore > $highestPlacementScore) {
+                \Log::debug('New highest placement score found: ' . $currentPlacementScore . ' (previous: ' . $highestPlacementScore . ')');
+                $highestPlacementScore = $currentPlacementScore;
+                $highestPlacementId = $currentPlacementId;
+                $highestPlacementActivityId = $currentPlacementActivityId;
+            }
+            
+            if ($currentAchievementScore > $highestAchievementScore) {
+                \Log::debug('New highest achievement score found: ' . $currentAchievementScore . ' (previous: ' . $highestAchievementScore . ')');
+                $highestAchievementScore = $currentAchievementScore;
+                $highestAchievementId = $currentAchievementId;
+                $highestAchievementActivityId = $currentAchievementActivityId;
+            }
+        }
+        
+        \Log::debug('Final highest placement score: ' . $highestPlacementScore . ' (ID: ' . $highestPlacementId . ', Activity ID: ' . $highestPlacementActivityId . ')');
+        \Log::debug('Final highest achievement score: ' . $highestAchievementScore . ' (ID: ' . $highestAchievementId . ', Activity ID: ' . $highestAchievementActivityId . ')');
+        
+        return [
+            'highestPlacementScore'         => $highestPlacementScore,
+            'highestAchievementScore'       => $highestAchievementScore,
+            'highestPlacementId'            => $highestPlacementId,
+            'highestAchievementId'          => $highestAchievementId,
+            'highestAchievementActivityId'  => $highestAchievementActivityId,
+            'highestPlacementActivityId'    => $highestPlacementActivityId,
+        ];
+    }
 }
