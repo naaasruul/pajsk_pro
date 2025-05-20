@@ -19,6 +19,32 @@
     <script src="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.js"></script>
 
     <style>
+        @media (max-width: 640px) {
+			table {
+				font-size: 0.7rem;
+			}
+		}
+
+        /* report.blade.php */
+        /* Score indicator styling */
+		.score-indicator {
+			position: absolute;
+			bottom: 2px;
+			right: 2px;
+			width: 20px;
+			height: 20px;
+			background-color: #4b5563;
+			border: 1px solid #6b7280;
+			color: white;
+			font-size: 9px;
+			line-height: 16px;
+			text-align: center;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			font-weight: bold;
+		}
+
         @media print {
             @page {
                 size: A4;
@@ -30,6 +56,8 @@
                 margin: 0 !important;
                 padding: 0 !important;
                 overflow: visible;
+                visibility: hidden;
+				font-family: Arial, Helvetica, sans-serif;
             }
             #default-sidebar {
                 display: none !important;
@@ -59,6 +87,56 @@
             .no-print {
                 display: none !important;
             }
+
+            /* report.blade.php */
+            /* Hide non-printable elements */
+			.no-print,
+			header,
+			nav,
+			footer,
+			button {
+				display: none !important;
+			}
+
+            /* report.blade.php */
+            .print-container,
+			.print-container * {
+				visibility: visible;
+			}
+
+            /* report.blade.php */
+            /* Remove all margins/padding and position the table at the top */
+			.print-container {
+				position: absolute;
+				left: 0;
+				top: 0;
+				width: 100%;
+				padding: 0 !important;
+				margin: 0 !important;
+			}
+
+            /* report.blade.php */
+            /* Hide score indicators when printing */
+			.score-indicator {
+				background-color: #ffffff;
+				border: 1px solid #000000;
+				color: white;
+			}
+
+            /* report.blade.php */
+			/* Reset all print colors to black on white */
+			table {
+				background-color: white !important;
+				color: black !important;
+			}
+
+            /* report.blade.php */
+			td,
+			th {
+				border: 1px solid black !important;
+				background-color: white !important;
+				color: black !important;
+			}
         }
     </style>
     
