@@ -13,15 +13,20 @@ class ExtraCocuSeeder extends Seeder
      */
     public function run(): void
     {
-        //
-        $this->call(ExtraCocuServices::class);
-        $this->call(ExtraCocuSpecialAwards::class);
-        $this->call(ExtraCocuCommunityServices::class);
-        $this->call(NilamSeeder::class);
-        $this->call(ExtraCocuTIMMS_PISA::class);
+        // //
+        // $this->command->info('Seeding Extra Cocu Services Table...');
+        // $this->call(ExtraCocuServices::class);
 
+        // $this->command->info('Seeding Extra Cocu Special Awards Table...');
+        // $this->call(ExtraCocuSpecialAwards::class);
 
+        // $this->command->info('Seeding Extra Cocu Community Services Table...');
+        // $this->call(ExtraCocuCommunityServices::class);
 
-        
+        // $this->command->info('Seeding Extra Cocu Nilam Table...');
+        // $this->call(NilamSeeder::class);
+
+        // $this->command->info('Seeding Extra Cocu TIMMS and PISA Table...');
+        // $this->call(ExtraCocuTIMMS_PISA::class);
     }
 }
