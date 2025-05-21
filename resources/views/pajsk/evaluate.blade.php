@@ -13,17 +13,19 @@
                 <div class="p-6 text-gray-900 dark:text-gray-100">
                     <div class="mb-6">
                         <h3 class="text-lg font-semibold mb-4">Evaluate: {{ $student->user->name }}</h3>
-                        <div class="grid grid-cols-2 gap-4 mb-4">
-                            <div>
-                                <p class="text-sm text-gray-600 dark:text-gray-400">Class: {{ $student->classroom->year . ' ' . $student->classroom->class_name }}
-                                </p>
-                                <p class="text-sm text-gray-600 dark:text-gray-400">Club: {{ $club->club_name }}</p>
+                        <!-- Student Info -->
+                        <div class="grid grid-cols-2 gap-4 mb-6">
+                            <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+                                <h4 class="font-medium text-sm text-gray-500 dark:text-gray-400 mb-2">Student Information</h4>
+                                <div class="space-y-1">
+                                    <p class="text-gray-900 dark:text-gray-100">Class: {{ $student->classroom->year . ' ' . $student->classroom->class_name }}</p>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">{{ isset($student) && isset($student->user) ? $student->user->name : 'Student' }}</p>
+                                </div>
                             </div>
-                            <div>
-                                <p class="text-sm text-gray-600 dark:text-gray-400">Position: {{ $position ?
-                                    $position->position_name : 'No Position' }}</p>
-                                <p class="text-sm text-gray-600 dark:text-gray-400">Position Score: {{ $position ?
-                                    $position->point : 0 }}/10</p>
+                            <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+                                <h4 class="font-medium text-sm text-gray-500 dark:text-gray-400 mb-2">Club Information</h4>
+                                <p class="text-gray-900 dark:text-gray-100">Position: {{ $position ? $position->position_name : 'No Position' }}</p>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">Position Score: {{ $position ?$position->point : 0 }}/10</p>
                             </div>
                         </div>
                     </div>
