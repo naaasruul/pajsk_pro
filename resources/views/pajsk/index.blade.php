@@ -18,7 +18,7 @@
 						<th scope="col" class="px-6 py-3">Name</th>
 						<th scope="col" class="px-6 py-3">Class</th>
 						<th scope="col" class="px-6 py-3">Position</th>
-						<th scope="col" class="px-6 py-3">Points</th>
+						{{-- <th scope="col" class="px-6 py-3">Points</th> --}}
 						<th scope="col" class="px-6 py-3">Actions</th>
 					</tr>
 				</thead>
@@ -30,16 +30,23 @@
 						</td>
 						<td class="px-6 py-4">{{ $student['user']['classroom']['year'] }} {{ $student['user']['classroom']['class_name'] }}</td>
 						<td class="px-6 py-4">{{ $student['position_name'] }}</td>
-						<td class="px-6 py-4">
+						{{-- <td class="px-6 py-4">
 							{{ $student['position_name'] !== 'No Position' ?
 							($positions->where('position_name', $student['position_name'])->first()->point ?? 0)
 							: 0 }}
-						</td>
+						</td> --}}
 						<td class="px-6 py-4 space-x-3">
-							<a href="{{ route('pajsk.evaluate-student', $student['id']) }}"
-								class="font-medium text-blue-600 dark:text-blue-500 hover:underline">
-								Evaluate
-							</a>
+							@if ($student['has_assessment'])
+								<a href="{{ route('pajsk.result', ['student' => $student['id'], 'evaluation' => $student['assessment_id']]) }}"
+									class="font-medium text-green-600 dark:text-green-500 hover:underline">
+									Result
+								</a>
+							@else
+								<a href="{{ route('pajsk.evaluate-student', $student['id']) }}"
+									class="font-medium text-blue-600 dark:text-blue-500 hover:underline">
+									Evaluate
+								</a>
+							@endif
 						</td>
 					</tr>
 					@empty

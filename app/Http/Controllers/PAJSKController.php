@@ -35,7 +35,12 @@ class PAJSKController extends Controller
         // Get paginated students from the club
         $students = $club->students()->with('user')->paginate(10);
         
-        $studentsWithPositions = $students->map(function ($student) use ($positions) {
+        $studentsWithPositions = $students->map(function ($student) use ($positions, $club) {
+            $assessment = PajskAssessment::where('student_id', $student->id)
+                ->where('class_id', $student->classroom->id)
+                ->whereJsonContains('club_ids', $club->id)
+                ->first();
+
             $position = $student->pivot->club_position_id
                 ? $positions->find($student->pivot->club_position_id)
                 : null;
@@ -50,6 +55,8 @@ class PAJSKController extends Controller
                     ],
                 ],
                 'position_name' => $position ? $position->position_name : 'No Position',
+                'has_assessment' => !is_null($assessment),
+                'assessment_id' => $assessment?->id
             ];
         });
 
