@@ -24,12 +24,8 @@ class PAJSKController extends Controller
 {
     public function index() 
     {
-        $teacher = Teacher::with('club')->whereNotNull('club_id')->first();
-        if (!$teacher || !$teacher->club) {
-            abort(404, 'No club assigned. Please contact administrator.');
-        }
-
-        $club = Club::with('students.user')->find($teacher->club_id);
+        $teacher = Auth::user()->teacher;
+        $club = $teacher ? $teacher->club : null;
         $positions = ClubPosition::all();
         
         // Get paginated students from the club
@@ -45,6 +41,16 @@ class PAJSKController extends Controller
                 ? $positions->find($student->pivot->club_position_id)
                 : null;
 
+            // Determine club category index
+            $categoryIndex = null;
+            if (in_array($club->category, ['Sukan & Permainan', 'Sukan'])) {
+                $categoryIndex = 0;
+            } elseif (in_array($club->category, ['Kelab & Persatuan', 'Kelab & Permainan'])) {
+                $categoryIndex = 1;
+            } elseif ($club->category == 'Badan Beruniform') {
+                $categoryIndex = 2;
+            }
+
             return [    
                 'id' => $student->id,
                 'user' => [
@@ -55,7 +61,10 @@ class PAJSKController extends Controller
                     ],
                 ],
                 'position_name' => $position ? $position->position_name : 'No Position',
-                'has_assessment' => !is_null($assessment),
+                'has_assessment' => !is_null($assessment) && 
+                    $assessment->class_id === $student->classroom->id &&
+                    isset($assessment->total_scores[$categoryIndex]) && 
+                    $assessment->total_scores[$categoryIndex] > 0,
                 'assessment_id' => $assessment?->id
             ];
         });
@@ -790,6 +799,7 @@ class PAJSKController extends Controller
         $result = [
             // 'year'                      => $assessment->classroom->year,
             // 'class_name'                => $assessment->classroom->class_name,
+            'cgpaLast'                  => $cgpaLast,
             'student'                   => $student,
             'report'                    => $report,
             'totalScores'               => $assessment->total_scores ?? [],
