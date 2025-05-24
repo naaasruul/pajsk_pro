@@ -836,8 +836,20 @@ class PAJSKController extends Controller
     // Add this new private function near the bottom of the class
     private function getHighestScores($activities): array
     {
-        \Log::debug('Starting getHighestScores function with ' . count($activities) . ' activities');
+        Log::debug('Starting getHighestScores function with ' . count($activities) . ' activities');
         
+        if (count($activities) == 0) {
+            Log::debug('No activities found, returning null values');
+            return [
+                'highestPlacementScore' => null,
+                'highestAchievementScore' => null,
+                'highestPlacementId' => null,
+                'highestAchievementId' => null,
+                'highestAchievementActivityId' => null,
+                'highestPlacementActivityId' => null,
+            ];
+        }
+
         $highestPlacementScore = 0;
         $highestAchievementScore = 0;
         $highestPlacementId = null;
