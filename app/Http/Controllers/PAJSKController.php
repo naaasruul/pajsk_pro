@@ -917,16 +917,54 @@ class PAJSKController extends Controller
             }
         }
         
-        \Log::debug('Final highest placement score: ' . $highestPlacementScore . ' (ID: ' . $highestPlacementId . ', Activity ID: ' . $highestPlacementActivityId . ')');
-        \Log::debug('Final highest achievement score: ' . $highestAchievementScore . ' (ID: ' . $highestAchievementId . ', Activity ID: ' . $highestAchievementActivityId . ')');
+        Log::debug('Final highest placement score: ' . $highestPlacementScore . ' (ID: ' . $highestPlacementId . ', Activity ID: ' . $highestPlacementActivityId . ')');
+        Log::debug('Final highest achievement score: ' . $highestAchievementScore . ' (ID: ' . $highestAchievementId . ', Activity ID: ' . $highestAchievementActivityId . ')');
+
+        if ($highestAchievementId != null) {
+            $achievementData = Activity::where('id', $activity->id ?? null)->first();
+            Log::debug('Achievement data retrieved for ID: ' . $activity->id);
+            $represent = $achievementData ? $achievementData->represent : 'N/A';
+            $involvementName = ($achievementData && $achievementData->involvement) ? ($achievementData->involvement->description ?? 'N/A') : 'N/A';
+            $club = Club::find($activity->club_id ?? null);
+            $clubName = $club ? $club->club_name : 'N/A';
+            $achievement = Achievement::find($activity->achievement_id ?? null);
+            $achievementName = $achievement ? $achievement->achievement_name : 'N/A';
+            $placement = Placement::find($activity->placement_id ?? null);
+            $placementName = $placement ? $placement->name : 'N/A';
+            $achievementString = "{$represent} {$involvementName} {$clubName} Peringkat {$achievementName}";
+        } else {
+            $achievementString = "No achievement.";
+        };
+
+        if ($highestPlacementId != null) {
+            $placementData = Activity::where('id', $activity->id ?? null)->first();
+            Log::debug('Placement data retrieved for ID: ' . $activity->id);
+            $represent = $placementData ? $placementData->represent : 'N/A';
+            $involvementName = ($placementData && $placementData->involvement) ? ($placementData->involvement->description ?? 'N/A') : 'N/A';
+            $club = Club::find($activity->club_id ?? null);
+            $clubName = $club ? $club->club_name : 'N/A';
+            $achievement = Achievement::find($activity->achievement_id ?? null);
+            $achievementName = $achievement ? $achievement->achievement_name : 'N/A';
+            $placement = Placement::find($activity->placement_id ?? null);
+            $placementName = $placement ? $placement->name : 'N/A';
+            $placementString = "{$represent} {$involvementName} {$clubName}, {$placementName} Peringkat {$achievementName}";
+        } else {
+            $placementString = "No placement.";
+        }
+
+        Log::debug($placementString);
+        Log::debug($achievementString);
+
         
         return [
-            'highestPlacementScore'         => $highestPlacementScore,
-            'highestAchievementScore'       => $highestAchievementScore,
-            'highestPlacementId'            => $highestPlacementId,
-            'highestAchievementId'          => $highestAchievementId,
-            'highestAchievementActivityId'  => $highestAchievementActivityId,
-            'highestPlacementActivityId'    => $highestPlacementActivityId,
+            'highestPlacementScore'         => $highestPlacementScore ?? 0,
+            'highestAchievementScore'       => $highestAchievementScore ?? 0,
+            'highestPlacementId'            => $highestPlacementId ?? null,
+            'highestAchievementId'          => $highestAchievementId ?? null,
+            'highestAchievementActivityId'  => $highestAchievementActivityId ?? null,
+            'highestPlacementActivityId'    => $highestPlacementActivityId ?? null,
+            'achievementString'             => $achievementString,
+            'placementString'               => $placementString,
         ];
     }
 }
