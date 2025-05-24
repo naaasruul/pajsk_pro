@@ -33,10 +33,10 @@ class Student extends Model
     }
 
     // Remove or comment out the old relationship:
-//     public function activities()
-//     {
-//         return $this->belongsToMany(Activity::class, 'activity_student');
-//     }
+    public function activities()
+    {
+        return $this->belongsToMany(Activity::class, 'activity_student');
+    }
 
     // New accessor that returns activities using the JSON field in the activities table
     public function getActivitiesAttribute()
