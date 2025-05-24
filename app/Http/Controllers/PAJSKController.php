@@ -450,7 +450,7 @@ class PAJSKController extends Controller
                 $placement = Placement::find($evaluation->placement_ids[$i] ?? null);
                 $achievementName = $achievement ? $achievement->achievement_name : 'N/A';
                 $placementName = $placement ? $placement->placement_name : 'N/A';
-                return "{$represent} {$involvementName} {$clubName} Peringkat {$achievementName} {$activityData->id}";
+                return "{$represent} {$involvementName} {$clubName} Peringkat {$achievementName}";
             }, range(0, count($evaluation->club_ids) - 1)),
             'placement_strings' => array_map(function($p) use ($evaluation) {
                 $activityData = Activity::where('id', $evaluation->placements_activity_ids[$p] ?? null)->first();
@@ -462,7 +462,7 @@ class PAJSKController extends Controller
                 $achievementName = $achievement ? $achievement->achievement_name : 'N/A';
                 $placement = Placement::find($evaluation->placement_ids[$p] ?? null);
                 $placementName = $placement ? $placement->name : 'N/A';
-                return "{$represent} {$involvementName} {$clubName}, {$placementName} Peringkat {$achievementName} {$activityData->id}";
+                return "{$represent} {$involvementName} {$clubName}, {$placementName} Peringkat {$achievementName}";
             }, range(0, count($evaluation->club_ids) - 1)),
         ];
 
