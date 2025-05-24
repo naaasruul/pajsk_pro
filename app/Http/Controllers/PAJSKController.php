@@ -841,12 +841,14 @@ class PAJSKController extends Controller
         if (count($activities) == 0) {
             Log::debug('No activities found, returning null values');
             return [
-                'highestPlacementScore' => null,
-                'highestAchievementScore' => null,
-                'highestPlacementId' => null,
-                'highestAchievementId' => null,
-                'highestAchievementActivityId' => null,
-                'highestPlacementActivityId' => null,
+                'highestPlacementScore'         => null,
+                'highestAchievementScore'       => null,
+                'highestPlacementId'            => null,
+                'highestAchievementId'          => null,
+                'highestAchievementActivityId'  => null,
+                'highestPlacementActivityId'    => null,
+                'achievementString'             => 'No achievement.',
+                'placementString'               => 'No placement.',
             ];
         }
 
