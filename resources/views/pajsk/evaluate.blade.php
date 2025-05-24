@@ -328,11 +328,11 @@
                                 </p>
                                 <p class="flex justify-between">
                                     <span>Achievement Score:</span>
-                                    <span>{{ $highestAchievementScore }}/20</span>
+                                    <span>{{ $highestAchievementScore ?? 0 }}/20</span>
                                 </p>
                                 <p class="flex justify-between">
                                     <span>Placement Score:</span>
-                                    <span>{{ $highestPlacementScore }}/20</span>
+                                    <span>{{ $highestPlacementScore ?? 0 }}/20</span>
                                 </p>
                                 <p class="flex justify-between">
                                     <span>Commitment Score:</span>
