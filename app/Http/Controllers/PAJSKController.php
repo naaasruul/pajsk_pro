@@ -866,93 +866,77 @@ class PAJSKController extends Controller
         Log::debug('Initial values set: placement score = 0, achievement score = 0');
         
         foreach ($activities as $activity) {
-            Log::debug('Processing activity ID: ' . $activity->id);
-            
-            if (!$activity->achievement) {
-                Log::debug('Activity ' . $activity->id . ' has no achievement, skipping');
-                continue;
-            }
-            
-            $currentPlacementId = null;
-            $currentAchievementId = null;
-            $currentPlacementActivityId = null;
-            $currentAchievementActivityId = null;
+            Log::debug('Processing activity ID: ' . $activity->id . '=================================================================================================================');
+                        
             $currentPlacementScore = null;
             $currentAchievementScore = null;
             
+            // Process placement score
             if ($activity->placement_id) {
                 Log::debug('Activity ' . $activity->id . ' has placement_id: ' . $activity->placement_id);
                 $currentPlacementScore = $activity->achievement->placements()
                     ->where('placement_id', $activity->placement_id)
                     ->first()?->pivot->score ?? null;
-                $currentPlacementId = $activity->placement_id;
-                $currentPlacementActivityId = $activity->id;
-                Log::debug('Placement score: ' . $currentPlacementScore);
+                Log::debug('Placement score: ' . ($currentPlacementScore ?? 'null'));
+                
+                // Only update if we have a valid score and it's higher than current highest
+                if ($currentPlacementScore !== null && $currentPlacementScore > $highestPlacementScore) {
+                    Log::debug('New highest placement score found: ' . $currentPlacementScore . ' (previous: ' . $highestPlacementScore . ')');
+                    $highestPlacementScore = $currentPlacementScore;
+                    $highestPlacementId = $activity->placement_id;
+                    $highestPlacementActivityId = $activity->id;
+                }
+            } else {
+                Log::debug('Activity ' . $activity->id . ' has no placement_id');
             }
             
+            // Process achievement score
             if ($activity->achievement_id) {
                 Log::debug('Activity ' . $activity->id . ' has achievement_id: ' . $activity->achievement_id);
                 $currentAchievementScore = $activity->achievement->involvements()
-                ->where('achievement_id', $activity->achievement_id)
-                ->first()?->pivot->score ?? null;
-                $currentAchievementId = $activity->achievement_id;
-                $currentAchievementActivityId = $activity->id;
-                Log::debug('Achievement score: ' . $currentAchievementScore);
-            }
-            
-            if ($currentPlacementScore > $highestPlacementScore) {
-                Log::debug('New highest placement score found: ' . $currentPlacementScore . ' (previous: ' . $highestPlacementScore . ')');
-                $highestPlacementScore = $currentPlacementScore ?? 0;
-                $highestPlacementId = $currentPlacementId;
-                $highestPlacementActivityId = $currentPlacementActivityId;
-            } else {
-                $highestPlacementScore = $currentPlacementScore;
-                $highestPlacementId = $currentPlacementId;
-                $highestPlacementActivityId = $currentPlacementActivityId;
-            }
-            
-            if ($currentAchievementScore > $highestAchievementScore) {
-                Log::debug('New highest achievement score found: ' . $currentAchievementScore . ' (previous: ' . $highestAchievementScore . ')');
-                $highestAchievementScore = $currentAchievementScore ?? 0;
-                $highestAchievementId = $currentAchievementId;
-                $highestAchievementActivityId = $currentAchievementActivityId;
-            } else {
-                $highestAchievementScore = $currentAchievementScore;
-                $highestAchievementId = $currentAchievementId;
-                $highestAchievementActivityId = $currentAchievementActivityId;
+                    ->where('achievement_id', $activity->achievement_id)
+                    ->first()?->pivot->score ?? null;
+                Log::debug('Achievement score: ' . ($currentAchievementScore ?? 'null'));
                 
+                // Only update if we have a valid score and it's higher than current highest
+                if ($currentAchievementScore !== null && $currentAchievementScore > $highestAchievementScore) {
+                    Log::debug('New highest achievement score found: ' . $currentAchievementScore . ' (previous: ' . $highestAchievementScore . ')');
+                    $highestAchievementScore = $currentAchievementScore;
+                    $highestAchievementId = $activity->achievement_id;
+                    $highestAchievementActivityId = $activity->id;
+                }
             }
         }
         
         Log::debug('Final highest placement score: ' . $highestPlacementScore . ' (ID: ' . $highestPlacementId . ', Activity ID: ' . $highestPlacementActivityId . ')');
         Log::debug('Final highest achievement score: ' . $highestAchievementScore . ' (ID: ' . $highestAchievementId . ', Activity ID: ' . $highestAchievementActivityId . ')');
 
+        // Build achievement string
         if ($highestAchievementId != null) {
-            $achievementData = Activity::where('id', $activity->id ?? null)->first();
-            Log::debug('Achievement data retrieved for ID: ' . $activity->id);
+            $achievementData = Activity::where('id', $highestAchievementActivityId)->first();
+            Log::debug('Achievement data retrieved for ID: ' . $highestAchievementActivityId);
             $represent = $achievementData ? $achievementData->represent : 'N/A';
             $involvementName = ($achievementData && $achievementData->involvement) ? ($achievementData->involvement->description ?? 'N/A') : 'N/A';
-            $club = Club::find($activity->club_id ?? null);
+            $club = Club::find($achievementData->club_id ?? null);
             $clubName = $club ? $club->club_name : 'N/A';
-            $achievement = Achievement::find($activity->achievement_id ?? null);
+            $achievement = Achievement::find($highestAchievementId);
             $achievementName = $achievement ? $achievement->achievement_name : 'N/A';
-            $placement = Placement::find($activity->placement_id ?? null);
-            $placementName = $placement ? $placement->name : 'N/A';
             $achievementString = "{$represent} {$involvementName} {$clubName} Peringkat {$achievementName}";
         } else {
             $achievementString = "No achievement.";
-        };
+        }
 
+        // Build placement string
         if ($highestPlacementId != null) {
-            $placementData = Activity::where('id', $activity->id ?? null)->first();
-            Log::debug('Placement data retrieved for ID: ' . $activity->id);
+            $placementData = Activity::where('id', $highestPlacementActivityId)->first();
+            Log::debug('Placement data retrieved for ID: ' . $highestPlacementActivityId);
             $represent = $placementData ? $placementData->represent : 'N/A';
             $involvementName = ($placementData && $placementData->involvement) ? ($placementData->involvement->description ?? 'N/A') : 'N/A';
-            $club = Club::find($activity->club_id ?? null);
+            $club = Club::find($placementData->club_id ?? null);
             $clubName = $club ? $club->club_name : 'N/A';
-            $achievement = Achievement::find($activity->achievement_id ?? null);
+            $achievement = Achievement::find($placementData->achievement_id ?? null);
             $achievementName = $achievement ? $achievement->achievement_name : 'N/A';
-            $placement = Placement::find($activity->placement_id ?? null);
+            $placement = Placement::find($highestPlacementId);
             $placementName = $placement ? $placement->name : 'N/A';
             $placementString = "{$represent} {$involvementName} {$clubName}, {$placementName} Peringkat {$achievementName}";
         } else {
@@ -962,14 +946,13 @@ class PAJSKController extends Controller
         Log::debug($placementString);
         Log::debug($achievementString);
 
-        
         return [
-            'highestPlacementScore'         => $highestPlacementScore ?? 0,
-            'highestAchievementScore'       => $highestAchievementScore ?? 0,
-            'highestPlacementId'            => $highestPlacementId ?? null,
-            'highestAchievementId'          => $highestAchievementId ?? null,
-            'highestAchievementActivityId'  => $highestAchievementActivityId ?? null,
-            'highestPlacementActivityId'    => $highestPlacementActivityId ?? null,
+            'highestPlacementScore'         => $highestPlacementScore,
+            'highestAchievementScore'       => $highestAchievementScore,
+            'highestPlacementId'            => $highestPlacementId,
+            'highestAchievementId'          => $highestAchievementId,
+            'highestAchievementActivityId'  => $highestAchievementActivityId,
+            'highestPlacementActivityId'    => $highestPlacementActivityId,
             'achievementString'             => $achievementString,
             'placementString'               => $placementString,
         ];
