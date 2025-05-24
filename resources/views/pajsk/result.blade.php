@@ -12,27 +12,32 @@
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900 dark:text-gray-100">
                     @if(isset($totalScores) && empty($totalScores))
-                    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
-                        <strong class="font-bold">No Assessments!</strong>
-                        <span class="block sm:inline">One or more assessment categories have no data recorded yet.</span>
-                    </div>
+                        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
+                            <strong class="font-bold">No Assessments!</strong>
+                            <span class="block sm:inline">No club evaluations have been recorded yet.</span>
+                        </div>
                     @endif
 
                     @php
-                        $clubCount = count(isset($assessment) && isset($assessment->club_ids) ? $assessment->club_ids : []);
-                        $dataCount = count(isset($totalScores) ? $totalScores : []);
-                        $missingClubIds = array_slice(isset($assessment) && isset($assessment->club_ids) ? $assessment->club_ids : [], $dataCount);
-                        $missingClubNames = collect($missingClubIds)
-                          ->map(fn($id) => \App\Models\Club::find($id)?->club_name)
-                          ->filter()
-                          ->implode(', ');
+                        $allClubs = collect($assessment->club_ids ?? [])->map(function($id) {
+                            return \App\Models\Club::find($id)?->club_name;
+                        })->filter();
+                        
+                        $assessedClubs = collect($totalScores ?? [])->filter()->keys()
+                            ->map(fn($index) => $assessment->club_ids[$index])
+                            ->map(fn($id) => \App\Models\Club::find($id)?->club_name)
+                            ->filter();
+                        
+                        $pendingClubs = $allClubs->diff($assessedClubs);
+                        $completedCount = $assessedClubs->count();
+                        $totalCount = $allClubs->count();
                     @endphp
-                    @if($clubCount > $dataCount)
+                    
+                    @if($pendingClubs->isNotEmpty())
                         <div class="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded relative mb-4" role="alert">
-                             <strong class="font-bold">Incomplete Evaluation!</strong>
-                             <span class="block sm:inline">
-                                 {{ $clubCount - $dataCount }} club{{ ($clubCount - $dataCount) > 1 ? 's' : '' }} missing evaluation data:
-                                 {{ $missingClubNames }}.
+                             <strong class="font-bold">Evaluation Progress ({{ $completedCount }}/{{ $totalCount }}):</strong>
+                             <span class="block sm:inline mt-1">
+                                 Pending assessments for: {{ $pendingClubs->implode(', ') }}
                              </span>
                         </div>
                     @endif
@@ -286,8 +291,12 @@
                                 @endhasanyrole
                             @else
                                 @hasanyrole('admin|teacher')
+                                @php
+                                    $scoreCount = count(array_filter($totalScores ?? [], fn($score) => !is_null($score)));
+                                @endphp
                                 <a href="{{ route('pajsk.generate-report', ['student' => isset($student) ? $student : '', 'assessment' => isset($assessment) ? $assessment : '']) }}" 
-                                   class="inline-flex items-center px-4 py-2 bg-green-600 dark:bg-green-200 border border-transparent rounded-md font-semibold text-xs text-white dark:text-green-800 uppercase tracking-widest hover:bg-green-500 dark:hover:bg-green-300">
+                                   class="inline-flex items-center px-4 py-2 bg-green-600 dark:bg-green-200 border border-transparent rounded-md font-semibold text-xs text-white dark:text-green-800 uppercase tracking-widest hover:bg-green-500 dark:hover:bg-green-300 
+                                   {{ $scoreCount < 3 ? 'opacity-50 cursor-not-allowed pointer-events-none' : '' }}">
                                     Generate Report
                                 </a>
                                 @endhasanyrole
