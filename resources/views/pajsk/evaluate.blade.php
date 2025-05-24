@@ -39,8 +39,8 @@
                         positionScore: {{ $position ? $position->point : 0 }},
                         commitmentScore: parseFloat(localStorage.getItem('commitmentScore')) || 0,
                         serviceScore: parseFloat(localStorage.getItem('serviceScore')) || 0,
-                        achievementScore: {{ $highestAchievementScore }},
-                        placementScore: {{ $highestPlacementScore }},
+                        achievementScore: {{ $highestAchievementScore ? $highestAchievementScore : 0 }},
+                        placementScore: {{ $highestPlacementScore ? $highestPlacementScore : 0 }},
                         attendanceScores: {
                             @foreach($attendanceScores as $attendance)
                                 {{ $attendance->attendance_count }}: {{ $attendance->score }},
