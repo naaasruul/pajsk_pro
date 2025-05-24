@@ -19,6 +19,7 @@ use App\Models\ExtraCocuricullum;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
 
 class PAJSKController extends Controller
 {
@@ -423,10 +424,13 @@ class PAJSKController extends Controller
             // Added placement scores
             'placement' => [
                 'ids' => $evaluation->placement_ids,
-                'scores' => array_map(function($id) {
-                    $placement = Placement::find($id);
-                    return $placement ? ($placement->achievements()->first()->pivot->score ?? 0) : 0;
-                }, $evaluation->placement_ids ?? []),
+                'scores' => array_map(function($id, $achievementId) {
+                    if (!$id || !$achievementId) return 0;
+                    return DB::table('achievement_placement')
+                        ->where('placement_id', $id)
+                        ->where('achievement_id', $achievementId)
+                        ->value('score') ?? 0;
+                }, $evaluation->placement_ids ?? [], $evaluation->achievement_ids ?? []),
             ],
             // Added achievement scores
             'achievement' => [
@@ -446,7 +450,7 @@ class PAJSKController extends Controller
                 $placement = Placement::find($evaluation->placement_ids[$i] ?? null);
                 $achievementName = $achievement ? $achievement->achievement_name : 'N/A';
                 $placementName = $placement ? $placement->placement_name : 'N/A';
-                return "{$represent} {$involvementName} {$clubName} Peringkat {$achievementName}";
+                return "{$represent} {$involvementName} {$clubName} Peringkat {$achievementName} {$activityData->id}";
             }, range(0, count($evaluation->club_ids) - 1)),
             'placement_strings' => array_map(function($p) use ($evaluation) {
                 $activityData = Activity::where('id', $evaluation->placements_activity_ids[$p] ?? null)->first();
@@ -458,7 +462,7 @@ class PAJSKController extends Controller
                 $achievementName = $achievement ? $achievement->achievement_name : 'N/A';
                 $placement = Placement::find($evaluation->placement_ids[$p] ?? null);
                 $placementName = $placement ? $placement->name : 'N/A';
-                return "{$represent} {$involvementName} {$clubName}, {$placementName} Peringkat {$achievementName}";
+                return "{$represent} {$involvementName} {$clubName}, {$placementName} Peringkat {$achievementName} {$activityData->id}";
             }, range(0, count($evaluation->club_ids) - 1)),
         ];
 
