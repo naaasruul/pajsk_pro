@@ -41,10 +41,7 @@ class OldDataSeeder extends Seeder
         $teachers = Teacher::all();
         $clubs = Club::all();
         $students = Student::all();
-        // // Retrieve a seeded activity to use its involvement_id and placement_id
-        // $seededActivity = Activity::inRandomOrder()->first();
-        // $involvementIdFromActivity = $seededActivity ? $seededActivity->involvement_id : null;
-        // $placementIdFromActivity   = $seededActivity ? $seededActivity->placement_id : null;
+        
         // Get available service contribution ids (as string values)
         $serviceContributions = ServiceContribution::all();
         $serviceIdsAvailable = $serviceContributions->pluck('id')->map(fn($id) => (string)$id)->toArray();
@@ -53,17 +50,18 @@ class OldDataSeeder extends Seeder
         // Get available commitment ids (as strings)
         $commitmentIdsPool = Commitment::pluck('id')->map(fn($id) => (string)$id)->toArray();
         
-        // Helper function to ensure an array $n has exactly $n elements.
-        $ensureLength = function(array $arr, int $n) {
-            if(count($arr) < $n) {
-                // pad by repeating random elements
-                while(count($arr) < $n) {
-                    $arr[] = $arr[array_rand($arr)];
-                }
-            } elseif(count($arr) > $n) {
-                $arr = array_slice($arr, 0, $n);
+        // Helper function to get club category index
+        $getCategoryIndex = function($category) {
+            switch ($category) {
+                case 'Sukan & Permainan':
+                    return 0;
+                case 'Kelab & Persatuan':
+                    return 1;
+                case 'Badan Beruniform':
+                    return 2;
+                default:
+                    return null;
             }
-            return $arr;
         };
 
         // Also seed extra cocuricullum data for each student
@@ -90,24 +88,13 @@ class OldDataSeeder extends Seeder
                 ]
             );
         }
-        // // Attach seeded activity to each student if not already attached
-        // if ($seededActivity) {
-        //     foreach ($students as $student) {
-        //         if (!$student->activities()->where('activity_id', $seededActivity->id)->exists()) {
-        //             $student->activities()->attach($seededActivity->id);
-        //         }
-        //     }
-        // }
 
         // Loop through each student to create pajsk_assessments data.
         foreach ($students as $student) {
             $studentClass = Classroom::find($student->class_id);
             $maxYear = $studentClass->year;
-            // Get student's clubs (as IDs)
-            $studentClubIds = $ensureLength($student->clubs->pluck('id')->toArray(), 3);
             
             // For each unique classroom year (1 .. current year), create one assessment.
-            // Loop over each unique classroom year so that a student has one assessment per year.
             for ($year = 1; $year <= $maxYear; $year++) {
                 if ($year < $maxYear) {
                     $classroom = Classroom::where('year', $year)->inRandomOrder()->first();
@@ -116,171 +103,148 @@ class OldDataSeeder extends Seeder
                     $class_id = $student->classroom->id;
                 }
                 
-                // Determine random item quantity (0-3) for each evaluation array
-                // $n = rand(0, 3);
-                // DEBUG: Force n to always be 3 for testing
+                // Initialize arrays with 3 elements (for 3 categories)
                 $n = 3;
-
-                // Select $n distinct teacher IDs.
-                $teacherArr = $teachers->pluck('id')->toArray();
-                shuffle($teacherArr);
-                $teacherIds = array_slice($teacherArr, 0, $n);
                 
-                // Select $n distinct service contribution IDs (as strings).
-                $serviceContribArr = $serviceContributions->pluck('id')->map(fn($id) => (string)$id)->toArray();
-                shuffle($serviceContribArr);
-                $serviceContribIds = array_slice($serviceContribArr, 0, $n);
-                
-                // Select $n distinct attendance IDs.
-                $attendanceArr = $attendanceIdsPool;
-                shuffle($attendanceArr);
-                $attendanceIds = array_slice($attendanceArr, 0, $n);
-                
-                // Select $n distinct club position IDs.
-                $positionArr = ClubPosition::all()->pluck('id')->toArray();
-                shuffle($positionArr);
-                $studentClubPositions = array_slice($positionArr, 0, $n);
-                
-                // Use distinct service IDs same as service contribution IDs.
-                $serviceIds = $serviceContribIds;
-
-                // For commitments, build a 2D array with $n nested arrays, each with 4 random commitment ids.
-                $commitmentIds = [];
-                for ($j = 0; $j < $n; $j++) {
-                    $commitmentIds[] = (array) array_rand(array_flip($commitmentIdsPool), 4);
-                }
-
-                // For each student, get random activities with achievements
-                $activities = $student->activities()
-                    ->with(['achievement.involvements', 'achievement.placements'])
-                    ->get()
-                    ->filter(fn($act) => $act->achievement)
-                    ->values();
-
-                // Get activities for each club where student is a participant
-                $studentActivities = Activity::whereRaw('JSON_CONTAINS(activity_students_id, ?)', ['"'.$student->id.'"'])
-                    ->whereHas('achievement')
-                    ->with(['achievement.involvements', 'achievement.placements', 'club'])
-                    ->get();
-
-                // Get student's clubs grouped by category
-                $clubsByCategory = [
-                    'Sukan' => $student->clubs->where('category', 'like', '%Sukan%')->first()?->id,
-                    'Kelab' => $student->clubs->where('category', 'like', '%Kelab%')->first()?->id,
-                    'Badan' => $student->clubs->whereIn('category', ['Badan Beruniform'])->first()?->id,
-                ];
-
-                // Order student's clubs by category type [Kelab, Sukan, Badan]
-                $orderedClubIds = [null, null, null];
-                foreach ($student->clubs as $club) {
-                    if (in_array($club->category, ['Sukan & Permainan'])) {
-                        $orderedClubIds[0] = $club->id; // Sukan first
-                    } elseif (in_array($club->category, ['Kelab & Persatuan'])) {
-                        $orderedClubIds[1] = $club->id; // Kelab second
-                    } elseif ($club->category === 'Badan Beruniform') {
-                        $orderedClubIds[2] = $club->id; // Badan third
-                    }
-                }
-
-                // Filter out nulls and ensure exactly 3 elements
-                $studentClubIds = array_values(array_filter($orderedClubIds));
-                $studentClubIds = $ensureLength($studentClubIds, 3);
-
-                // Initialize arrays matching club order
+                // Initialize all arrays with nulls for proper indexing
+                $studentClubIds = array_fill(0, 3, null);
+                $teacherIds = array_fill(0, 3, null);
+                $serviceContribIds = array_fill(0, 3, null);
+                $attendanceIds = array_fill(0, 3, null);
+                $studentClubPositions = array_fill(0, 3, null);
+                $serviceIds = array_fill(0, 3, null);
+                $commitmentIds = array_fill(0, 3, []);
                 $achievementIds = array_fill(0, 3, null);
                 $achievementActivityIds = array_fill(0, 3, null);
                 $placementIds = array_fill(0, 3, null);
                 $placementActivityIds = array_fill(0, 3, null);
+                $totals = array_fill(0, 3, 0);
+                $percents = array_fill(0, 3, 0);
 
-                // Get all relevant activities for student and these specific clubs
-                $relevantActivities = Activity::whereIn('club_id', $studentClubIds)
-                    ->whereRaw('JSON_CONTAINS(activity_students_id, ?)', ['"'.$student->id.'"'])
-                    ->whereHas('achievement')
-                    ->with(['achievement.placements'])
-                    ->get()
-                    ->groupBy('club_id');
-
-                // Match activities to club positions
-                foreach ($studentClubIds as $index => $clubId) {
-                    $clubActivities = $relevantActivities->get($clubId, collect());
-                    
-                    if ($clubActivities->isNotEmpty()) {
-                        // Get best activity for this club
-                        $bestActivity = $clubActivities->sortByDesc(function($activity) {
-                            return $activity->achievement->placements->sum('pivot.score');
-                        })->first();
-
-                        if ($bestActivity && $bestActivity->achievement) {
-                            $achievementIds[$index] = $bestActivity->achievement->id;
-                            $achievementActivityIds[$index] = $bestActivity->id;
-
-                            if ($bestActivity->achievement->placements->isNotEmpty()) {
-                                $placementIds[$index] = $bestActivity->achievement->placements->first()->id;
-                                $placementActivityIds[$index] = $bestActivity->id;
-                            }
-                        }
+                // Map student's clubs to correct category indices
+                foreach ($student->clubs as $club) {
+                    $categoryIndex = $getCategoryIndex($club->category);
+                    if ($categoryIndex !== null) {
+                        $studentClubIds[$categoryIndex] = $club->id;
                     }
                 }
 
-                // If no activities found for a club, use null values
-                while (count($achievementIds) < count($studentClubIds)) {
-                    $achievementIds[] = null;
-                    $achievementActivityIds[] = null;
-                    $placementIds[] = null;
-                    $placementActivityIds[] = null;
-                }
+                // Prepare pools for random selection
+                $teacherArr = $teachers->pluck('id')->toArray();
+                $serviceContribArr = $serviceContributions->pluck('id')->map(fn($id) => (string)$id)->toArray();
+                $attendanceArr = $attendanceIdsPool;
+                $positionArr = ClubPosition::all()->pluck('id')->toArray();
 
-                // No need to pad arrays - we want exact matches with clubs
-
-                // Initialize arrays with correct sizes and null values
-                $totals = array_fill(0, $n, 0);
-                $percents = array_fill(0, $n, 0);
-
-                for ($k = 0; $k < $n; $k++) {
-                    // Basic scores init
-                    $attScore = Attendance::find($attendanceIds[$k])?->score ?? rand(30, 40);
-                    $posScore = ClubPosition::find($studentClubPositions[$k])?->point ?? rand(1, 10);
-                    $involScore = 0;
-                    $placeScore = 0;
-                    
-                    // Handle activity data for this index if available
-                    if ($activities->isNotEmpty()) {
-                        $activityForOrg = $activities->random();
+                // Fill arrays at each index where we have a club
+                for ($i = 0; $i < 3; $i++) {
+                    if ($studentClubIds[$i] !== null) {
+                        // Assign random values for this category index
+                        $teacherIds[$i] = $teacherArr[array_rand($teacherArr)];
+                        $serviceContribIds[$i] = $serviceContribArr[array_rand($serviceContribArr)];
+                        $serviceIds[$i] = $serviceContribIds[$i]; // Same as service contribution
+                        $attendanceIds[$i] = $attendanceArr[array_rand($attendanceArr)];
+                        $studentClubPositions[$i] = $positionArr[array_rand($positionArr)];
                         
-                        // Achievement handling
-                        if ($activityForOrg->achievement) {
-                            $achievementIds[$k] = $activityForOrg->achievement->id;
-                            $achievementActivityIds[$k] = $activityForOrg->id;
+                        // Generate 4 random commitment IDs for this index
+                        $randomCommitments = [];
+                        for ($j = 0; $j < 4; $j++) {
+                            $randomCommitments[] = $commitmentIdsPool[array_rand($commitmentIdsPool)];
+                        }
+                        $commitmentIds[$i] = $randomCommitments;
+                    }
+                }
+
+                // Get activities for clubs stored in studentClubIds array
+                for ($i = 0; $i < 3; $i++) {
+                    if ($studentClubIds[$i] !== null) {
+                        // First try to get activity for the specific club where student participates
+                        $activity = Activity::where('club_id', $studentClubIds[$i])
+                            ->whereRaw('JSON_CONTAINS(activity_students_id, ?)', ['"'.$student->id.'"'])
+                            ->with(['achievement', 'achievement.involvements', 'achievement.placements'])
+                            ->orderBy('id', 'desc')
+                            ->first();
+
+                        // If no activity found with student participation, get any activity from the club
+                        if (!$activity) {
+                            $activity = Activity::where('club_id', $studentClubIds[$i])
+                                ->with(['achievement', 'achievement.involvements', 'achievement.placements'])
+                                ->orderBy('id', 'desc')
+                                ->first();
+                        }
+
+                        // If still no activity, create a fallback or use any available activity
+                        if (!$activity) {
+                            $activity = Activity::with(['achievement', 'achievement.involvements', 'achievement.placements'])
+                                ->inRandomOrder()
+                                ->first();
+                        }
+
+                        if ($activity) {
+                            // Store activity at the same index as the club
+                            $achievementActivityIds[$i] = $activity->id;
                             
-                            // Get involvement score
-                            $involvement = $activityForOrg->achievement->involvements->first();
-                            $involScore = $involvement ? ($involvement->pivot->score ?? 0) : 0;
+                            // Handle achievement if exists
+                            if ($activity->achievement) {
+                                $achievementIds[$i] = $activity->achievement->id;
+                                
+                                // Handle placements
+                                if ($activity->achievement->placements && $activity->achievement->placements->isNotEmpty()) {
+                                    $placementIds[$i] = $activity->achievement->placements->first()->id;
+                                    $placementActivityIds[$i] = $activity->id;
+                                }
+                            }
                             
-                            // Get placement score
-                            $placement = $activityForOrg->achievement->placements->first();
-                            if ($placement) {
-                                $placementIds[$k] = $placement->id;
-                                $placementActivityIds[$k] = $activityForOrg->id;
-                                $placeScore = $placement->pivot->score ?? 0;
+                            // Ensure student is attached to this activity
+                            if (!$student->activities()->where('activity_id', $activity->id)->exists()) {
+                                $student->activities()->attach($activity->id);
                             }
                         }
                     }
-
-                    // Calculate commitment scores
-                    $commScore = isset($commitmentIds[$k]) ? array_sum(array_map(function($cid) {
-                        return Commitment::find($cid)?->score ?? rand(1, 4);
-                    }, $commitmentIds[$k])) : 0;
-                    
-                    // Service score
-                    $servScore = isset($serviceContribIds[$k]) ? 
-                        (ServiceContribution::find($serviceContribIds[$k])?->score ?? rand(5, 10)) : 0;
-                    
-                    // Calculate total and percentage
-                    $totals[$k] = $attScore + $posScore + $involScore + $commScore + $servScore + $placeScore;
-                    $percents[$k] = round(($totals[$k] / 110) * 100, 2);
                 }
 
-                // Create assessment with filled arrays
+                // Calculate scores for each category index
+                for ($k = 0; $k < 3; $k++) {
+                    if ($studentClubIds[$k] !== null) {
+                        // Basic scores
+                        $attScore = $attendanceIds[$k] ? (Attendance::find($attendanceIds[$k])?->score ?? rand(30, 40)) : 0;
+                        $posScore = $studentClubPositions[$k] ? (ClubPosition::find($studentClubPositions[$k])?->point ?? rand(1, 10)) : 0;
+                        $involScore = 0;
+                        $placeScore = 0;
+                        
+                        // Achievement involvement score
+                        if ($achievementIds[$k] && $achievementActivityIds[$k]) {
+                            $activity = Activity::find($achievementActivityIds[$k]);
+                            if ($activity && $activity->achievement) {
+                                $involvement = $activity->achievement->involvements->first();
+                                $involScore = $involvement ? ($involvement->pivot->score ?? 0) : 0;
+                            }
+                        }
+                        
+                        // Placement score
+                        if ($placementIds[$k]) {
+                            $placement = \App\Models\Placement::find($placementIds[$k]);
+                            $placeScore = $placement ? ($placement->pivot->score ?? 0) : 0;
+                        }
+
+                        // Commitment scores
+                        $commScore = 0;
+                        if (!empty($commitmentIds[$k])) {
+                            foreach ($commitmentIds[$k] as $cid) {
+                                $commScore += Commitment::find($cid)?->score ?? rand(1, 4);
+                            }
+                        }
+                        
+                        // Service score
+                        $servScore = $serviceContribIds[$k] ? 
+                            (ServiceContribution::find($serviceContribIds[$k])?->score ?? rand(5, 10)) : 0;
+                        
+                        // Calculate total and percentage
+                        $totals[$k] = $attScore + $posScore + $involScore + $commScore + $servScore + $placeScore;
+                        $percents[$k] = round(($totals[$k] / 110) * 100, 2);
+                    }
+                }
+
+                // Create assessment with category-indexed arrays
                 PajskAssessment::create([
                     'student_id' => $student->id,
                     'class_id' => $class_id,
