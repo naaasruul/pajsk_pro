@@ -17,7 +17,9 @@ use App\Models\Services;
 use App\Models\SpecialAward;
 use App\Models\CommunityServices;
 use App\Models\Nilam;
+use App\Models\Placement;
 use App\Models\TimmsAndPisa;
+use Log;
 use Illuminate\Support\Facades\DB;
 
 class OldDataSeeder extends Seeder
@@ -103,8 +105,8 @@ class OldDataSeeder extends Seeder
                     $class_id = $student->classroom->id;
                 }
                 
-                // Initialize arrays with 3 elements (for 3 categories)
-                $n = 3;
+                // // Initialize arrays with 3 elements (for 3 categories)
+                // $n = rand(1, 3); // Randomly choose how many categories to fill (1 to 3)
                 
                 // Initialize all arrays with nulls for proper indexing
                 $studentClubIds = array_fill(0, 3, null);
@@ -221,9 +223,20 @@ class OldDataSeeder extends Seeder
                         }
                         
                         // Placement score
-                        if ($placementIds[$k]) {
-                            $placement = \App\Models\Placement::find($placementIds[$k]);
-                            $placeScore = $placement ? ($placement->pivot->score ?? 0) : 0;
+                        if ($placementIds[$k] && $achievementIds[$k]) {
+                            // Get activity and its achievement
+                            $activity = Activity::find($achievementActivityIds[$k]);
+                            if ($activity && $activity->achievement) {
+                                // Get placement score from pivot table
+                                $placeScore = DB::table('achievement_placement')
+                                    ->where([
+                                        'placement_id' => $placementIds[$k],
+                                        'achievement_id' => $activity->achievement->id
+                                    ])
+                                    ->value('score') ?? 0;
+
+                                Log::debug("Placement score for activity {$activity->id}, placement {$placementIds[$k]}, achievement {$activity->achievement->id}: {$placeScore}");
+                            }
                         }
 
                         // Commitment scores
