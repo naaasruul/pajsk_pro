@@ -84,7 +84,7 @@ class PAJSKController extends Controller
         $student->load(['clubs']);
         $teacher = Auth::user()->teacher;
         $teacherClub = $teacher->club;
-        \Log::info('Teacher Club:', [
+        Log::info('Teacher Club:', [
             'teacher_id' => $teacher->id,
             'club_id' => $teacherClub->id,
         ]);
@@ -857,13 +857,13 @@ class PAJSKController extends Controller
         $highestAchievementId = null;
         $highestAchievementActivityId = null;
         
-        \Log::debug('Initial values set: placement score = 0, achievement score = 0');
+        Log::debug('Initial values set: placement score = 0, achievement score = 0');
         
         foreach ($activities as $activity) {
-            \Log::debug('Processing activity ID: ' . $activity->id);
+            Log::debug('Processing activity ID: ' . $activity->id);
             
             if (!$activity->achievement) {
-                \Log::debug('Activity ' . $activity->id . ' has no achievement, skipping');
+                Log::debug('Activity ' . $activity->id . ' has no achievement, skipping');
                 continue;
             }
             
@@ -875,28 +875,28 @@ class PAJSKController extends Controller
             $currentAchievementScore = null;
             
             if ($activity->placement_id) {
-                \Log::debug('Activity ' . $activity->id . ' has placement_id: ' . $activity->placement_id);
+                Log::debug('Activity ' . $activity->id . ' has placement_id: ' . $activity->placement_id);
                 $currentPlacementScore = $activity->achievement->placements()
                     ->where('placement_id', $activity->placement_id)
-                    ->first()?->pivot->score ?? 0;
+                    ->first()?->pivot->score ?? null;
                 $currentPlacementId = $activity->placement_id;
                 $currentPlacementActivityId = $activity->id;
-                \Log::debug('Placement score: ' . $currentPlacementScore);
+                Log::debug('Placement score: ' . $currentPlacementScore);
             }
             
             if ($activity->achievement_id) {
-                \Log::debug('Activity ' . $activity->id . ' has achievement_id: ' . $activity->achievement_id);
+                Log::debug('Activity ' . $activity->id . ' has achievement_id: ' . $activity->achievement_id);
                 $currentAchievementScore = $activity->achievement->involvements()
                 ->where('achievement_id', $activity->achievement_id)
-                ->first()?->pivot->score ?? 0;
+                ->first()?->pivot->score ?? null;
                 $currentAchievementId = $activity->achievement_id;
                 $currentAchievementActivityId = $activity->id;
-                \Log::debug('Achievement score: ' . $currentAchievementScore);
+                Log::debug('Achievement score: ' . $currentAchievementScore);
             }
             
             if ($currentPlacementScore > $highestPlacementScore) {
                 Log::debug('New highest placement score found: ' . $currentPlacementScore . ' (previous: ' . $highestPlacementScore . ')');
-                $highestPlacementScore = $currentPlacementScore;
+                $highestPlacementScore = $currentPlacementScore ?? 0;
                 $highestPlacementId = $currentPlacementId;
                 $highestPlacementActivityId = $currentPlacementActivityId;
             } else {
@@ -907,13 +907,14 @@ class PAJSKController extends Controller
             
             if ($currentAchievementScore > $highestAchievementScore) {
                 Log::debug('New highest achievement score found: ' . $currentAchievementScore . ' (previous: ' . $highestAchievementScore . ')');
-                $highestAchievementScore = $currentAchievementScore;
+                $highestAchievementScore = $currentAchievementScore ?? 0;
                 $highestAchievementId = $currentAchievementId;
                 $highestAchievementActivityId = $currentAchievementActivityId;
             } else {
                 $highestAchievementScore = $currentAchievementScore;
                 $highestAchievementId = $currentAchievementId;
                 $highestAchievementActivityId = $currentAchievementActivityId;
+                
             }
         }
         
