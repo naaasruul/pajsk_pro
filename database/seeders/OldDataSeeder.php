@@ -78,6 +78,8 @@ class OldDataSeeder extends Seeder
                 + ($communityService->point ?? 0)
                 + ($nilam->point ?? 0)
                 + ($timmsPisa->point ?? 0);
+                
+            $totalPoint = min($totalPoint, 10);
             ExtraCocuricullum::updateOrCreate(
                 ['student_id' => $student->id, 'class_id' => $student->class_id],
                 [

@@ -105,7 +105,8 @@ class ExtraCocuriculumController extends Controller
         Log::info('nilamPoint = '.$nilamPoint);
         Log::info('timmsAndPisaPoint = '.$timmsAndPisaPoint);
         $totalPoint = $servicePoint + $specialAwardPoint + $communityServicePoint + $nilamPoint + $timmsAndPisaPoint;
-
+        $totalPoint = min($totalPoint, 10);
+        
         $student = Student::find($studentId);
         // Create the ExtraCocuricullum record
         ExtraCocuricullum::create([
