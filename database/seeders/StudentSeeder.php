@@ -16,11 +16,11 @@ class StudentSeeder extends Seeder
     {
         // Retrieve all classrooms from the database
         $classrooms = Classroom::all();
-        $yearsix = Classroom::where('year', 6)->get();
+        $yearsix = Classroom::where('year', 1)->get();
 
-        // Create 50 students with users
+        // Create 10 students with users
         $students = collect();
-        for ($i = 1; $i <= 50; $i++) {
+        for ($i = 1; $i <= 10; $i++) {
 
             $user = User::create([
                 'name' => fake()->unique()->name(),
@@ -43,6 +43,6 @@ class StudentSeeder extends Seeder
             // $this->command->info($students);
         }
 
-        $this->command->info('Created 50 students for testing');
+        $this->command->info('Created 10 students for testing');
     }
 }
