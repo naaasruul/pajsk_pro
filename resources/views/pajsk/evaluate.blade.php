@@ -35,7 +35,7 @@
                         selectedCommitments: JSON.parse(localStorage.getItem('selectedCommitments') || '[]'),
                         maxCommitments: 4,
                         attendanceDays: parseInt(localStorage.getItem('attendanceDays')) || 1,
-                        attendanceScore: 0,
+                        attendanceScore: 3,
                         positionScore: {{ $position ? $position->point : 0 }},
                         commitmentScore: parseFloat(localStorage.getItem('commitmentScore')) || 0,
                         serviceScore: parseFloat(localStorage.getItem('serviceScore')) || 0,
@@ -48,10 +48,10 @@
                         },
                         selectedAttendanceId: localStorage.getItem('selectedAttendanceId') || null,
                         selectedPositionId: localStorage.getItem('selectedPositionId') || {{ $position ? $position->id : 'null' }},
-                        selectedAchievementId: localStorage.getItem('selectedAchievementId') || {{ $highestAchievementId }},  
-                        selectedAchievementActivityId: localStorage.getItem('selectedAchievementActivityId') || {{ $highestAchievementActivityId }},  
-                        selectedPlacementId: localStorage.getItem('selectedPlacementId') || {{ $highestPlacementId }},
-                        selectedPlacementActivityId: localStorage.getItem('selectedPlacementActivityId') || {{ $highestPlacementActivityId }},
+                        selectedAchievementId: localStorage.getItem('selectedAchievementId') || {{ $highestAchievementId ?? 'null' }},  
+                        selectedAchievementActivityId: localStorage.getItem('selectedAchievementActivityId') || {{ $highestAchievementActivityId ?? 'null' }},  
+                        selectedPlacementId: localStorage.getItem('selectedPlacementId') || {{ $highestPlacementId ?? 'null' }},
+                        selectedPlacementActivityId: localStorage.getItem('selectedPlacementActivityId') || {{ $highestPlacementActivityId ?? 'null' }},
                         selectedCommitmentIds: JSON.parse(localStorage.getItem('selectedCommitmentIds') || '[]'),
                         selectedServiceId: localStorage.getItem('selectedServiceId') || null,
                         
@@ -76,13 +76,12 @@
                            return ((this.calculateTotal() / 110) * 100).toFixed(2);
                         },
                         initializeForm() {
-                            // Initialize hidden inputs with current selection values
                             this.$refs.attendanceIdInput.value = this.selectedAttendanceId ?? 1;
-                            this.$refs.positionIdInput.value = this.selectedPositionId;
-                            this.$refs.achievementIdInput.value = this.selectedAchievementId;
-                            this.$refs.achievementActivityIdInput.value = this.selectedAchievementActivityId;
-                            this.$refs.placementIdInput.value = this.selectedPlacementId;
-                            this.$refs.placementActivityIdInput.value = this.selectedPlacementActivityId;
+                            this.$refs.positionIdInput.value = this.selectedPositionId ?? null;
+                            this.$refs.achievementIdInput.value = this.selectedAchievementId || null;
+                            this.$refs.achievementActivityIdInput.value = this.selectedAchievementActivityId || null;
+                            this.$refs.placementIdInput.value = this.selectedPlacementId || null;
+                            this.$refs.placementActivityIdInput.value = this.selectedPlacementActivityId || null;
                             this.$refs.commitmentIdsInput.value = JSON.stringify(this.selectedCommitmentIds);
                             this.$refs.serviceIdInput.value = this.selectedServiceId;
                         },
@@ -102,6 +101,7 @@
                             localStorage.setItem('selectedServiceId', serviceId);
                         },
                         resetStorage() {
+                            // Clear localStorage
                             localStorage.removeItem('attendanceDays');
                             localStorage.removeItem('selectedCommitments');
                             localStorage.removeItem('commitmentScore');
@@ -114,15 +114,28 @@
                             localStorage.removeItem('selectedPlacementActivityId');
                             localStorage.removeItem('selectedCommitmentIds');
                             localStorage.removeItem('selectedServiceId');
+
+                            // Reset state variables
+                            this.selectedAttendanceId = null;
+                            this.selectedPositionId = {{ $position ? $position->id : 'null' }};
+                            this.selectedAchievementId = {{ $highestAchievementId ?? 'null' }};
+                            this.selectedAchievementActivityId = {{ $highestAchievementActivityId ?? 'null' }};
+                            this.selectedPlacementId = {{ $highestPlacementId ?? 'null' }};
+                            this.selectedPlacementActivityId = {{ $highestPlacementActivityId ?? 'null' }};
+                            this.selectedCommitmentIds = [];
+                            this.selectedServiceId = null;
+
+                            // Initialize form with reset values
+                            window.location.reload();
                         }
                     }" 
                     x-init="$nextTick(() => {
-                        if ($refs.attendanceSlider) {
-                             $refs.attendanceSlider.value = attendanceDays;
-                             $refs.attendanceInput.value = attendanceDays;
-                             attendanceScore = calculateAttendanceScore(attendanceDays);
-                        }
                         initializeForm();
+                        if ($refs.attendanceSlider) {
+                            $refs.attendanceSlider.value = attendanceDays;
+                            $refs.attendanceInput.value = attendanceDays;
+                            attendanceScore = calculateAttendanceScore(attendanceDays);
+                        }
                     })">
                         @csrf
 
@@ -200,17 +213,11 @@
                         <div class="space-y-2 mb-6">
                             <h4 class="text-lg font-medium mb-4 border-b pb-2">Involvement Stage [{{ $highestAchievementScore }} Marks]</h4>
                             <div class="space-y-2">
-                                @forelse($involvementActivities as $activity)
-                                    @if(isset($activity->involvement))
-                                        <div class="flex justify-between p-2 bg-gray-100 rounded dark:bg-gray-600">
-                                            <span>
-                                                {{ $activity->represent }} {{ $activity->involvement->description }} in {{ $activity->club->club_name ?? 'N/A' }}, Peringkat {{ $activity->achievement->achievement_name ?? 'N/A' }}
-                                            </span>
-                                        </div>
-                                    @endif
-                                @empty
-                                    <p class="text-gray-500">No activities recorded</p>
-                                @endforelse
+                                <div class="flex justify-between p-2 bg-gray-100 rounded dark:bg-gray-600">
+                                    <span>
+                                        {{ $achievementString }}
+                                    </span>
+                                </div>
                             </div>
                         </div>
 
@@ -222,20 +229,11 @@
                         <div class="space-y-2 mb-6">
                             <h4 class="text-lg font-medium mb-4 border-b pb-2">Placement Stage [{{ $highestPlacementScore }} Marks]</h4>
                             <div class="space-y-2">
-                                @forelse($placementActivities as $activity)
-                                    <div class="flex justify-between p-2 bg-gray-100 rounded dark:bg-gray-600">
-                                        <span>
-                                            {{ $activity->represent }} {{ $activity->involvement->description ?? '' }} in {{ $activity->club->club_name ?? 'N/A' }},
-                                            @if(isset($activity->placement))
-                                                {{ $activity->placement->name }} Peringkat {{ $activity->achievement->achievement_name ?? 'N/A' }}
-                                            @else
-                                                No Placement
-                                            @endif
-                                        </span>
-                                    </div>
-                                @empty
-                                    <p class="text-gray-500">No activities recorded</p>
-                                @endforelse
+                                <div class="flex justify-between p-2 bg-gray-100 rounded dark:bg-gray-600">
+                                    <span>
+                                            {{ $placementString }}
+                                    </span>
+                                </div>
                             </div>
                         </div>
 
