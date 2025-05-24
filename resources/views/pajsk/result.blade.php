@@ -202,13 +202,11 @@
                                                 <span class="text-lg">{{ $scores['achievement']['scores'][$index] ?? 'N/A' }}/20</span>
                                             </div>
                                             <div class="text-sm text-gray-600 dark:text-gray-300">
-                                                @foreach(range(0, count($assessment->club_ids) - 1) as $i)
-                                                    @if(!is_null($achievement_ids[$i]))
-                                                            <div class="text-sm text-gray-500 dark:text-gray-400">
-                                                                <p>{{ $scores['achievement_strings'][$i] }}</p>
-                                                            </div>
-                                                    @endif
-                                                @endforeach
+                                                @if(!is_null($achievement_ids[$index]))
+                                                        <div class="text-sm text-gray-500 dark:text-gray-400">
+                                                            <p>{{ $scores['achievement_strings'][$index] }}</p>
+                                                        </div>
+                                                @endif
                                             </div>
                                         </div>
                                         <!-- Placement Section -->
@@ -218,15 +216,15 @@
                                                 <span class="text-lg">{{ $scores['placement']['scores'][$index] ?? 'N/A' }}/20</span>
                                             </div>
                                             <div class="text-sm text-gray-600 dark:text-gray-300">
-                                                @foreach(range(0, count($assessment->club_ids) - 1) as $p)
-                                                    @if(!is_null($placement_ids[$p]))
+                                                @if(!is_null($placement_ids[$index]))
+                                                    <div class="text-sm text-gray-500 dark:text-gray-400">
                                                         <div class="text-sm text-gray-500 dark:text-gray-400">
-                                                            <div class="text-sm text-gray-500 dark:text-gray-400">
-                                                                <p>{{ $scores['placement_strings'][$p] }}</p>
-                                                            </div>
+                                                            <p>
+                                                                {{ $scores['placement_strings'][$index] }} 
+                                                            </p>
                                                         </div>
-                                                    @endif
-                                                @endforeach
+                                                    </div>
+                                                @endif
                                             </div>
                                         </div>
                                         <!-- Commitments Section -->
