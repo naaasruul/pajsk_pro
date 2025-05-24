@@ -857,8 +857,8 @@ class PAJSKController extends Controller
             $currentAchievementId = null;
             $currentPlacementActivityId = null;
             $currentAchievementActivityId = null;
-            $currentPlacementScore = 0;
-            $currentAchievementScore = 0;
+            $currentPlacementScore = null;
+            $currentAchievementScore = null;
             
             if ($activity->placement_id) {
                 \Log::debug('Activity ' . $activity->id . ' has placement_id: ' . $activity->placement_id);
@@ -881,14 +881,22 @@ class PAJSKController extends Controller
             }
             
             if ($currentPlacementScore > $highestPlacementScore) {
-                \Log::debug('New highest placement score found: ' . $currentPlacementScore . ' (previous: ' . $highestPlacementScore . ')');
+                Log::debug('New highest placement score found: ' . $currentPlacementScore . ' (previous: ' . $highestPlacementScore . ')');
+                $highestPlacementScore = $currentPlacementScore;
+                $highestPlacementId = $currentPlacementId;
+                $highestPlacementActivityId = $currentPlacementActivityId;
+            } else {
                 $highestPlacementScore = $currentPlacementScore;
                 $highestPlacementId = $currentPlacementId;
                 $highestPlacementActivityId = $currentPlacementActivityId;
             }
             
             if ($currentAchievementScore > $highestAchievementScore) {
-                \Log::debug('New highest achievement score found: ' . $currentAchievementScore . ' (previous: ' . $highestAchievementScore . ')');
+                Log::debug('New highest achievement score found: ' . $currentAchievementScore . ' (previous: ' . $highestAchievementScore . ')');
+                $highestAchievementScore = $currentAchievementScore;
+                $highestAchievementId = $currentAchievementId;
+                $highestAchievementActivityId = $currentAchievementActivityId;
+            } else {
                 $highestAchievementScore = $currentAchievementScore;
                 $highestAchievementId = $currentAchievementId;
                 $highestAchievementActivityId = $currentAchievementActivityId;
