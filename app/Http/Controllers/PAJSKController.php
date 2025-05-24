@@ -142,6 +142,8 @@ class PAJSKController extends Controller
             'highestPlacementActivityId'    => $highestScores['highestPlacementActivityId'],
             'highestAchievementId'          => $highestScores['highestAchievementId'],
             'highestAchievementActivityId'  => $highestScores['highestAchievementActivityId'],
+            'placementString'               => $highestScores['placementString'],
+            'achievementString'             => $highestScores['achievementString'],
         ]);
     }
 
