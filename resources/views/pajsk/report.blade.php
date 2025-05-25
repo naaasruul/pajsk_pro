@@ -2,7 +2,7 @@
 	<x-slot name="header">
 		<div class="flex justify-between items-center">
 			<h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-				{{ __('PAJSK Reports History') }}
+				{{ __('PAJSK Report History') }}
 			</h2>
 		</div>
 	</x-slot>
@@ -12,9 +12,18 @@
 			<!-- Main Content -->
 			<div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg print-container">
 				
-				<p class="text-sm text-gray-600 dark:text-gray-400">Student: {{ isset($student) && isset($student->user) ? $student->user->name : '--' }}</p>
-				<p class="text-sm text-gray-600 dark:text-gray-400">Class: {{ isset($report) && isset($report->classroom) ? $report->classroom->year . ' ' . $report->classroom->class_name : '--' }}</p>
-				<div class="p-2 sm:p-4 overflow-x-auto">
+				<div class="grid grid-cols-2 gap-4 mb-6">
+					<div class="">
+						<p class="text-sm text-gray-600 dark:text-gray-400">Student: {{ isset($student) && isset($student->user) ? $student->user->name : '--' }}</p>
+						<p class="text-sm text-gray-600 dark:text-gray-400">Class: {{ isset($report) && isset($report->classroom) ? $report->classroom->year . ' ' . $report->classroom->class_name : '--' }}</p>
+					</div>
+					<div class="">
+						<p class="text-sm text-gray-500 dark:text-gray-400">Report ID: {{ $report->id }}</p>
+						<p class="text-sm text-gray-500 dark:text-gray-400">PAJSK Assessment ID: {{ $pajsk->id }}</p>
+						<p class="text-sm text-gray-500 dark:text-gray-400">Extra-Cocuricullar ID: {{ $extracocuricullum->id }}</p>
+					</div>
+				</div>
+				<div class="pb-4 overflow-x-auto">
 					<table
 						class="w-full text-sm text-left text-gray-500 dark:text-gray-300 border-collapse border border-gray-500 dark:border-gray-700 table-auto">
 						<thead class="text-xs text-white uppercase bg-blue-600 dark:bg-blue-800">
@@ -78,8 +87,8 @@
 									<span class="score-indicator">{{ $groupedPositionScores['Badan Beruniform'] }}</span>
 								</td>
 								<td class="px-2 py-2 sm:px-4 sm:py-3 text-center border border-gray-500 dark:border-gray-500 relative">
-									N/A
-									<span class="score-indicator">N/A</span>
+									{{ isset($extracocuricullum->communityService) ? $extracocuricullum->communityService->name : '--' }}
+									<span class="score-indicator">{{ isset($extracocuricullum->communityService) ? $extracocuricullum->communityService->point : '0' }}</span>
 								</td>
 							</tr>
 							<tr class="bg-white dark:bg-gray-700 border">
@@ -193,7 +202,7 @@
 								</td>
 								<td class="px-2 py-2 sm:px-4 sm:py-3 text-center border border-gray-500 dark:border-gray-500 relative">
 									{{ isset($extracocuricullum->nilam) ? $extracocuricullum->nilam->tier->name . ' ' . $extracocuricullum->nilam->achievement->achievement_name : '--' }}
-									<span class="score-indicator">{{ isset($extracocuricullum->nilam) ? $extracocuricullum->nilam->achievement->point : '0' }}</span>
+									<span class="score-indicator">{{ isset($extracocuricullum->nilam) ? $extracocuricullum->nilam->point : '0' }}</span>
 								</td>
 							</tr>
 
