@@ -131,25 +131,8 @@ class PAJSKController extends Controller
             ?->club_position_id;
         $position = $positionId ? ClubPosition::find($positionId) : null;  
 
-        // Compute teacher-club specific scores:
-        $teacherClubActivities = $student->activities->filter(function ($activity) use ($teacherClub) {
-            return $activity->club_id === $teacherClub->id;
-        });
-        $teacherActivity = $teacherClubActivities->first();
-        $involvementScoreForTeacher = 0;
-        $placementScoreForTeacher = 0;
-        if ($teacherActivity && $teacherActivity->achievement) {
-            if ($teacherActivity->placement_id) {
-                $placementScoreForTeacher = $teacherActivity->achievement->placements()
-                    ->where('placement_id', $teacherActivity->placement_id)
-                    ->first()?->pivot->score ?? 0;
-            }
-            $involvementScoreForTeacher = $teacherActivity->achievement->involvements()
-                    ->where('involvement_type_id', $teacherActivity->involvement_id)
-                    ->first()?->pivot->score ?? 0;
-        }
         // Call the new function to get highest scores
-        $highestScores = $this->getHighestScores($teacherClubActivities);
+        $highestScores = $this->getHighestScores($clubActivities);
 
         return view('pajsk.evaluate', [
             'student'                       => $student,
@@ -158,8 +141,6 @@ class PAJSKController extends Controller
             'attendanceScores'              => Attendance::all(),
             'commitments'                   => Commitment::all(),
             'serviceContributions'          => ServiceContribution::all(),
-            'involvementScore'              => $involvementScoreForTeacher,
-            'placementScore'                => $placementScoreForTeacher,
             'teacher'                       => $teacher,
             'clubActivities'                => $clubActivities,
             'highestPlacementScore'         => $highestScores['highestPlacementScore'],
@@ -171,37 +152,6 @@ class PAJSKController extends Controller
             'placementString'               => $highestScores['placementString'],
             'achievementString'             => $highestScores['achievementString'],
         ]);
-    }
-
-    private function calculateAchievementScore(Student $student): int
-    {
-        $maxScore = 0;
-        
-        foreach ($student->activities as $activity) {
-            // Skip if missing required relations
-            if (!$activity->achievement) continue;
-            
-            // Get score based on placement if exists
-            if ($activity->placement_id) {
-                $placementScore = $activity->achievement->placements()
-                    ->where('placement_id', $activity->placement_id)
-                    ->first()?->pivot->score ?? 0;
-                    
-                if ($placementScore > 0) {
-                    $maxScore = max($maxScore, $placementScore);
-                    continue; // Skip involvement check if we got placement score
-                }
-            }
-
-            // Fallback to involvement score if no placement or placement score
-            $involvementScore = $activity->achievement->involvements()
-                ->where('involvement_type_id', $activity->involvement_id)
-                ->first()?->pivot->score ?? 0;
-            
-            $maxScore = max($maxScore, $involvementScore);
-        }
-        
-        return min($maxScore, 20); // Cap at 20 points
     }
 
     public function storeEvaluation(Request $request, Student $student)
