@@ -115,16 +115,15 @@ class PAJSKController extends Controller
             'teacher_id' => $teacher->id,
             'club_id' => $teacherClub->id,
         ]);
-        $clubActivities = $student->activities->filter(function ($activity) use ($teacherClub) {
-            return (int)$activity->club_id === (int)$teacherClub->id; // cast to int for proper comparison
-        });
+        $clubActivities = Activity::where('club_id', $teacherClub->id)
+            ->where('activity_students_id', 'like', '%' . $student->id . '%')
+            ->get();
 
         Log::info('Student Activities:', [
             'student_id' => $student->id,
             'activities' => $clubActivities->toArray(), // changed to log proper array
         ]);
 
-        
         $positionId = $student->clubs
             ->where('id', $teacherClub->id)
             ->first()
