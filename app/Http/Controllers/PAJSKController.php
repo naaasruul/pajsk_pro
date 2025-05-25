@@ -367,7 +367,7 @@ class PAJSKController extends Controller
 
         $assessment->save();
 
-        return redirect()->route('pajsk.result', ['student' => $student, 'evaluation' => $assessment]);
+        return redirect()->route('pajsk.result', ['student' => $student, 'evaluation' => $assessment])->with('success', 'PAJSK Evaluation saved successfully!');
     }
 
     public function result(Student $student, PajskAssessment $evaluation)
@@ -407,6 +407,10 @@ class PAJSKController extends Controller
                 'names' => array_map(function($id) {
                     $club = Club::find($id);
                     return $club ? $club->club_name : '';
+                }, $evaluation->club_ids ?? []),
+                'categories' => array_map(function($id) {
+                    $club = Club::find($id);
+                    return $club ? $club->category : '';
                 }, $evaluation->club_ids ?? []),
             ],
             'club_positions' => [

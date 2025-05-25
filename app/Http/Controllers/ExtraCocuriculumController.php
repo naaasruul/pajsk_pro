@@ -125,7 +125,7 @@ class ExtraCocuriculumController extends Controller
 
         $student = Student::find($studentId);
         // Create the ExtraCocuricullum record
-        ExtraCocuricullum::create([
+        $evaluation = ExtraCocuricullum::create([
             'student_id' => $studentId,
             'class_id' => $student->classroom->id,
             'service_id' => $validated['service_point'],
@@ -136,7 +136,7 @@ class ExtraCocuriculumController extends Controller
             'total_point' => $totalPoint,
         ]);
 
-        return redirect()->back()->with('success', 'Extra Cocuricculum data added successfully!');
+        return redirect()->route('pajsk.extra-cocuriculum.result', ['student' => $studentId, 'evaluation' => $evaluation])->with('success', 'Extra Cocuricculum data added successfully!');
     }
 
     /**
