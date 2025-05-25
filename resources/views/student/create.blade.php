@@ -46,6 +46,22 @@
                                 </div>
                             </div>
 
+                            {{-- Assign Mentor --}}
+                            <div class="border-b border-gray-900/10 pb-6">
+                                <h2 class="text-base font-semibold leading-7">Assign Homeroom</h2>
+                                <div class="flex flex-wrap -mx-2">
+                                    <div class="w-full md:w-1/4 px-2 mt-4">
+                                        <x-input-label for="year-select" :value="__('Teacher Name')" />
+                                        <select id="teacher-select" name="teacher_id" class="mt-2 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" required>
+                                            <option >{{ __('Select Teacher') }}</option>
+                                            @foreach($teachers as $teacher)
+                                                <option value="{{ $teacher->id }}">{{ $teacher->name }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
                             <!-- Student Information -->
                             <div class="border-b border-gray-900/10 pb-6">
                                 <h2 class="text-base font-semibold leading-7">Student Information</h2>
