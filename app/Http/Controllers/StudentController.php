@@ -36,7 +36,9 @@ class StudentController extends Controller
     public function create()
     {
         $classroomsGrouped = Classroom::all()->groupBy('year');
-        return view('student.create', compact('classroomsGrouped'));
+
+        $teachers = User::role('teacher')->get();
+        return view('student.create', compact('classroomsGrouped','teachers'));
     }
 
     public function store(Request $request)
@@ -49,6 +51,7 @@ class StudentController extends Controller
             'phone_number'  => 'required|string|max:20',
             'class_id'      => 'required|exists:classrooms,id',
             'gender'        => 'required',
+            'teacher_id'    => 'exists:teachers,id',
         ]);
 
         DB::transaction(function () use ($validated) {
@@ -58,10 +61,11 @@ class StudentController extends Controller
                 'gender'   => $validated['gender'],
                 'password' => Hash::make($validated['password']),
             ]);
-
+            
             $user->assignRole('student');
-
-            $user->student()->create([
+            
+    b            $user->student()->create([
+                'mentor_id' => $validated['teacher_id'] ?? null,
                 'address'       => $validated['address'],
                 'phone_number'  => $validated['phone_number'],
                 'home_number'   => $request->home_number ?? null,

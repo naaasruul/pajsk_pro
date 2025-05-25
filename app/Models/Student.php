@@ -17,6 +17,7 @@ class Student extends Model
         'address',
         'phone_number',
         'home_number',
+        'mentor_id',
         'class_id'
     ];
 

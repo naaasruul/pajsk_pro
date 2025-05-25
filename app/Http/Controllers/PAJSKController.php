@@ -862,6 +862,8 @@ class PAJSKController extends Controller
             'groupedPlacementScores'    => $groupedPlacementScores,
             'extracocuricullum'         => $extracocuricullum,
         ];
+
+        // dd($result); // For debugging purposes, remove this line in production
         
         return view('pajsk.report', $result);
     }
