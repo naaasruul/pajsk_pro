@@ -163,7 +163,18 @@
                         <h4 class="text-lg font-medium mb-4">PAJSK Score Breakdown</h4>
 
                         @foreach($assessment->club_ids as $index => $clubId)
-                            @if(isset($totalScores[$index]) && $totalScores[$index] !== null)
+                            @php
+                                $canViewClub = auth()->user()->hasRole('admin') || 
+                                    (
+                                        auth()->user()->hasRole('teacher') && 
+                                        auth()->user()->teacher && 
+                                        auth()->user()->teacher->club_id == $clubId
+                                    ) ||
+                                    auth()->user()->hasRole('student');
+                            @endphp
+
+                            @if($canViewClub && isset($totalScores[$index]) && $totalScores[$index] !== null)
+                                <h4 class="text-lg font-medium mb-4">{{ $scores['clubs']['categories'][$index] }}</h4>
                                 <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 mb-6 page-break">
                                     <div class="space-y-3">
 
