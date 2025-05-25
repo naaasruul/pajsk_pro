@@ -543,12 +543,16 @@ class PAJSKController extends Controller
         // Retrieve all clubs to populate the filter dropdown
         $clubs = Club::orderBy('club_name')->get();
 
-        if (auth()->user()->hasrole('admin')) {
+        if (auth()->user()->hasRole('admin')) {
             $query = PajskAssessment::with(['student.user', 'serviceContribution', 'classroom']);
-        } else if (auth()->user()->hasrole('teacher')) {
+        } else if (auth()->user()->hasRole('teacher')) {
             $query = PajskAssessment::with(['student.user', 'serviceContribution', 'classroom'])
-                ->whereJsonContains('teacher_ids', auth()->user()->teacher->id);
-        } else if (auth()->user()->hasrole('student')) {
+                ->where(function($q) {
+                    $teacher = auth()->user()->teacher;
+                    $clubId = $teacher->club_id;
+                    $q->whereJsonContains('club_ids', $clubId);
+                });
+        } else if (auth()->user()->hasRole('student')) {
             $query = PajskAssessment::with(['student.user', 'serviceContribution', 'classroom'])
                 ->where('student_id', auth()->user()->student->id);
         } else {
