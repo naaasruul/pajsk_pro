@@ -147,10 +147,13 @@ class OldDataSeeder extends Seeder
                         $attendanceIds[$i] = $attendanceArr[array_rand($attendanceArr)];
                         $studentClubPositions[$i] = $positionArr[array_rand($positionArr)];
                         
-                        // Generate 4 random commitment IDs for this index
+                        // Generate 4 unique random commitment IDs for this index
+                        $availableCommitments = $commitmentIdsPool;
                         $randomCommitments = [];
-                        for ($j = 0; $j < 4; $j++) {
-                            $randomCommitments[] = $commitmentIdsPool[array_rand($commitmentIdsPool)];
+                        for ($j = 0; $j < 4 && !empty($availableCommitments); $j++) {
+                            $randomIndex = array_rand($availableCommitments);
+                            $randomCommitments[] = $availableCommitments[$randomIndex];
+                            unset($availableCommitments[$randomIndex]); // Remove used ID
                         }
                         $commitmentIds[$i] = $randomCommitments;
                     }
