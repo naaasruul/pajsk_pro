@@ -818,34 +818,19 @@ class PAJSKController extends Controller
                         $groupedAttendanceScores[$group] = $attendance?->score ?? 0;
                     }
 
-                    // Add placement scores
+                    // Add attendance scores 
                     if (isset($assessment->placement_ids[$i])) {
-                        $activities = Activity::where([
-                            ['club_id', $clubId],
-                            ['achievement_id', $assessment->achievement_ids[$i] ?? null]
-                        ])
-                        ->whereRaw('JSON_CONTAINS(activity_students_id, ?)', ['"'.$student->id.'"'])
-                        ->get();
-                        
-                        $scores = $this->getHighestScores($activities);
-                        $placement = Placement::find($scores['highestPlacementId'] ?? null);
-                        $groupedPlacementNames[$group] = $placement->name ?? '--';
-                        $groupedPlacementScores[$group] = $scores['highestPlacementScore'] ?? 0;
+                        $placement = Placement::find($assessment->placement_ids[$i]);
+                        $achievement = Achievement::find($assessment->achievement_ids[$i]);
+                        $groupedPlacementNames[$group] = $placement?->name ?? '--';
+                        $groupedPlacementScores[$group] = $achievement ? $achievement->placements()->first()?->pivot->score ?? 0 : 0;
                     }
 
-                    // Add achievement scores
+                    // Add attendance scores 
                     if (isset($assessment->achievement_ids[$i])) {
-                        $activities = Activity::where([
-                            ['club_id', $clubId],
-                            ['achievement_id', $assessment->achievement_ids[$i] ?? null]
-                        ])
-                        ->whereRaw('JSON_CONTAINS(activity_students_id, ?)', ['"'.$student->id.'"'])
-                        ->get();
-                        
-                        $scores = $this->getHighestScores($activities);
-                        $achievement = Achievement::find($scores['highestAchievementId'] ?? null);
-                        $groupedAchievementNames[$group] = $achievement->achievement_name ?? '--';
-                        $groupedAchievementScores[$group] = $scores['highestAchievementScore'] ?? 0;
+                        $achievement = Achievement::find($assessment->achievement_ids[$i]);
+                        $groupedAchievementNames[$group] = $achievement?->achievement_name ?? '--';
+                        $groupedAchievementScores[$group] = $achievement ? $achievement->involvements()->first()?->pivot->score ?? 0 : 0;
                     }
                 }
             }
