@@ -21,15 +21,23 @@
 				{{ $student->extraCocuriculum->total_point ?? 0 }}
 			</td>
 			<td class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-				<a href="{{ route('pajsk.extra-cocuriculum.create', $student->id) }}" class="text-blue-600 hover:text-blue-900 dark:text-blue-500 dark:hover:text-blue-700">
-					Evaluate
-				</a>
+				@if($existingEvaluation)
+					<a href="{{ route('pajsk.extra-cocuriculum.result', ['student' => $student, 'evaluation' => $existingEvaluation]) }}"
+						class="font-medium text-green-600 dark:text-green-500 hover:underline">
+						Result
+					</a>
+				@else
+					<a href="{{ route('pajsk.extra-cocuriculum.create', $student->id) }}" 
+					   class="text-blue-600 hover:text-blue-900 dark:text-blue-500 dark:hover:text-blue-700">
+						Evaluate
+					</a>
+				@endif
 			</td>
 		</tr>
 		@empty
 		<tr>
 			<td colspan="5" class="px-6 py-4 text-center text-gray-500 dark:text-gray-400">
-				No students registered in this club.
+				No students registered in this homeroom.
 			</td>
 		</tr>
 		@endforelse
