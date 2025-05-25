@@ -81,6 +81,32 @@ class PAJSKController extends Controller
 
     public function evaluateStudent(Student $student)
     {
+        $teacher = Auth::user()->teacher;
+        $teacherClub = $teacher->club;
+        
+        // Get teacher's club category index
+        $categoryIndex = null;
+        if (in_array($teacherClub->category, ['Sukan & Permainan', 'Sukan'])) {
+            $categoryIndex = 0;
+        } elseif (in_array($teacherClub->category, ['Kelab & Persatuan', 'Kelab & Permainan'])) {
+            $categoryIndex = 1;
+        } elseif ($teacherClub->category == 'Badan Beruniform') {
+            $categoryIndex = 2;
+        }
+
+        // Check if teacher has already evaluated
+        $assessment = PajskAssessment::where('student_id', $student->id)
+            ->where('class_id', $student->classroom->id)
+            ->whereJsonContains('club_ids', $teacherClub->id)
+            ->first();
+
+        if (!is_null($assessment) && 
+            $assessment->class_id === $student->classroom->id && 
+            isset($assessment->total_scores[$categoryIndex]) && 
+            $assessment->total_scores[$categoryIndex] > 0) {
+            return redirect()->route('pajsk.result', ['student' => $student, 'evaluation' => $assessment])->with('error', 'Student has already been evaluated. Displaying existing evaluation.');
+        }
+
         // Removed eager loading of activities relationships since "activities" is an accessor
         $student->load(['clubs']);
         $teacher = Auth::user()->teacher;

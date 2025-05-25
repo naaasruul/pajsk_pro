@@ -45,7 +45,16 @@ class ExtraCocuriculumController extends Controller
      */
     public function create(Student $student)
     {
-        //
+        // Check if the student already has an evaluation for the current class
+        $existingEvaluation = ExtraCocuricullum::where('student_id', $student->id)
+            ->where('class_id', $student->classroom->id)
+            ->first();
+
+        if ($existingEvaluation) {
+            return redirect()->route('pajsk.extra-cocuriculum.result', ['student' => $student->id, 'evaluation' => $existingEvaluation])
+                ->with('error', 'This student already has an evaluation for the current class. Displaying existing evaluation.');
+        }
+
         $student = Student::find($student->id);
         Log::info('Student:', ['student' => $student]);
 
