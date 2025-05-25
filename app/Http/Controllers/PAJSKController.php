@@ -447,7 +447,7 @@ class PAJSKController extends Controller
                 'names' => array_map(function ($idArray) {
                     return array_map(function ($id) {
                         $commitment = Commitment::find($id);
-                        return $commitment ? $commitment->commitment_name : null;
+                        return $commitment ? $commitment->commitment_name . ' (' . $commitment->score . ' Marks)'  : null;
                     }, $idArray);
                 }, $commitmentIds),
             ],
