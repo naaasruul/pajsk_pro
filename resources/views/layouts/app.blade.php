@@ -56,7 +56,7 @@
                 margin: 0 !important;
                 padding: 0 !important;
                 overflow: visible;
-                visibility: hidden;
+                /* visibility: hidden; */
 				font-family: Arial, Helvetica, sans-serif;
             }
             #default-sidebar {
