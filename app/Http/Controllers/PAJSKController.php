@@ -857,6 +857,7 @@ class PAJSKController extends Controller
             'cgpaLast'                  => $cgpaLast,
             'student'                   => $student,
             'report'                    => $report,
+            'pajsk'                     => $assessment,
             'totalScores'               => $assessment->total_scores ?? [],
             'percentages'               => $assessment->percentages ?? [],
             'teacher_ids'               => $assessment->teacher_ids,
