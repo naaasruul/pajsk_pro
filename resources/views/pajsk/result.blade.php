@@ -44,7 +44,8 @@
 
                     <div class="mb-6">
                         <h3 class="text-lg font-semibold">Evaluation Results for {{ isset($student) && isset($student->user) ? $student->user->name : 'Student' }}</h3>
-                        <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">Assessment ID: {{ $assessment->id }}</p>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">Assessment ID: {{ $assessment->id }}</p>
+                        <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">{{ $extracocuricullum ? 'Extra-Cocurriculum ID: ' . $extracocuricullum->id : '' }}</p>
 						<!-- Student Info -->
 						<div class="grid grid-cols-2 gap-4 mb-6">
 							<div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
