@@ -299,7 +299,7 @@
                                 </a>
                                 @endhasanyrole
                             @else
-                                @hasanyrole('admin|teacher')
+                                @hasanyrole('admin')
                                 @php
                                     $scoreCount = count(array_filter($totalScores ?? [], fn($score) => !is_null($score)));
                                 @endphp
