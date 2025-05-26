@@ -81,6 +81,32 @@ class PAJSKController extends Controller
 
     public function evaluateStudent(Student $student)
     {
+        $teacher = Auth::user()->teacher;
+        $teacherClub = $teacher->club;
+        
+        // Get teacher's club category index
+        $categoryIndex = null;
+        if (in_array($teacherClub->category, ['Sukan & Permainan', 'Sukan'])) {
+            $categoryIndex = 0;
+        } elseif (in_array($teacherClub->category, ['Kelab & Persatuan', 'Kelab & Permainan'])) {
+            $categoryIndex = 1;
+        } elseif ($teacherClub->category == 'Badan Beruniform') {
+            $categoryIndex = 2;
+        }
+
+        // Check if teacher has already evaluated
+        $assessment = PajskAssessment::where('student_id', $student->id)
+            ->where('class_id', $student->classroom->id)
+            ->whereJsonContains('club_ids', $teacherClub->id)
+            ->first();
+
+        if (!is_null($assessment) && 
+            $assessment->class_id === $student->classroom->id && 
+            isset($assessment->total_scores[$categoryIndex]) && 
+            $assessment->total_scores[$categoryIndex] > 0) {
+            return redirect()->route('pajsk.result', ['student' => $student, 'evaluation' => $assessment])->with('error', 'Student has already been evaluated. Displaying existing evaluation.');
+        }
+
         // Removed eager loading of activities relationships since "activities" is an accessor
         $student->load(['clubs']);
         $teacher = Auth::user()->teacher;
@@ -89,16 +115,15 @@ class PAJSKController extends Controller
             'teacher_id' => $teacher->id,
             'club_id' => $teacherClub->id,
         ]);
-        $clubActivities = $student->activities->filter(function ($activity) use ($teacherClub) {
-            return (int)$activity->club_id === (int)$teacherClub->id; // cast to int for proper comparison
-        });
+        $clubActivities = Activity::where('club_id', $teacherClub->id)
+            ->where('activity_students_id', 'like', '%' . $student->id . '%')
+            ->get();
 
         Log::info('Student Activities:', [
             'student_id' => $student->id,
             'activities' => $clubActivities->toArray(), // changed to log proper array
         ]);
 
-        
         $positionId = $student->clubs
             ->where('id', $teacherClub->id)
             ->first()
@@ -106,25 +131,8 @@ class PAJSKController extends Controller
             ?->club_position_id;
         $position = $positionId ? ClubPosition::find($positionId) : null;  
 
-        // Compute teacher-club specific scores:
-        $teacherClubActivities = $student->activities->filter(function ($activity) use ($teacherClub) {
-            return $activity->club_id === $teacherClub->id;
-        });
-        $teacherActivity = $teacherClubActivities->first();
-        $involvementScoreForTeacher = 0;
-        $placementScoreForTeacher = 0;
-        if ($teacherActivity && $teacherActivity->achievement) {
-            if ($teacherActivity->placement_id) {
-                $placementScoreForTeacher = $teacherActivity->achievement->placements()
-                    ->where('placement_id', $teacherActivity->placement_id)
-                    ->first()?->pivot->score ?? 0;
-            }
-            $involvementScoreForTeacher = $teacherActivity->achievement->involvements()
-                    ->where('involvement_type_id', $teacherActivity->involvement_id)
-                    ->first()?->pivot->score ?? 0;
-        }
         // Call the new function to get highest scores
-        $highestScores = $this->getHighestScores($teacherClubActivities);
+        $highestScores = $this->getHighestScores($clubActivities);
 
         return view('pajsk.evaluate', [
             'student'                       => $student,
@@ -133,8 +141,6 @@ class PAJSKController extends Controller
             'attendanceScores'              => Attendance::all(),
             'commitments'                   => Commitment::all(),
             'serviceContributions'          => ServiceContribution::all(),
-            'involvementScore'              => $involvementScoreForTeacher,
-            'placementScore'                => $placementScoreForTeacher,
             'teacher'                       => $teacher,
             'clubActivities'                => $clubActivities,
             'highestPlacementScore'         => $highestScores['highestPlacementScore'],
@@ -146,37 +152,6 @@ class PAJSKController extends Controller
             'placementString'               => $highestScores['placementString'],
             'achievementString'             => $highestScores['achievementString'],
         ]);
-    }
-
-    private function calculateAchievementScore(Student $student): int
-    {
-        $maxScore = 0;
-        
-        foreach ($student->activities as $activity) {
-            // Skip if missing required relations
-            if (!$activity->achievement) continue;
-            
-            // Get score based on placement if exists
-            if ($activity->placement_id) {
-                $placementScore = $activity->achievement->placements()
-                    ->where('placement_id', $activity->placement_id)
-                    ->first()?->pivot->score ?? 0;
-                    
-                if ($placementScore > 0) {
-                    $maxScore = max($maxScore, $placementScore);
-                    continue; // Skip involvement check if we got placement score
-                }
-            }
-
-            // Fallback to involvement score if no placement or placement score
-            $involvementScore = $activity->achievement->involvements()
-                ->where('involvement_type_id', $activity->involvement_id)
-                ->first()?->pivot->score ?? 0;
-            
-            $maxScore = max($maxScore, $involvementScore);
-        }
-        
-        return min($maxScore, 20); // Cap at 20 points
     }
 
     public function storeEvaluation(Request $request, Student $student)
@@ -341,7 +316,7 @@ class PAJSKController extends Controller
 
         $assessment->save();
 
-        return redirect()->route('pajsk.result', ['student' => $student, 'evaluation' => $assessment]);
+        return redirect()->route('pajsk.result', ['student' => $student, 'evaluation' => $assessment])->with('success', 'PAJSK Evaluation saved successfully!');
     }
 
     public function result(Student $student, PajskAssessment $evaluation)
@@ -382,6 +357,10 @@ class PAJSKController extends Controller
                     $club = Club::find($id);
                     return $club ? $club->club_name : '';
                 }, $evaluation->club_ids ?? []),
+                'categories' => array_map(function($id) {
+                    $club = Club::find($id);
+                    return $club ? $club->category : '';
+                }, $evaluation->club_ids ?? []),
             ],
             'club_positions' => [
                 'ids' => $evaluation->club_position_ids,
@@ -417,7 +396,7 @@ class PAJSKController extends Controller
                 'names' => array_map(function ($idArray) {
                     return array_map(function ($id) {
                         $commitment = Commitment::find($id);
-                        return $commitment ? $commitment->commitment_name : null;
+                        return $commitment ? $commitment->commitment_name . ' (' . $commitment->score . ' Marks)'  : null;
                     }, $idArray);
                 }, $commitmentIds),
             ],
@@ -513,12 +492,16 @@ class PAJSKController extends Controller
         // Retrieve all clubs to populate the filter dropdown
         $clubs = Club::orderBy('club_name')->get();
 
-        if (auth()->user()->hasrole('admin')) {
+        if (auth()->user()->hasRole('admin')) {
             $query = PajskAssessment::with(['student.user', 'serviceContribution', 'classroom']);
-        } else if (auth()->user()->hasrole('teacher')) {
+        } else if (auth()->user()->hasRole('teacher')) {
             $query = PajskAssessment::with(['student.user', 'serviceContribution', 'classroom'])
-                ->whereJsonContains('teacher_ids', auth()->user()->teacher->id);
-        } else if (auth()->user()->hasrole('student')) {
+                ->where(function($q) {
+                    $teacher = auth()->user()->teacher;
+                    $clubId = $teacher->club_id;
+                    $q->whereJsonContains('club_ids', $clubId);
+                });
+        } else if (auth()->user()->hasRole('student')) {
             $query = PajskAssessment::with(['student.user', 'serviceContribution', 'classroom'])
                 ->where('student_id', auth()->user()->student->id);
         } else {
@@ -784,34 +767,19 @@ class PAJSKController extends Controller
                         $groupedAttendanceScores[$group] = $attendance?->score ?? 0;
                     }
 
-                    // Add placement scores
+                    // Add attendance scores 
                     if (isset($assessment->placement_ids[$i])) {
-                        $activities = Activity::where([
-                            ['club_id', $clubId],
-                            ['achievement_id', $assessment->achievement_ids[$i] ?? null]
-                        ])
-                        ->whereRaw('JSON_CONTAINS(activity_students_id, ?)', ['"'.$student->id.'"'])
-                        ->get();
-                        
-                        $scores = $this->getHighestScores($activities);
-                        $placement = Placement::find($scores['highestPlacementId'] ?? null);
-                        $groupedPlacementNames[$group] = $placement->name ?? '--';
-                        $groupedPlacementScores[$group] = $scores['highestPlacementScore'] ?? 0;
+                        $placement = Placement::find($assessment->placement_ids[$i]);
+                        $achievement = Achievement::find($assessment->achievement_ids[$i]);
+                        $groupedPlacementNames[$group] = $placement?->name ?? '--';
+                        $groupedPlacementScores[$group] = $achievement ? $achievement->placements()->first()?->pivot->score ?? 0 : 0;
                     }
 
-                    // Add achievement scores
+                    // Add attendance scores 
                     if (isset($assessment->achievement_ids[$i])) {
-                        $activities = Activity::where([
-                            ['club_id', $clubId],
-                            ['achievement_id', $assessment->achievement_ids[$i] ?? null]
-                        ])
-                        ->whereRaw('JSON_CONTAINS(activity_students_id, ?)', ['"'.$student->id.'"'])
-                        ->get();
-                        
-                        $scores = $this->getHighestScores($activities);
-                        $achievement = Achievement::find($scores['highestAchievementId'] ?? null);
-                        $groupedAchievementNames[$group] = $achievement->achievement_name ?? '--';
-                        $groupedAchievementScores[$group] = $scores['highestAchievementScore'] ?? 0;
+                        $achievement = Achievement::find($assessment->achievement_ids[$i]);
+                        $groupedAchievementNames[$group] = $achievement?->achievement_name ?? '--';
+                        $groupedAchievementScores[$group] = $achievement ? $achievement->involvements()->first()?->pivot->score ?? 0 : 0;
                     }
                 }
             }
@@ -823,6 +791,7 @@ class PAJSKController extends Controller
             'cgpaLast'                  => $cgpaLast,
             'student'                   => $student,
             'report'                    => $report,
+            'pajsk'                     => $assessment,
             'totalScores'               => $assessment->total_scores ?? [],
             'percentages'               => $assessment->percentages ?? [],
             'teacher_ids'               => $assessment->teacher_ids,

@@ -12,18 +12,23 @@
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900 dark:text-gray-100">
                     <div class="mb-6">
-                        <h3 class="text-lg font-semibold mb-4">Evaluation Results for {{ $result['student']->user->name }}</h3>
+                        <h3 class="text-lg font-semibold">Evaluation Results for {{ $result['student']->user->name }}</h3>
+						<p class="text-sm text-gray-500 dark:text-gray-400 mb-4">Assessment ID: {{ $result['extraCocuricullum']->id }}</p>
 
                         <div class="grid grid-cols-2 gap-4 mb-6">
                             <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
                                 <h4 class="font-medium text-sm text-gray-500 dark:text-gray-400 mb-2">Student Information</h4>
                                 <div class="space-y-1">
                                     <p class="text-gray-900 dark:text-gray-100">Class: {{ $result['student']->classroom->year }} {{ $result['student']->classroom->class_name }}</p>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">{{ $result['student']->user->name }}</p>
                                 </div>
                             </div>
                             <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
                                 <h4 class="font-medium text-sm text-gray-500 dark:text-gray-400 mb-2">Assessment Date</h4>
-                                <p class="text-gray-900 dark:text-gray-100">{{ $result['extraCocuricullum']->created_at->format('d/m/Y H:i') }}</p>
+                                <div class="space-y-1">
+                                    <p class="text-gray-900 dark:text-gray-100">Last updated: {{ $result['extraCocuricullum']->updated_at->format('d/m/Y H:i') }}</p>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">Created: {{ $result['extraCocuricullum']->created_at->format('d/m/Y H:i') }}</p>
+                                </div>
                             </div>
                         </div>
 
@@ -46,7 +51,7 @@
                                 Print
                             </button>
                             <a href="{{ route('pajsk.extra-cocuriculum.history') }}"
-                               class="inline-flex items-center px-4 py-2 bg-gray-800 dark:bg-gray-200 border border-transparent rounded-md font-semibold text-xs text-white dark:text-gray-800 uppercase tracking-widest hover:bg-gray-700 dark:hover:bg-white">
+                               class="no-print inline-flex items-center px-4 py-2 bg-gray-800 dark:bg-gray-200 border border-transparent rounded-md font-semibold text-xs text-white dark:text-gray-800 uppercase tracking-widest hover:bg-gray-700 dark:hover:bg-white">
                                 Return to List
                             </a>
                         </div>

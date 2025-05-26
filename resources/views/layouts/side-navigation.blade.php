@@ -63,6 +63,9 @@
                 <x-sidebar-item class="pl-11" :route="route('pajsk.extra-cocuriculum.history')" :role="request()->routeIs('pajsk.extra-cocuriculum-history')">
                     {{ __('Extra-Cocuriculum History') }}
                 </x-sidebar-item>
+                <x-sidebar-item class="pl-11" :route="route('pajsk.report-history')" :role="request()->routeIs('pajsk.extra-cocuriculum-history')">
+                    {{ __('Report History') }}
+                </x-sidebar-item>
             </ul>
             <x-sidebar-item class="" :route="route('activity.approval')" :role="request()->routeIs('activity.approval')">
                 Activity

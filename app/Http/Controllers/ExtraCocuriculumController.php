@@ -28,8 +28,16 @@ class ExtraCocuriculumController extends Controller
             $students = Student::where('mentor_id', $teacher->id)->paginate(10);
         }
 
-        Log::info('Students:', ['students' => $students]);
-        return view('cocuriculum.extra-cocuriculum',compact('students'));
+        foreach ($students as $student) {
+            Log::info('Student:', ['student' => $student]);
+            $existingEvaluation = ExtraCocuricullum::where('student_id', $student->id)
+                ->where('class_id', $student->classroom->id)
+                ->first();
+        }
+
+        // Log::info('Students:', ['students' => $students]);
+        Log::info('Existing:', ['existingEvaluation' => $existingEvaluation]);
+        return view('cocuriculum.extra-cocuriculum',compact(['students', 'existingEvaluation']));
     }
 
     /**
@@ -37,7 +45,16 @@ class ExtraCocuriculumController extends Controller
      */
     public function create(Student $student)
     {
-        //
+        // Check if the student already has an evaluation for the current class
+        $existingEvaluation = ExtraCocuricullum::where('student_id', $student->id)
+            ->where('class_id', $student->classroom->id)
+            ->first();
+
+        if ($existingEvaluation) {
+            return redirect()->route('pajsk.extra-cocuriculum.result', ['student' => $student->id, 'evaluation' => $existingEvaluation])
+                ->with('error', 'This student already has an evaluation for the current class. Displaying existing evaluation.');
+        }
+
         $student = Student::find($student->id);
         Log::info('Student:', ['student' => $student]);
 
@@ -109,7 +126,7 @@ class ExtraCocuriculumController extends Controller
         
         $student = Student::find($studentId);
         // Create the ExtraCocuricullum record
-        ExtraCocuricullum::create([
+        $evaluation = ExtraCocuricullum::create([
             'student_id' => $studentId,
             'class_id' => $student->classroom->id,
             'service_id' => $validated['service_point'],
@@ -120,7 +137,7 @@ class ExtraCocuriculumController extends Controller
             'total_point' => $totalPoint,
         ]);
 
-        return redirect()->back()->with('success', 'Extra Cocuricculum data added successfully!');
+        return redirect()->route('pajsk.extra-cocuriculum.result', ['student' => $studentId, 'evaluation' => $evaluation])->with('success', 'Extra Cocuricculum data added successfully!');
     }
 
     /**

@@ -43,8 +43,9 @@
                     @endif
 
                     <div class="mb-6">
-                        <h3 class="text-lg font-semibold mb-4">Evaluation Results for {{ isset($student) && isset($student->user) ? $student->user->name : 'Student' }}</h3>
-                        
+                        <h3 class="text-lg font-semibold">Evaluation Results for {{ isset($student) && isset($student->user) ? $student->user->name : 'Student' }}</h3>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">Assessment ID: {{ $assessment->id }}</p>
+                        <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">{{ $extracocuricullum ? 'Extra-Cocurriculum ID: ' . $extracocuricullum->id : '' }}</p>
 						<!-- Student Info -->
 						<div class="grid grid-cols-2 gap-4 mb-6">
 							<div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
@@ -163,7 +164,18 @@
                         <h4 class="text-lg font-medium mb-4">PAJSK Score Breakdown</h4>
 
                         @foreach($assessment->club_ids as $index => $clubId)
-                            @if(isset($totalScores[$index]) && $totalScores[$index] !== null)
+                            @php
+                                $canViewClub = auth()->user()->hasRole('admin') || 
+                                    (
+                                        auth()->user()->hasRole('teacher') && 
+                                        auth()->user()->teacher && 
+                                        auth()->user()->teacher->club_id == $clubId
+                                    ) ||
+                                    auth()->user()->hasRole('student');
+                            @endphp
+
+                            @if($canViewClub && isset($totalScores[$index]) && $totalScores[$index] !== null)
+                                <h4 class="text-lg font-medium mb-4">{{ $scores['clubs']['categories'][$index] }}</h4>
                                 <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 mb-6 page-break">
                                     <div class="space-y-3">
 
@@ -288,7 +300,7 @@
                                 </a>
                                 @endhasanyrole
                             @else
-                                @hasanyrole('admin|teacher')
+                                @hasanyrole('admin')
                                 @php
                                     $scoreCount = count(array_filter($totalScores ?? [], fn($score) => !is_null($score)));
                                 @endphp

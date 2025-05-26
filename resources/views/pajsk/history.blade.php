@@ -141,19 +141,35 @@
 									{{ $sukanPermainan }}
 								</td>
 								<td class="px-6 py-4 whitespace-nowrap text-sm">
-									@php
-										$percentageCount = count($evaluation->percentages ?? []);
-										if ($percentageCount <= 1) {
-											$badgeClass = 'bg-red-100 text-red-800';
-										} elseif ($percentageCount == 2) {
-											$badgeClass = 'bg-yellow-100 text-yellow-800';
-										} else {
-											$badgeClass = 'bg-green-100 text-green-800';
-										}
-									@endphp
-									<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ $badgeClass }}">
-										{{ $percentageCount }}/3
-									</span>
+									@if(auth()->user()->hasRole('admin'))
+										@php
+											$percentageCount = count(array_filter($evaluation->percentages ?? [], fn($p) => !is_null($p)));
+											$badgeClass = match(true) {
+												$percentageCount <= 1 => 'bg-red-100 text-red-800',
+												$percentageCount == 2 => 'bg-yellow-100 text-yellow-800',
+												default => 'bg-green-100 text-green-800'
+											};
+										@endphp
+										<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ $badgeClass }}">
+											{{ $percentageCount }}/3
+										</span>
+									@elseif(auth()->user()->hasRole('teacher'))
+										@php
+											$teacherIndex = array_search(auth()->user()->teacher->club_id, $evaluation->club_ids ?? []);
+											$hasTeacherEvaluated = $teacherIndex !== false && isset($evaluation->percentages[$teacherIndex]);
+										@endphp
+										@if($hasTeacherEvaluated)
+											<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+												<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+													<path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+												</svg>
+											</span>
+										@else
+											<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
+												Pending
+											</span>
+										@endif
+									@endif
 								</td>
 								<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
 									{{ $evaluation->updated_at->format('d/m/Y H:i') ?? $evaluation->created_at->format('d/m/Y H:i') }}
