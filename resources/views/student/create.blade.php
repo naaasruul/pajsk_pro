@@ -99,12 +99,12 @@
                                     <x-text-input id="phone_number" name="phone_number" type="text" class="mt-1 block w-full" :value="old('phone_number')" required />
                                     <x-input-error :messages="$errors->get('phone_number')" class="mt-2" />
                                 </div>
-
+{{-- 
                                 <div class="mt-4">
                                     <x-input-label for="home_number" :value="__('Home Number')" />
                                     <x-text-input id="home_number" name="home_number" type="text" class="mt-1 block w-full" :value="old('home_number')" required />
                                     <x-input-error :messages="$errors->get('home_number')" class="mt-2" />
-                                </div>
+                                </div> --}}
 
                                 <div class="mt-4">
                                     <x-input-label for="address" :value="__('Address')" />
