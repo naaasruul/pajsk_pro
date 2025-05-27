@@ -25,19 +25,28 @@ class ExtraCocuriculumController extends Controller
             $students = Student::paginate(10);
         } else {
             $teacher = auth()->user()->teacher; // Assuming the logged-in user is a teacher
+
             $students = Student::where('mentor_id', $teacher->id)->paginate(10);
+            // dd($students);
         }
 
+        $existingEvaluations = [];
         foreach ($students as $student) {
             Log::info('Student:', ['student' => $student]);
-            $existingEvaluation = ExtraCocuricullum::where('student_id', $student->id)
-                ->where('class_id', $student->classroom->id)
-                ->first();
+            // Safely get classroom id, handle if classroom is null
+            $classroomId = $student->classroom->id ?? null;
+            if ($classroomId) {
+                $existingEvaluations[$student->id] = ExtraCocuricullum::where('student_id', $student->id)
+                    ->where('class_id', $classroomId)
+                    ->first();
+            } else {
+                $existingEvaluations[$student->id] = null;
+            }
         }
 
         // Log::info('Students:', ['students' => $students]);
-        Log::info('Existing:', ['existingEvaluation' => $existingEvaluation]);
-        return view('cocuriculum.extra-cocuriculum',compact(['students', 'existingEvaluation']));
+        Log::info('Existing:', ['existingEvaluation' => $existingEvaluations]);
+        return view('cocuriculum.extra-cocuriculum',compact(['students', 'existingEvaluations']));
     }
 
     /**
