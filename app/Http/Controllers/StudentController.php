@@ -64,7 +64,7 @@ class StudentController extends Controller
             
             $user->assignRole('student');
             
-    b            $user->student()->create([
+              $user->student()->create([
                 'mentor_id' => $validated['teacher_id'] ?? null,
                 'address'       => $validated['address'],
                 'phone_number'  => $validated['phone_number'],
