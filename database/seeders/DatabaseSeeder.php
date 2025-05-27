@@ -27,32 +27,32 @@ class DatabaseSeeder extends Seeder
         $userAdmin->assignRole('admin');
 
         $userTeacherKelab = User::create([
-            'name' => 'Teacher User (Kelab)',
+            'name' => 'Manab (Kelab)',
             'email' => 'teacher@example.com',
             'password' => bcrypt('password'),
         ]);
         $userTeacherKelab->assignRole('teacher');
 
         $userTeacherUniform = User::create([
-            'name' => 'Teacher User (Uniform)',
+            'name' => 'Maznah (Uniform)',
             'email' => 'teacherU@example.com',
             'password' => bcrypt('password'),
         ]);
         $userTeacherUniform->assignRole('teacher');
 
         $userTeacherSukan = User::create([
-            'name' => 'Teacher User (Sukan)',
+            'name' => 'Bedah (Sukan)',
             'email' => 'teacherS@example.com',
             'password' => bcrypt('password'),
         ]);
         $userTeacherSukan->assignRole('teacher');
 
-        $userStudent = User::create([
-            'name' => 'Student User',
-            'email' => 'student@example.com',
-            'password' => bcrypt('password'),
-        ]);
-        $userStudent->assignRole('student');
+        // $userStudent = User::create([
+        //     'name' => 'Student User',
+        //     'email' => 'student@example.com',
+        //     'password' => bcrypt('password'),
+        // ]);
+        // $userStudent->assignRole('student');
 
         $this->call([
             InvolvementTypeSeeder::class,    // Add this first
@@ -91,13 +91,13 @@ class DatabaseSeeder extends Seeder
             'active_status' => 1,
         ]);
 
-        $userStudent = Student::create([
-            'user_id' => $userStudent->id,
-            'phone_number' => fake()->phoneNumber(),
-            'home_number' => fake()->phoneNumber(),
-            'address' => fake()->address(),
-            'class_id' => $class->id,
-        ]);
+        // $userStudent = Student::create([
+        //     'user_id' => $userStudent->id,
+        //     'phone_number' => fake()->phoneNumber(),
+        //     'home_number' => fake()->phoneNumber(),
+        //     'address' => fake()->address(),
+        //     'class_id' => $class->id,
+        // ]);
 
         $userTeacherKelab = Teacher::create([
             'user_id' => $userTeacherKelab->id,
