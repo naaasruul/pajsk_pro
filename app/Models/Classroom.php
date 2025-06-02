@@ -29,4 +29,14 @@ class Classroom extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function teacher()
+    {
+        return $this->hasOne(Teacher::class);
+    }
+
+    public function classroomSubjectAssignments()
+{
+    return $this->hasMany(ClassroomSubjectTeacher::class);
+}
 }
