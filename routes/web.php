@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\ClassroomController;
 use App\Http\Controllers\ClubController;
+use App\Http\Controllers\Subject\SubjectController;
 
 Route::get('/', [AuthenticatedSessionController::class, 'create'])
         ->name('login');
@@ -59,6 +60,18 @@ Route::middleware('auth')->group(function () {
             Route::delete('/{cocuriculum}', [CocuriculumController::class, 'destroy'])->name('destroy');
             Route::get('/extra-cocuriculum', [ExtraCocuriculumController::class, 'index'])->name('extra-cocuriculum');
         });
+
+        Route::prefix('subjects')->name('subject.')->group(function () {
+            Route::get('/', [SubjectController::class, 'index'])->name('index');
+            Route::get('/create', [SubjectController::class, 'create'])->name('create');
+            Route::get('/edit', [SubjectController::class, 'edit'])->name('edit');
+
+            Route::post('/store', [SubjectController::class, 'store'])->name('store');
+            Route::post('/{subject}/assign-teachers', [SubjectController::class, 'assignTeachers'])->name('assignTeachers');
+            Route::post('/{subject}/assign-teacher-to-class', [SubjectController::class, 'assignTeacherToClass'])->name('assignTeacherToClass');
+        });
+
+
         Route::prefix('activity')->name('activity.')->group(function () {
             Route::get('/', [ActivityController::class, 'index'])->name('index');
             Route::get('/create', [ActivityController::class, 'create'])->name('create');
