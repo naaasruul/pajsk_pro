@@ -29,10 +29,13 @@
                                                 <select name="teacher_id" id="teacher_id" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" required>
                                                     <option value="">-- Select Teacher --</option>
                                                     @foreach($teachers as $teacher)
-                                                    <option value="{{ $teacher->id }}" @if(in_array($teacher->id, $assignedTeacherIds)) disabled style="color:gray;" @endif>
+                                                    <option value="{{ $teacher->id }}">
+                                                        {{ $teacher->user->name }}
+                                                    </option>
+                                                    {{-- <option value="{{ $teacher->id }}" @if(in_array($teacher->id, $assignedTeacherIds)) disabled style="color:gray;" @endif>
                                                         {{ $teacher->user->name }}
                                                         @if(in_array($teacher->id, $assignedTeacherIds)) (Already assigned) @endif
-                                                    </option>
+                                                    </option> --}}
                                                     @endforeach
                                                 </select>
                                             </div>
