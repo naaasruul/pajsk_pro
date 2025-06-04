@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\ClassroomController;
 use App\Http\Controllers\ClubController;
+use App\Http\Controllers\SEGAK\SegakController;
 use App\Http\Controllers\Subject\SubjectController;
 
 Route::get('/', [AuthenticatedSessionController::class, 'create'])
@@ -91,6 +92,14 @@ Route::middleware('auth')->group(function () {
             Route::get('/{student}/edit', [ClubController::class, 'editStudent'])->name('edit-student');
             Route::put('/{student}/update', [ClubController::class, 'updateStudent'])->name('update-student');
             Route::delete('/remove-student/{student}', [ClubController::class, 'removeStudent'])->name('remove-student');
+        });
+
+        Route::prefix('segak')->name('segak.')->group(function () {
+            Route::get('/', [SegakController::class, 'index'])->name('index');
+            Route::get('/pick-session/class/{class_id}', [SegakController::class, 'pickSession'])->name('pick-session');
+            Route::get('/pick-session/class/{class_id}/session/{session_id}', [SegakController::class, 'pickStudent'])->name('pick-student');
+            Route::get('/pick-session/class/{class_id}/session/{session_id}/student/{student_id}/create', [SegakController::class, 'create'])->name('create');
+            Route::get('/store', [SegakController::class, 'store'])->name('store');
         });
     });
 
