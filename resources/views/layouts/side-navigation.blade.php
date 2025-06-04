@@ -105,12 +105,30 @@
             </button>
             <ul id="dropdown-student" class="hidden py-2 space-y-2">
                 <x-sidebar-item class="pl-11" :route="route('pajsk.index')" :role="request()->routeIs('pajsk.index')">
-                    PAJSK Assessment
+                    {{ __('PAJSK Assessment') }}
                 </x-sidebar-item>
                 <x-sidebar-item class="pl-11" :route="route('pajsk.extra-cocuriculum')"
                     :role="request()->routeIs('pajsk.extra-cocuriculum')">
                     {{ __('Extra-Cocuriculum') }}
                 </x-sidebar-item>
+                
+                @php
+                    $pjkSubject = \App\Models\Subject::where('code', 'PJK')->first();
+                    $hasPjk = false;
+                    if($pjkSubject && auth()->user()->teacher) {
+                        $hasPjk = \DB::table('classroom_subject_teacher')
+                            ->where('teacher_id', auth()->user()->teacher->id)
+                            ->where('subject_id', $pjkSubject->id)
+                            ->exists();
+                        }
+
+                @endphp
+                    @if($hasPjk)
+                        <x-sidebar-item class="pl-11" :route="route('segak.index')" :role="request()->routeIs('segak.index')">
+                            {{ __('SEGAK Evaluation') }} <span class="text-red-500">(BETA)</span>
+                        </x-sidebar-item>
+                    @endif
+                
 
             </ul>
             {{-- History --}}
