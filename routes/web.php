@@ -99,7 +99,7 @@ Route::middleware('auth')->group(function () {
             Route::get('/pick-session/class/{class_id}', [SegakController::class, 'pickSession'])->name('pick-session');
             Route::get('/pick-session/class/{class_id}/session/{session_id}', [SegakController::class, 'pickStudent'])->name('pick-student');
             Route::get('/pick-session/class/{class_id}/session/{session_id}/student/{student_id}/create', [SegakController::class, 'create'])->name('create');
-            Route::get('/store', [SegakController::class, 'store'])->name('store');
+            Route::post('/store', [SegakController::class, 'store'])->name('store');
         });
     });
 
