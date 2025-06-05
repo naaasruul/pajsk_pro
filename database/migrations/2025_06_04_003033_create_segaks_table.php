@@ -27,6 +27,7 @@ return new class extends Migration
             $table->integer('sit_up_steps');
             $table->integer('sit_up_score');
             $table->float('sit_and_reach');
+            $table->float('sit_and_reach_score');
 
             $table->integer('total_score');
             $table->string('gred', 5);
