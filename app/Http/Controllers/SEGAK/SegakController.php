@@ -108,7 +108,8 @@ class SegakController extends Controller
         'session' => 'required|in:1,2',
         'classroom_id' => 'required|exists:classrooms,id',
         'date' => 'required|date',
-        'student_name' => 'required|string|max:255',
+        'student_id' => 'required|exists:students,id',
+        
         'weight' => 'required|numeric',
         'height' => 'required|numeric',
         'step_test_steps' => 'required|integer',
@@ -118,6 +119,7 @@ class SegakController extends Controller
         'sit_up_steps' => 'required|integer',
         'sit_up_score' => 'required|integer',
         'sit_and_reach' => 'required|numeric',
+        'sit_and_reach_score' => 'required|numeric',
         'total_score' => 'required|integer',
         'gred' => 'required|string|max:5',
         'bmi_status' => 'required|string|max:50',
