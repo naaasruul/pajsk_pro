@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            {{ __('Edit Student') }}
+            {{ __('Edit Classroom') }}
         </h2>
     </x-slot>
 
@@ -45,6 +45,18 @@
                                                 :value="old('class_name', $classroom->class_name)" required />
                                             <x-input-error :messages="$errors->get('class_name')" class="mt-2" />
                                         </div>
+
+                                        {{-- <div class="w-full md:w-1/4 px-2 mt-4">
+                                            <x-input-label for="teachers" :value="__('Assign Teacher')" />
+                                            <select x-model="teacher" id="teacher" name="teacher"
+                                                class="mt-2 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                                required>
+                                                <option value="">--</option>
+                                                @foreach ($teachers as $teacher)
+                                                    <option value="{{ $teacher->id }}">{{ $teacher->user->name }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div> --}}
                                     </div>
 
                                     <!-- Live Preview Message -->

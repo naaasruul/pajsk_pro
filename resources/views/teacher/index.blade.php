@@ -32,8 +32,8 @@
                         <td class="px-6 py-4">{{ $teacher->home_number }}</td>
                         <td class="px-6 py-4">{{ $teacher->address }}</td>
                         <td class="px-6 py-4">{{ $teacher->club->club_name ?? 'No Club' }}</td>
+                    
                         <td class="px-6 py-4">
-
                             <a href="{{ route('teachers.edit', $teacher) }}" class="font-medium text-blue-600 dark:text-blue-500 hover:underline">Edit</a>
                         </td>
                     </tr>

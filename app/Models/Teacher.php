@@ -46,4 +46,18 @@ class Teacher extends Model
     {
         return $this->hasMany(Activity::class, 'created_by');
     }
+
+    public function subjects()
+    {
+        return $this->belongsToMany(Subject::class, 'subject_teacher');
+    }
+
+    public function classroom(){
+        return $this->belongsTo(Classroom::class);
+    }
+
+    public function classroomSubjectAssignments()
+{
+    return $this->hasMany(ClassroomSubjectTeacher::class);
+}
 }

@@ -12,6 +12,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\ClassroomController;
 use App\Http\Controllers\ClubController;
+use App\Http\Controllers\SEGAK\SegakController;
+use App\Http\Controllers\Subject\SubjectController;
 
 Route::get('/', [AuthenticatedSessionController::class, 'create'])
         ->name('login');
@@ -59,6 +61,18 @@ Route::middleware('auth')->group(function () {
             Route::delete('/{cocuriculum}', [CocuriculumController::class, 'destroy'])->name('destroy');
             Route::get('/extra-cocuriculum', [ExtraCocuriculumController::class, 'index'])->name('extra-cocuriculum');
         });
+
+        Route::prefix('subjects')->name('subject.')->group(function () {
+            Route::get('/', [SubjectController::class, 'index'])->name('index');
+            Route::get('/create', [SubjectController::class, 'create'])->name('create');
+            Route::get('/edit', [SubjectController::class, 'edit'])->name('edit');
+
+            Route::post('/store', [SubjectController::class, 'store'])->name('store');
+            Route::post('/{subject}/assign-teachers', [SubjectController::class, 'assignTeachers'])->name('assignTeachers');
+            Route::post('/{subject}/assign-teacher-to-class', [SubjectController::class, 'assignTeacherToClass'])->name('assignTeacherToClass');
+        });
+
+
         Route::prefix('activity')->name('activity.')->group(function () {
             Route::get('/', [ActivityController::class, 'index'])->name('index');
             Route::get('/create', [ActivityController::class, 'create'])->name('create');
@@ -78,6 +92,14 @@ Route::middleware('auth')->group(function () {
             Route::get('/{student}/edit', [ClubController::class, 'editStudent'])->name('edit-student');
             Route::put('/{student}/update', [ClubController::class, 'updateStudent'])->name('update-student');
             Route::delete('/remove-student/{student}', [ClubController::class, 'removeStudent'])->name('remove-student');
+        });
+
+        Route::prefix('segak')->name('segak.')->group(function () {
+            Route::get('/', [SegakController::class, 'index'])->name('index');
+            Route::get('/pick-session/class/{class_id}', [SegakController::class, 'pickSession'])->name('pick-session');
+            Route::get('/pick-session/class/{class_id}/session/{session_id}', [SegakController::class, 'pickStudent'])->name('pick-student');
+            Route::get('/pick-session/class/{class_id}/session/{session_id}/student/{student_id}/create', [SegakController::class, 'create'])->name('create');
+            Route::post('/store', [SegakController::class, 'store'])->name('store');
         });
     });
 

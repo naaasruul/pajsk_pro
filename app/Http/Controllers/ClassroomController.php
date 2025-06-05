@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Classroom;
+use App\Models\Teacher;
 use Illuminate\Http\Request;
 
 class ClassroomController extends Controller
@@ -60,9 +61,9 @@ class ClassroomController extends Controller
     {
         // Find the classroom by ID
         $classroom = Classroom::findOrFail($id);
-
+        $teachers = Teacher::all();
         // Return the view to edit the classroom
-        return view('classroom.edit', compact('classroom'));
+        return view('classroom.edit', compact('classroom','teachers'));
     }
 
     /**
