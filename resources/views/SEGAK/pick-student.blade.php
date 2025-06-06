@@ -7,13 +7,21 @@
 
     <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
         <div class="p-6 text-gray-900 dark:text-gray-100">
-            <h2 class="text-2xl font-bold mb-4">
+            <div class="flex justify-between mb-4">
+                <h2 class="text-2xl font-bold mb-4">
                 Segak Evaluation For Class:
-                <span
-                    class="bg-purple-100 text-2xl font-bold text-purple-800  me-2 px-2.5 py-0.5 rounded-sm dark:bg-purple-900 dark:text-purple-300">
-                    {{$class->year}} {{$class->class_name}}
-                </span>
-            </h2>
+                    <span
+                        class="bg-purple-100 text-2xl font-bold text-purple-800  me-2 px-2.5 py-0.5 rounded-sm dark:bg-purple-900 dark:text-purple-300">
+                        {{$class->year}} {{$class->class_name}}
+                    </span>
+                </h2>    
+
+                <a href="{{ route('segak.view-class',['class_id'=>$class->id,'session_id'=>$session_id]) }}" class="text-white  font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center me-2 "type='button'>
+                    <i class="fa-solid fa-eye fa-xl me-2"></i>
+                    View
+                </a>
+            </div>
+            
 
             <div class="relative overflow-x-auto">
                 <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
