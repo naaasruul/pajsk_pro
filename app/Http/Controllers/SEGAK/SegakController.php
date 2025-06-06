@@ -8,6 +8,7 @@ use App\Models\Segak;
 use App\Models\Student;
 use App\Models\Subject;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class SegakController extends Controller
 {
@@ -17,15 +18,21 @@ class SegakController extends Controller
     public function index()
     {
         //
-        $teacher = auth()->user()->teacher;
+        $user = auth()->user();
+        $teacher = $user->teacher;
         $pjkSubject = Subject::where('code', 'PJK')->first();
 
-        $classIds = \DB::table('classroom_subject_teacher')
+        if($user->hasRole('teacher')){
+            $classIds = DB::table('classroom_subject_teacher')
             ->where('teacher_id', $teacher->id)
             ->where('subject_id', $pjkSubject->id)
             ->pluck('classroom_id')
             ->unique()
             ->toArray();
+        }elseif($user->hasRole('admin')){
+            $classIds = DB::table('classroom_subject_teacher')
+            ->pluck('classroom_id');
+        }
 
         $classes = Classroom::whereIn('id', $classIds)->get();
 
@@ -33,16 +40,21 @@ class SegakController extends Controller
     }
 
     public function pickSession(Classroom $class_id){
-        $teacher = auth()->user()->teacher;
+        $user = auth()->user();
+        $teacher = $user->teacher;
         $pjkSubject = Subject::where('code', 'PJK')->first();
 
-        // Get classes where this teacher teaches PJK
-        $classIds = \DB::table('classroom_subject_teacher')
+        if($user->hasRole('teacher')){
+            $classIds = DB::table('classroom_subject_teacher')
             ->where('teacher_id', $teacher->id)
             ->where('subject_id', $pjkSubject->id)
             ->pluck('classroom_id')
             ->unique()
             ->toArray();
+        }elseif($user->hasRole('admin')){
+            $classIds = DB::table('classroom_subject_teacher')
+            ->pluck('classroom_id');
+        }
 
         $classes = Classroom::whereIn('id', $classIds)->get();
         $class = Classroom::find($class_id->id);
@@ -52,16 +64,21 @@ class SegakController extends Controller
 
     public function pickStudent(Classroom $class_id, $session_id)
     {
-        $teacher = auth()->user()->teacher;
+        $user = auth()->user();
+        $teacher = $user->teacher;
         $pjkSubject = Subject::where('code', 'PJK')->first();
 
-        // Get classes where this teacher teaches PJK
-        $classIds = \DB::table('classroom_subject_teacher')
+        if($user->hasRole('teacher')){
+            $classIds = DB::table('classroom_subject_teacher')
             ->where('teacher_id', $teacher->id)
             ->where('subject_id', $pjkSubject->id)
             ->pluck('classroom_id')
             ->unique()
             ->toArray();
+        }elseif($user->hasRole('admin')){
+            $classIds = DB::table('classroom_subject_teacher')
+            ->pluck('classroom_id');
+        }
 
         $classes = Classroom::whereIn('id', $classIds)->get();
         // $class = Classroom::find($class_id->id)->with('students');
@@ -84,13 +101,7 @@ class SegakController extends Controller
         $teacher = auth()->user()->teacher;
         $pjkSubject = Subject::where('code', 'PJK')->first();
 
-        // Get classes where this teacher teaches PJK
-        $classIds = \DB::table('classroom_subject_teacher')
-            ->where('teacher_id', $teacher->id)
-            ->where('subject_id', $pjkSubject->id)
-            ->pluck('classroom_id')
-            ->unique()
-            ->toArray();
+        
 
         $classes = Classroom::whereIn('id', $classIds)->get();
         $class = Classroom::find($class_id->id);
@@ -134,9 +145,17 @@ class SegakController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function showByClass(Classroom $class_id, $session_id)
     {
         //
+        $students = $class_id->students;
+
+        $segaks = Segak::with(['student', 'classroom'])
+        ->where('classroom_id', $class_id->id)
+        ->where('session', $session_id)
+        ->get();
+
+        return view('SEGAK.view-all-by-class', compact('class_id','session_id','students','segaks'));
     }
 
     /**
