@@ -141,4 +141,9 @@ class Student extends Model
             ]
         ];
     }
+
+    public function segaks()
+    {
+        return $this->hasMany(\App\Models\Segak::class);
+    }
 }

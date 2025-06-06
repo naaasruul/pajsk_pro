@@ -29,6 +29,10 @@ class Classroom extends Model
     {
         return $this->belongsTo(User::class);
     }
+    public function segaks()
+    {
+        return $this->hasMany(\App\Models\Segak::class);
+    }
 
     public function teacher()
     {
