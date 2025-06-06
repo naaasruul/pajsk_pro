@@ -35,9 +35,9 @@
                     <form method="POST" action="{{ route('segak.store') }}" class="space-y-6">
                         @csrf
 
-                        <input type="text" name='session' value="{{ $session_id }}">
-                        <input type="text" name='classroom_id' value="{{ $class->id }}">
-                        <input type="text" name='student_id' value="{{ $student_id->id }}">
+                        <input type="hidden" name='session' value="{{ $session_id }}">
+                        <input type="hidden" name='classroom_id' value="{{ $class->id }}">
+                        <input type="hidden" name='student_id' value="{{ $student_id->id }}">
 
                         {{-- Student Information --}}
                         <div
