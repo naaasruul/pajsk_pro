@@ -16,10 +16,12 @@
                             {{ $class_id->year }} {{ $class_id->class_name }} (Session {{ $session_id }})
                         </span>
                     </h2>
-                    <button onclick="window.print()"
-                        class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 print:hidden">
-                        Print
-                    </button>
+                    @if ($is_segak_valid)
+                        <button onclick="window.print()"
+                            class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 print:hidden">
+                            Generate Report
+                        </button>
+                    @endif
                 </div>
                 <div class="relative overflow-x-auto print:overflow-visible">
                     <table
@@ -77,7 +79,7 @@
         </div>
     </x-container>
 
-    @include('SEGAK._print-by-class')        
+    @include('SEGAK._print-by-class')
 
 
 </x-app-layout>
