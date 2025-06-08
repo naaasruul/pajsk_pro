@@ -30,7 +30,9 @@
                             <th scope="col" class="px-6 py-3">#</th>
                             <th scope="col" class="px-6 py-3">Student Name</th>
                             {{-- <th scope="col" class="px-6 py-3">IC / ID</th> --}}
+                            {{-- @hasrole('teacher') --}}
                             <th scope="col" class="px-6 py-3">Action</th>
+                            {{-- @endhasrole --}}
                         </tr>
                     </thead>
                     <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
@@ -39,12 +41,23 @@
                             <td class="px-6 py-4">{{ $loop->iteration }}</td>
                             <td class="px-6 py-4">{{ $student->user->name }}</td>
                             {{-- <td class="px-6 py-4">{{ $student->ic ?? $student->id }}</td> --}}
+                            @hasrole('teacher')
                             <td class="px-6 py-4">
                                 <a href="{{ route('segak.create', ['class_id' => $class->id, 'session_id' => $session_id, 'student_id' => $student->id]) }}"
                                     class="inline-flex items-center px-3 py-1 bg-blue-600 text-white text-xs font-semibold rounded hover:bg-blue-700">
                                     Create SEGAK
                                 </a>
                             </td>
+                            @endhasrole
+
+                            @hasrole('admin')
+                            <td class="px-6 py-4">
+                                <a href="{{ route('segak.view-student', ['student_id' => $student->id,'session_id' => $session_id, ]) }}"
+                                    class="inline-flex items-center px-3 py-1 bg-blue-600 text-white text-xs font-semibold rounded hover:bg-blue-700">
+                                    View Student
+                                </a>
+                            </td>
+                            @endhasrole
                         </tr>
                         @empty
                         <tr>
