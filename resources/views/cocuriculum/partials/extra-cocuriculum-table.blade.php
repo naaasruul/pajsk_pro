@@ -21,8 +21,8 @@
 				{{ $student->extraCocuriculum->total_point ?? 0 }}
 			</td>
 			<td class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-				@if($existingEvaluation)
-					<a href="{{ route('pajsk.extra-cocuriculum.result', ['student' => $student, 'evaluation' => $existingEvaluation]) }}"
+				@if($existingEvaluations[$student->id])
+					<a href="{{ route('pajsk.extra-cocuriculum.result', ['student' => $student, 'evaluation' => $existingEvaluations[$student->id]]) }}"
 						class="font-medium text-green-600 dark:text-green-500 hover:underline">
 						Result
 					</a>
