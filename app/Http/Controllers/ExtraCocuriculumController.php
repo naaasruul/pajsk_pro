@@ -45,7 +45,7 @@ class ExtraCocuriculumController extends Controller
         }
 
         // Log::info('Students:', ['students' => $students]);
-        Log::info('Existing:', ['existingEvaluation' => $existingEvaluations]);
+        Log::info('Existing:', ['existingEvaluations' => $existingEvaluations]);
         return view('cocuriculum.extra-cocuriculum',compact(['students', 'existingEvaluations']));
     }
 
@@ -232,7 +232,7 @@ class ExtraCocuriculumController extends Controller
             'student' => $student,
             'extraCocuricullum' => $extraCocuricullum,
         ];
-
+        // dd($result);
         return view('cocuriculum.extra-cocuriculum-result', compact('result'));
     }
 }
