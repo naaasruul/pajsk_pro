@@ -57,7 +57,8 @@ Route::middleware('auth')->group(function () {
             Route::get('/pick-session/class/{class_id}/session/{session_id}/student/{student_id}/create', [SegakController::class, 'create'])->name('create');
             Route::post('/store', [SegakController::class, 'store'])->name('store');
 
-            Route::get('/pick-session/class/{class_id}/session/{session_id}/view', [SegakController::class, 'showByClass'])->name('view-class');
+            Route::get('/pick-session/class/{class_id}/session/{session_id}/view-class', [SegakController::class, 'showByClass'])->name('view-class');
+            Route::get('/pick-session/session/{session_id}/view-student/{student_id}', [SegakController::class, 'showByStudent'])->name('view-student');
         });
     });
 
