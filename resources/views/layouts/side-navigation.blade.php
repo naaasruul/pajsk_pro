@@ -53,28 +53,23 @@
                 </svg>
             </button>
             <ul id="dropdown-student" class="hidden py-2 space-y-2">
-                {{-- <x-sidebar-item class="pl-11" :route="route('club.index')"
-                    :role="request()->routeIs('club.index')">
-                    Club Management
-                </x-sidebar-item>
-                <x-sidebar-item class="pl-11" :route="route('pajsk.index')" :role="request()->routeIs('pajsk.index')">
-                    PAJSK Assessment
-                </x-sidebar-item> --}}
                 <x-sidebar-item class="pl-11" :route="route('pajsk.history')"
                     :role="request()->routeIs('pajsk.history')">
                     {{ __('Assessment History') }}
                 </x-sidebar-item>
-                {{-- <x-sidebar-item class="pl-11" :route="route('pajsk.extra-cocuriculum')"
-                    :role="request()->routeIs('pajsk.extra-cocuriculum')">
-                    {{ __('Extra-Cocuriculum') }}
-                </x-sidebar-item> --}}
+
                 <x-sidebar-item class="pl-11" :route="route('pajsk.extra-cocuriculum.history')"
                     :role="request()->routeIs('pajsk.extra-cocuriculum-history')">
                     {{ __('Extra-Cocuriculum History') }}
                 </x-sidebar-item>
+
                 <x-sidebar-item class="pl-11" :route="route('pajsk.report-history')"
                     :role="request()->routeIs('pajsk.extra-cocuriculum-history')">
                     {{ __('Report History') }}
+                </x-sidebar-item>
+
+                <x-sidebar-item class="pl-11" :route="route('segak.index')" :role="request()->routeIs('segak.index')">
+                    {{ __('Segak History') }}
                 </x-sidebar-item>
             </ul>
             <x-sidebar-item class="" :route="route('activity.approval')"

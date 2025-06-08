@@ -1,4 +1,9 @@
 $(() => {
+
+    // to do list
+    // this scripts sepatutnya kena compare gender and age!
+
+
     // Example scoring rules (adjust as needed)
     function getScore(val, max) {
         if (val >= max) return 5;

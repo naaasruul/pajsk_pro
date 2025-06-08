@@ -47,6 +47,19 @@ Route::middleware('auth')->group(function () {
             Route::get('pajsk/report/{student}/{assessment}', [PAJSKController::class, 'generateReport'])->name('generate-report');
             Route::delete('pajsk/report/{report}', [PAJSKController::class, 'destroyReport'])->name('delete-report');
         });
+
+        // SEGAK ROUTES
+        
+        Route::prefix('segak')->name('segak.')->group(function () {
+            Route::get('/', [SegakController::class, 'index'])->name('index');
+            Route::get('/pick-session/class/{class_id}', [SegakController::class, 'pickSession'])->name('pick-session');
+            Route::get('/pick-session/class/{class_id}/session/{session_id}', [SegakController::class, 'pickStudent'])->name('pick-student');
+            Route::get('/pick-session/class/{class_id}/session/{session_id}/student/{student_id}/create', [SegakController::class, 'create'])->name('create');
+            Route::post('/store', [SegakController::class, 'store'])->name('store');
+
+            Route::get('/pick-session/class/{class_id}/session/{session_id}/view-class', [SegakController::class, 'showByClass'])->name('view-class');
+            Route::get('/pick-session/session/{session_id}/view-student/{student_id}', [SegakController::class, 'showByStudent'])->name('view-student');
+        });
     });
 
     // Routes accessible by teachers only
@@ -94,13 +107,6 @@ Route::middleware('auth')->group(function () {
             Route::delete('/remove-student/{student}', [ClubController::class, 'removeStudent'])->name('remove-student');
         });
 
-        Route::prefix('segak')->name('segak.')->group(function () {
-            Route::get('/', [SegakController::class, 'index'])->name('index');
-            Route::get('/pick-session/class/{class_id}', [SegakController::class, 'pickSession'])->name('pick-session');
-            Route::get('/pick-session/class/{class_id}/session/{session_id}', [SegakController::class, 'pickStudent'])->name('pick-student');
-            Route::get('/pick-session/class/{class_id}/session/{session_id}/student/{student_id}/create', [SegakController::class, 'create'])->name('create');
-            Route::post('/store', [SegakController::class, 'store'])->name('store');
-        });
     });
 
 

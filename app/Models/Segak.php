@@ -28,4 +28,13 @@ class Segak extends Model
         'bmi_status',
     ];
 
+    public function student()
+    {
+        return $this->belongsTo(Student::class);
+    }
+    public function classroom()
+    {
+        return $this->belongsTo(Classroom::class);
+    }
+
 }
