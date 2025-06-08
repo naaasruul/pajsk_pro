@@ -37,7 +37,7 @@
                             <p><strong>Service:</strong> {{ $result['extraCocuricullum']->service->name ?? 'N/A' }}</p>
                             <p><strong>Special Award:</strong> {{ $result['extraCocuricullum']->specialAward->name ?? 'N/A' }}</p>
                             <p><strong>Community Service:</strong> {{ $result['extraCocuricullum']->communityService->name ?? 'N/A' }}</p>
-                            <p><strong>Achievement (Nilam):</strong> {{ $result['extraCocuricullum']->nilam->achievement_name ?? 'N/A' }}</p>
+                            <p><strong>Achievement (Nilam):</strong> {{ $result['extraCocuricullum']->nilam->achievement->achievement_name ?? 'N/A' }} {{ $result['extraCocuricullum']->nilam->tier->name }}</p>
                             <p><strong>Timms and Pisa:</strong> {{ $result['extraCocuricullum']->timmsAndPisa->name ?? 'N/A' }}</p>
                             <p><strong>Total Point:</strong> {{ $result['extraCocuricullum']->total_point }}</p>
                         </div>
