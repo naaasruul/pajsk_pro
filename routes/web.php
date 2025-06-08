@@ -49,7 +49,10 @@ Route::middleware('auth')->group(function () {
         });
 
         // SEGAK ROUTES
-        
+    
+    });
+    // segak can access by admin and teacher and student
+    Route::middleware('role:admin|teacher|student')->group(function () { 
         Route::prefix('segak')->name('segak.')->group(function () {
             Route::get('/', [SegakController::class, 'index'])->name('index');
             Route::get('/pick-session/class/{class_id}', [SegakController::class, 'pickSession'])->name('pick-session');
@@ -61,7 +64,6 @@ Route::middleware('auth')->group(function () {
             Route::get('/pick-session/session/{session_id}/view-student/{student_id}', [SegakController::class, 'showByStudent'])->name('view-student');
         });
     });
-
     // Routes accessible by teachers only
     ///////////////////// ! development mode, allow admin to access this route, remove 'admin' once prod
     Route::middleware('role:teacher|admin')->group(function () {

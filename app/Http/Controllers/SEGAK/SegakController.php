@@ -42,6 +42,7 @@ class SegakController extends Controller
     public function pickSession(Classroom $class_id){
         $is_complete_term1 = false;
         $is_complete_term2 = false;
+
         $user = auth()->user();
         $teacher = $user->teacher;
         $pjkSubject = Subject::where('code', 'PJK')->first();
@@ -56,6 +57,9 @@ class SegakController extends Controller
         }elseif($user->hasRole('admin')){
             $classIds = DB::table('classroom_subject_teacher')
             ->pluck('classroom_id');
+        }elseif($user->hasRole('student')){
+            // If the user is a student, get their classroom
+            $classIds =  [$class_id->id];
         }
 
 
@@ -70,7 +74,7 @@ class SegakController extends Controller
         if($segak_1->count() > 0){
             $is_complete_term1 = true;
             if($segak_2->count() > 0){
-                $is_complete_term = true;
+                $is_complete_term2 = true;
             }
         }
 
@@ -168,6 +172,7 @@ class SegakController extends Controller
     public function showByClass(Classroom $class_id, $session_id)
     {
         //
+        $is_segak_valid = false;
         $students = $class_id->students;
 
         $segaks = Segak::with(['student', 'classroom'])
@@ -175,7 +180,15 @@ class SegakController extends Controller
         ->where('session', $session_id)
         ->get();
 
-        return view('SEGAK.view-all-by-class', compact('class_id','session_id','students','segaks'));
+        $get_all_segaks = Segak::with(['student', 'classroom'])
+        ->where('classroom_id', $class_id->id)
+        ->get();
+        // Check if there are no SEGAK records for the class and session
+        if($get_all_segaks->count() > 1) {
+            $is_segak_valid = true;
+        }
+
+        return view('SEGAK.view-all-by-class', compact('class_id','session_id','students','segaks', 'is_segak_valid'));
     }
 
 

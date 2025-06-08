@@ -194,6 +194,9 @@
             <x-sidebar-item :route="route('pajsk.report-history')" :role="request()->routeIs('pajsk.report-history')">
                 {{ __('Reports History') }}
             </x-sidebar-item>
+            <x-sidebar-item :route="route('segak.pick-session',['class_id'=>auth()->user()->student->class_id])" :role="request()->routeIs('segak.pick-session')">
+                {{ __('My Segak History') }}
+            </x-sidebar-item>
             @endhasanyrole
 
             <div class="pt-4 mt-4 space-y-2 border-t border-gray-200 dark:border-gray-700">

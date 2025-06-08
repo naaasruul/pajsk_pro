@@ -12,6 +12,10 @@ class Nilam extends Model
         'point',
     ];
 
+    public function extra_cocu(){
+        return $this->belongsTo(ExtraCocuricullum::class, 'nilam_id');
+    }
+
     public function achievement()
     {
         return $this->belongsTo(Achievement::class, 'achievement_id');
