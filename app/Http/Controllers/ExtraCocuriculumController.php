@@ -125,19 +125,22 @@ class ExtraCocuriculumController extends Controller
         $specialAwardPoint = SpecialAward::find($validated['special_award_point'])->point ?? 0;
         $communityServicePoint = CommunityServices::find($validated['community_service_point'])->point ?? 0;
         $timmsAndPisaPoint = TimmsAndPisa::find($validated['timms_and_pisa_point'])->point ?? 0;
+        
         Log::info('servicePoint = '.$servicePoint);
         Log::info('specialAwardPoint = '.$specialAwardPoint);
         Log::info('communityServicePoint = '.$communityServicePoint);
         Log::info('nilamPoint = '.$nilamPoint);
         Log::info('timmsAndPisaPoint = '.$timmsAndPisaPoint);
-        $totalPoint = $servicePoint + $specialAwardPoint + $communityServicePoint + $nilamPoint + $timmsAndPisaPoint;
-        $totalPoint = min($totalPoint, 10);
         
-        $student = Student::find($studentId);
+        $totalPoint = $servicePoint + $specialAwardPoint + $communityServicePoint + $nilamPoint + $timmsAndPisaPoint;
+        if($totalPoint > 10){
+            $totalPoint = 10;
+        }    
+
         // Create the ExtraCocuricullum record
-        $evaluation = ExtraCocuricullum::create([
+        ExtraCocuricullum::create([
             'student_id' => $studentId,
-            'class_id' => $student->classroom->id,
+            // 'class_id' => $student->classroom->id,
             'service_id' => $validated['service_point'],
             'special_award_id' => $validated['special_award_point'],
             'community_service_id' => $validated['community_service_point'],
@@ -146,7 +149,7 @@ class ExtraCocuriculumController extends Controller
             'total_point' => $totalPoint,
         ]);
 
-        return redirect()->route('pajsk.extra-cocuriculum.result', ['student' => $studentId, 'evaluation' => $evaluation])->with('success', 'Extra Cocuricculum data added successfully!');
+        return redirect()->route('pajsk.extra-cocuriculum')->with('success', 'Extra Cocuricculum data added successfully!');
     }
 
     /**
