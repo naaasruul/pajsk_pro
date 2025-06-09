@@ -57,9 +57,10 @@
                                 </span>
                             </td>
                             <td class="px-6 py-4">
+                                <a href="{{ route('activity.edit', $activity) }}"
+                                        class="font-medium text-blue-600 dark:text-blue-500 hover:underline">{{ $activity->status == 'approved' ? 'Assign Placement' : 'Edit' }}</a>
                                 @if ($activity->status != 'approved')
-                                    <a href="{{ route('activity.edit', $activity) }}"
-                                        class="font-medium text-blue-600 dark:text-blue-500 hover:underline">Edit</a>
+                                    
                                     <form action="{{ route('activity.destroy', $activity) }}" method="POST"
                                         class="inline">
                                         @csrf
@@ -67,8 +68,6 @@
                                         <button type="submit"
                                             class="font-medium text-red-600 dark:text-red-500 hover:underline ms-3">Remove</button>
                                     </form>
-                                @else
-                                    <span class="text-gray-500">Activity Approved</span>
                                 @endif
 
                             </td>
