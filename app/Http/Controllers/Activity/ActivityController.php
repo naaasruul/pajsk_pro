@@ -38,7 +38,7 @@ class ActivityController extends Controller
     public function create()
     {
         $teacher = auth()->user()->teacher;
-        
+
         return view('cocuriculum.create-activity', [
             'teacher' => $teacher,
             'students' => Student::with('user')->get(),
@@ -111,17 +111,17 @@ class ActivityController extends Controller
             'leader_id' => $validated['leader_id'],
             'created_by' => auth()->user()->teacher->id // Assuming the logged-in user is a teacher
         ]);
-    
+
         // Attach teachers to the activity (if any)
         if (!empty($validated['teachers'])) {
             $activity->teachers()->sync($validated['teachers']);
         }
-    
+
         // Attach students to the activity (if any)
         if (!empty($validated['students'])) {
             $activity->students()->sync($validated['students']);
         }
-    
+
         // Return a success response
         return response()->json([
             'message' => 'Activity created successfully!',
@@ -143,15 +143,15 @@ class ActivityController extends Controller
     public function editActivity(Activity $activity)
     {
         $teacher = auth()->user()->teacher;
-        
+
         // Load relationships for the activity
         $activity->load(['teachers', 'students', 'club', 'involvement', 'achievement']);
-    
+
         return view('cocuriculum.edit-activity', [
             'activity' => $activity,
             'teacher' => $teacher,
             'students' => Student::with('user')->get(),
-            'teachers' => Teacher::with('user')->get(), 
+            'teachers' => Teacher::with('user')->get(),
             'involvementTypes' => InvolvementType::orderBy('type')->get(),
             'clubs' => Club::all(),
             'achievementTypes' => Achievement::all(),
@@ -162,7 +162,7 @@ class ActivityController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function updateActivity(Request $request, Activity $activity) 
+    public function updateActivity(Request $request, Activity $activity)
     {
         // If already approved, only allow placement_id to be updated
         if ($activity->status === 'approved') {
@@ -262,7 +262,7 @@ class ActivityController extends Controller
     public function adminApproval(Request $request)
     {
         $activities = Activity::orderBy('created_at', 'desc')->paginate(10);
-    
+
         return view('cocuriculum.approval', compact('activities'));
     }
 
@@ -285,6 +285,4 @@ class ActivityController extends Controller
         return redirect()->back()
             ->with('success', 'Activity rejected successfully.');
     }
-
-
 }
