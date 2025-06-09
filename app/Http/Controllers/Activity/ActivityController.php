@@ -164,6 +164,21 @@ class ActivityController extends Controller
      */
     public function updateActivity(Request $request, Activity $activity) 
     {
+        // If already approved, only allow placement_id to be updated
+        if ($activity->status === 'approved') {
+            $validated = $request->validate([
+                'placement_id' => 'nullable|exists:placements,id',
+            ]);
+
+            $activity->update([
+                'placement_id' => $validated['placement_id'],
+            ]);
+
+            return redirect()->route('activity.index')
+                ->with('success', 'Placement updated successfully!');
+        }
+
+        // If not approved, allow full update
         $validated = $request->validate([
             'represent' => 'required',
             'placement_id' => 'nullable|exists:placements,id',
@@ -186,7 +201,7 @@ class ActivityController extends Controller
         // Update activity
         $activity->update([
             'represent' => $validated['represent'],
-            'placement_id' => $validated['placement_id'], // Add placement_id
+            'placement_id' => $validated['placement_id'],
             'involvement_id' => $validated['involvement_id'],
             'achievement_id' => $validated['achievement_id'],
             'club_id' => $validated['club_id'],
@@ -209,10 +224,8 @@ class ActivityController extends Controller
             $activity->students()->sync($validated['students']);
         }
 
-        return response()->json([
-            'message' => 'Activity updated successfully!',
-            'activity' => $activity
-        ]);
+        return redirect()->route('activity.index')
+                ->with('success', 'Placement updated successfully!');
     }
 
     /**
