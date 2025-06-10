@@ -446,7 +446,76 @@
 
         <script>
             $(document).ready(function() {
-                $('#submit-button','#placement-submit').on('click', function() {
+                $('#submit-button').on('click', function() {
+                    console.log('Submit button clicked');
+
+                    const formatTime = (timeInput) => {
+                        const time = $(timeInput).val();
+                        const [hours, minutes] = time.split(':');
+                        return `${hours.padStart(2, '0')}:${minutes.padStart(2, '0')}`;
+                    };
+
+                      let formData = {
+                        represent: $('#represent').val(),
+                        placement_id: $('#placement').val(),
+                        achievement_id: $('#achievement').val(),
+                        involvement_id: $('#involvement').val(),
+                        placement_id: $('#placement').val(), // Add this line
+                        club_id: $('#club').val(),
+                        activity_place: $('#address').val(), // Collect the address from the textarea
+                        category: $('#category').val(), // Collect the category dynamically
+                        datetime_start: $('#date-start').val(), // Collect the start date
+                        time_start: formatTime('#time-start'), // Format the start time
+                        datetime_end: $('#date-end').val(), // Collect the end date
+                        time_end: formatTime('#time-end'), // Format the end time
+                        teachers: [],
+                        students: [],
+                        _token: '{{ csrf_token() }}', // Include CSRF token
+                        _method: 'PUT', // Add method spoofing for PUT request
+                    };
+
+                                        // Collect selected teachers
+                    $('.teacher-tr input[type="checkbox"]:checked').each(function() {
+                        formData.teachers.push($(this).attr('id').replace('checkbox-table-search-',
+                            ''));
+                    });
+
+                    // Collect selected students
+                    $('.student-tr input[type="checkbox"]:checked').each(function() {
+                        formData.students.push($(this).attr('id').replace('checkbox-student-', ''));
+                    });
+
+                    // Send data to the API
+                    $.ajax({
+                        url: '{{ route('activity.update', $activity) }}', // Change to update route
+                        method: 'POST', // Keep as POST, Laravel will handle the PUT conversion
+                        data: formData,
+                        success: function(response) {
+                            // Display success message
+                            alert(response.message || 'Activity submitted successfully!');
+
+                            // Optionally, redirect or reset the form
+                            window.location.href = '{{ route('activity.index') }}';
+                        },
+                        error: function(xhr) {
+                            // Handle validation errors or other errors
+                            if (xhr.status === 422) {
+                                // Validation errors
+                                let errors = xhr.responseJSON.errors;
+                                let errorMessages = Object.values(errors).map(errorArray =>
+                                    errorArray.join(', ')).join('\n');
+                                alert('Validation Errors:\n' + errorMessages);
+                            } else {
+                                // Other errors
+                                alert('An error occurred: ' + (xhr.responseJSON.message || xhr
+                                    .statusText));
+                            }
+                        }
+                    });
+
+                }); // Hide submit button initially
+                $('#placement-submit').on('click', function() {
+                    console.log('Submit button clicked');
                     // Format time values to HH:mm format
                     const formatTime = (timeInput) => {
                         const time = $(timeInput).val();
@@ -476,7 +545,7 @@
                     // Collect selected teachers
                     $('.teacher-tr input[type="checkbox"]:checked').each(function() {
                         formData.teachers.push($(this).attr('id').replace('checkbox-table-search-',
-                        ''));
+                            ''));
                     });
 
                     // Collect selected students
