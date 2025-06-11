@@ -105,6 +105,8 @@ class ExtraCocuriculumController extends Controller
             'timms_and_pisa_point' => 'required|exists:timms_and_pisa,id',
         ]);
 
+        $student = Student::findOrFail($studentId);
+
         // Retrieve the Nilam point based on achievement and tier
         $achievementId = $validated['achievement'];
         $tierId = $validated['tiers'];
@@ -140,7 +142,7 @@ class ExtraCocuriculumController extends Controller
         // Create the ExtraCocuricullum record
         ExtraCocuricullum::create([
             'student_id' => $studentId,
-            // 'class_id' => $student->classroom->id,
+            'class_id' => $student->classroom->id,
             'service_id' => $validated['service_point'],
             'special_award_id' => $validated['special_award_point'],
             'community_service_id' => $validated['community_service_point'],
