@@ -111,11 +111,13 @@ class PAJSKController extends Controller
         $student->load(['clubs']);
         $teacher = Auth::user()->teacher;
         $teacherClub = $teacher->club;
+        
         Log::info('Teacher Club:', [
             'teacher_id' => $teacher->id,
             'club_id' => $teacherClub->id,
         ]);
-        $clubActivities = Activity::where('club_id', $teacherClub->id)
+
+        $clubActivities = Activity::where('category', $teacherClub->category)
             ->where('activity_students_id', 'like', '%' . $student->id . '%')
             ->get();
 
@@ -670,6 +672,7 @@ class PAJSKController extends Controller
             ->whereHas('classroom', function ($q) use ($previousYear) {
                 $q->where('year', $previousYear);
             })->latest()->first();
+            
         $cgpaLast = $oldAssessment ? $oldAssessment->cgpa : null;
         
         // Group clubs and related scores by club category
