@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Classroom;
 use App\Models\Student;
+use App\Models\Teacher;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -14,7 +15,7 @@ class StudentController extends Controller
     public function index(Request $request)
     {
         $query = Student::with('user', 'classroom');
-        
+
         if ($request->filled('year')) {
             $query->whereHas('classroom', function ($q) use ($request) {
                 $q->where('year', $request->year);
@@ -38,7 +39,7 @@ class StudentController extends Controller
         $classroomsGrouped = Classroom::all()->groupBy('year');
 
         $teachers = User::role('teacher')->get();
-        return view('student.create', compact('classroomsGrouped','teachers'));
+        return view('student.create', compact('classroomsGrouped', 'teachers'));
     }
 
     public function store(Request $request)
@@ -61,10 +62,10 @@ class StudentController extends Controller
                 'gender'   => $validated['gender'],
                 'password' => Hash::make($validated['password']),
             ]);
-            
+
             $user->assignRole('student');
-            
-              $user->student()->create([
+
+            $user->student()->create([
                 'mentor_id' => $validated['teacher_id'] ?? null,
                 'address'       => $validated['address'],
                 'phone_number'  => $validated['phone_number'],
@@ -80,17 +81,18 @@ class StudentController extends Controller
     public function edit(Student $student)
     {
         $classroomsGrouped = Classroom::all()->groupBy('year');
-        return view('student.edit', compact('student', 'classroomsGrouped'));
+        $teachers = Teacher::all();
+        return view('student.edit', compact('student', 'classroomsGrouped', 'teachers'));
     }
 
     public function update(Request $request, Student $student)
     {
         $validated = $request->validate([
             'name'          => 'required|string|max:255',
-            'email'         => 'required|email|unique:users,email,'.$student->user->id,
+            'email'         => 'required|email|unique:users,email,' . $student->user->id,
             'address'       => 'required|string|max:255',
             'phone_number'  => 'required|string|max:20',
-            'home_number'   => 'required|string|max:20',
+            'teacher_id'    => 'required|exists:users,id', // Add this line for homeroom assignment
             'class_id'      => 'required|exists:classrooms,id',
         ]);
 
@@ -103,7 +105,7 @@ class StudentController extends Controller
             $student->update([
                 'address'      => $validated['address'],
                 'phone_number' => $validated['phone_number'],
-                'home_number'  => $validated['home_number'],
+                'mentor_id'    => $validated['teacher_id'], // Assign homeroom teacher
                 'class_id'     => $validated['class_id'],
             ]);
         });
