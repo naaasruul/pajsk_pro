@@ -17,7 +17,6 @@
                     <th scope="col" class="px-6 py-3">Email</th>
                     <th scope="col" class="px-6 py-3">Class</th>
                     <th scope="col" class="px-6 py-3">Phone Number</th>
-                    <th scope="col" class="px-6 py-3">Home Number</th>
                     <th scope="col" class="px-6 py-3">Address</th>
                     <th scope="col" class="px-6 py-3">Actions</th>
                 </tr>
@@ -29,7 +28,6 @@
                         <td class="px-6 py-4">{{ $student->user->email }}</td>
                         <td class="px-6 py-4">{{ $student->classroom->year }} {{ $student->classroom->class_name }}</td>
                         <td class="px-6 py-4">{{ $student->phone_number }}</td>
-                        <td class="px-6 py-4">{{ $student->home_number }}</td>
                         <td class="px-6 py-4">{{ $student->address }}</td>
                         <td class="px-6 py-4">
                             <a href="{{ route('students.edit', $student) }}" class="font-medium text-blue-600 dark:text-blue-500 hover:underline">Edit</a>
